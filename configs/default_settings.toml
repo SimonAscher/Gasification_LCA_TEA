@@ -1,0 +1,38 @@
+# These are the first values loaded
+[default]
+
+[default.general]
+# List of countries supported within the model
+countries = ["UK", "Germany", "USA", "World"]
+
+# Country to be used in analysis
+country = "UK"
+
+# Number of Monte Carlo iterations to be used by the model
+iterations_MC = 10
+
+# Functional unit (FU) used in LCA
+FU = 1 # 1 tonne of feedstock
+
+[default.general.densities]
+# Densities of different gas species
+N2 = 1.165
+H2 = 0.0832
+CO = 1.14
+CO2 = 1.98
+CH4 = 0.656
+C2H4 = 1.18
+units = "kg/m3"
+
+[default.general.CO2_equivalents]
+# Carbon dioxide equivalent factors
+# Factors are based on the IPCC Sixth Assessment Report (AR6) and are for a 100-year time horizon
+CO2_equ_factor = 1
+CH4_fossil_equ_factor = 29.8
+CH4_non_fossil_equ_factor = 27.2
+N2O_equ_factor = 273
+
+[default.general.CO2_equivalents.electricity]
+# Carbon intensity of grid electricity
+UK = 0.21233 # Ref: https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2021
+USA = 0.38 # Ref: https://www.eia.gov/environment/emissions/carbon/
