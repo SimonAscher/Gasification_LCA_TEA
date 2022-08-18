@@ -1,11 +1,11 @@
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+# Import the settings settings from config.py
+from config import settings
 
+print(settings.general.iterations_MC)
+print(settings.general.country)
+print(settings.general.CO2_equivalents.electricity.UK)
+print(settings.general.CO2_equivalents.electricity)
 
+import get_CO2_equ.py
 
-
-print(np.array(5))
-
-print(pd.DataFrame)
+print(get_CO2_equ())

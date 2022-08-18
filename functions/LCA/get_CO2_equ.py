@@ -16,13 +16,13 @@ def get_CO2_equ(*,CO2: float = 0, CH4_fossil: float = 0, CH4_non_fossil: float =
 
     .. note::
     Ensure all inputs have the same units. Function will return the GWP in the same units.
-    Factors are based on the IPCC Sixth Assessment Report (AR6) and are for a 100-year time horizon
     """
 
-    CO2_equ_factor = 1
-    CH4_fossil_equ_factor = 29.8
-    CH4_non_fossil_equ_factor = 27.2
-    N2O_equ_factor = 273
+    from config import settings
+    CO2_equ_factor = settings.general.CO2_equivalents.CO2_equ_factor
+    CH4_fossil_equ_factor = settings.general.CO2_equivalents.CH4_fossil_equ_factor
+    CH4_non_fossil_equ_factor = settings.general.CO2_equivalents.CH4_non_fossil_equ_factor
+    N2O_equ_factor = settings.general.CO2_equivalents.N2O_equ_factor
 
     # Calculate GWP of process
     GWP = (CO2 * CO2_equ_factor + CH4_fossil * CH4_fossil_equ_factor + CH4_non_fossil * CH4_non_fossil_equ_factor
