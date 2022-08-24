@@ -1,3 +1,7 @@
+# TODO: This code is currently very inefficient - if I want to make e.g. 1000 predictions the model would get loaded every time - change so that models are extracted, and then just used to make predictions.
+
+
+# Function that fetches models
 def get_models():
     """
     Loads performance summary dataframe and extracts models from that.
@@ -9,7 +13,6 @@ def get_models():
     """
 
     # %% Load dataframe with models stored
-
     # Get directory path
     import os
 
@@ -28,7 +31,8 @@ def get_models():
     # %% Extract models for all outputs
 
     # Get column labels of performance summary object
-    column_labels = perf_summary.columns
+    from config import settings
+    column_labels = settings.labels.output_data
 
     models_dict = {}  # initialise dictionary to store loaded models in
 
@@ -74,11 +78,8 @@ def make_predictions(models_dict, data):
             pass
         else:
             # Define labels of data
-            input_data_labels = ['C [%daf]', 'H [%daf]', 'S [%daf]', 'Particle size [mm]', 'Ash [%db]', 'Moisture [%wb]',
-                                 'Temperature [°C]', 'Operation (Batch/Continuous)', 'ER', 'Catalyst', 'Scale',
-                                 'Agent_air', 'Agent_air + steam', 'Agent_other', 'Agent_oxygen', 'Agent_steam',
-                                 'Reactor_fixed bed', 'Reactor_fluidised bed', 'Reactor_other', 'Bed_N/A',
-                                 'Bed_alumina', 'Bed_olivine', 'Bed_other', 'Bed_silica']
+            from config import settings
+            input_data_labels = settings.labels.input_data
 
             # Change data to pandas dataframe
             data = pd.DataFrame(data=data,

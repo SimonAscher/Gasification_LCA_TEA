@@ -1,6 +1,15 @@
 # These are the first values loaded
 [default]
 
+
+[default.background]
+# Random number seed
+random_seed = 42
+
+# Number of Monte Carlo iterations to be used by the model
+iterations_MC = 10
+
+
 [default.general]
 # List of countries supported within the model
 countries = ["UK", "Germany", "USA", "World"]
@@ -8,13 +17,25 @@ countries = ["UK", "Germany", "USA", "World"]
 # Country to be used in analysis
 country = "UK"
 
-# Number of Monte Carlo iterations to be used by the model
-iterations_MC = 10
-
 # Functional unit (FU) used in LCA
 FU = 1 # 1 tonne of feedstock
 
-[default.general.densities]
+
+[default.labels]
+# Labels for model inputs array
+input_data = ["C [%daf]", "H [%daf]", "S [%daf]", "Particle size [mm]", "Ash [%db]", "Moisture [%wb]",
+    "Temperature [°C]", "Operation (Batch/Continuous)", "ER", 'Catalyst', "Scale", "Agent_air", "Agent_air + steam",
+    "Agent_other", "Agent_oxygen", "Agent_steam", "Reactor_fixed bed", "Reactor_fluidised bed", "Reactor_other",
+    "Bed_N/A", "Bed_alumina", "Bed_olivine", "Bed_other", "Bed_silica"]
+
+output_data = ["N2 [vol.% db]", "H2 [vol.% db]", "CO [vol.% db]", "CO2 [vol.% db]", "CH4 [vol.% db]",
+    "C2Hn [vol.% db]", "LHV [MJ/Nm3]", "Tar [g/Nm3]", "Gas yield [Nm3/kg wb]", "Char yield [g/kg wb]"]
+
+
+[default.data]
+
+
+[default.data.densities]
 # Densities of different gas species
 N2 = 1.165
 H2 = 0.0832
@@ -24,7 +45,8 @@ CH4 = 0.656
 C2H4 = 1.18
 units = "kg/m3"
 
-[default.general.CO2_equivalents]
+
+[default.data.CO2_equivalents]
 # Carbon dioxide equivalent factors
 # Factors are based on the IPCC Sixth Assessment Report (AR6) and are for a 100-year time horizon
 CO2_equ_factor = 1
@@ -32,7 +54,11 @@ CH4_fossil_equ_factor = 29.8
 CH4_non_fossil_equ_factor = 27.2
 N2O_equ_factor = 273
 
-[default.general.CO2_equivalents.electricity]
+
+[default.data.CO2_equivalents.electricity]
 # Carbon intensity of grid electricity
 UK = 0.21233 # Ref: https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2021
 USA = 0.38 # Ref: https://www.eia.gov/environment/emissions/carbon/
+
+
+

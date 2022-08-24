@@ -1,0 +1,313 @@
+﻿ID,C,H,N,S,O,feed_LHV,feed_type,feed_shape,feed_particle_size,feed_ash,feed_moisture,feed_VM,feed_FC,feed_cellulose,feed_hemicellulose,feed_lignin,temperature,operating_condition,operating_pressure,residence_time,steam_biomass_ratio,ER,gasifying_agent,reactor_type,bed_material,catalyst,scale
+1,59.39,8.57,0.93,0.27,32.3,19.45,municipal solid waste,pellets,5,20.69,6.4,NaN,NaN,NaN,NaN,NaN,849,continuous,NaN,120,NaN,0.26,air,fluidised bed,olivine,1,pilot
+2,59.39,8.57,0.93,0.27,32.3,19.45,municipal solid waste,pellets,5,20.69,6.4,NaN,NaN,NaN,NaN,NaN,852,continuous,NaN,120,NaN,0.26,air,fluidised bed,olivine,1,pilot
+3,59.39,8.57,0.93,0.27,32.3,19.45,municipal solid waste,pellets,5,20.69,6.4,NaN,NaN,NaN,NaN,NaN,869,continuous,NaN,120,NaN,0.27,air,fluidised bed,olivine,1,pilot
+4,59.39,8.57,0.93,0.27,32.3,19.45,municipal solid waste,pellets,5,20.69,6.4,NaN,NaN,NaN,NaN,NaN,879,continuous,NaN,120,NaN,0.3,air,fluidised bed,olivine,1,pilot
+5,59.39,8.57,0.93,0.27,32.3,19.45,municipal solid waste,pellets,5,20.69,6.4,NaN,NaN,NaN,NaN,NaN,898,continuous,NaN,120,NaN,0.32,air,fluidised bed,olivine,1,pilot
+6,59.39,8.57,0.93,0.27,32.3,19.45,municipal solid waste,pellets,5,20.69,6.4,NaN,NaN,NaN,NaN,NaN,932,continuous,NaN,120,NaN,0.33,air,fluidised bed,olivine,1,pilot
+7,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,867,continuous,NaN,NaN,NaN,0.22,air,fluidised bed,silica,0,pilot
+8,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,898,continuous,NaN,NaN,NaN,0.31,air,fluidised bed,silica,0,pilot
+9,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,845,continuous,NaN,NaN,NaN,0.2,air,fluidised bed,silica,0,pilot
+10,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,807,continuous,NaN,NaN,NaN,0.27,air,fluidised bed,olivine,1,pilot
+11,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,819,continuous,NaN,NaN,NaN,0.2,air,fluidised bed,olivine,1,pilot
+12,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,816,continuous,NaN,NaN,NaN,0.28,air,fluidised bed,olivine,1,pilot
+13,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,825,continuous,NaN,NaN,NaN,0.31,air,fluidised bed,olivine,1,pilot
+14,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,825,continuous,NaN,NaN,NaN,0.21,air,fluidised bed,olivine,1,pilot
+15,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,850,continuous,NaN,NaN,NaN,0.29,air,fluidised bed,olivine,1,pilot
+16,86.03,13.97,0,0,0,42.9,plastics,pellets,2,1,0.2,NaN,NaN,NaN,NaN,NaN,856,continuous,NaN,NaN,NaN,0.3,air,fluidised bed,dolomite,1,pilot
+17,85.78,14.23,0,0,0,42.9,plastics,pellets,1,1.3,0.3,NaN,NaN,NaN,NaN,NaN,818,continuous,NaN,NaN,NaN,0.23,air,fluidised bed,olivine,1,pilot
+18,85.78,14.23,0,0,0,42.9,plastics,pellets,1,1.3,0.3,NaN,NaN,NaN,NaN,NaN,831,continuous,NaN,NaN,NaN,0.27,air,fluidised bed,olivine,1,pilot
+19,85.78,14.23,0,0,0,42.9,plastics,pellets,1,1.3,0.3,NaN,NaN,NaN,NaN,NaN,829,continuous,NaN,NaN,NaN,0.24,air,fluidised bed,olivine,1,pilot
+20,85.78,14.23,0,0,0,42.9,plastics,pellets,1,1.3,0.3,NaN,NaN,NaN,NaN,NaN,879,continuous,NaN,NaN,NaN,0.29,air,fluidised bed,dolomite,1,pilot
+21,73.49,11.01,0,0.11,15.43,33.4,plastics,pellets,NaN,6.74,0.6,NaN,NaN,NaN,NaN,NaN,914,continuous,NaN,NaN,NaN,0.31,air,fluidised bed,olivine,1,pilot
+22,73.49,11.01,0,0.11,15.43,33.4,plastics,pellets,NaN,6.74,0.6,NaN,NaN,NaN,NaN,NaN,884,continuous,NaN,NaN,NaN,0.25,air,fluidised bed,olivine,1,pilot
+23,73.49,11.01,0,0.11,15.43,33.4,plastics,pellets,NaN,6.74,0.6,NaN,NaN,NaN,NaN,NaN,869,continuous,NaN,NaN,NaN,0.22,air,fluidised bed,olivine,1,pilot
+24,81.63,13.45,0.21,0.1,4.62,40.2,plastics,pellets,NaN,1.91,0.7,NaN,NaN,NaN,NaN,NaN,894,continuous,NaN,NaN,NaN,0.27,air,fluidised bed,olivine,1,pilot
+25,81.63,13.45,0.21,0.1,4.62,40.2,plastics,pellets,NaN,1.91,0.7,NaN,NaN,NaN,NaN,NaN,890,continuous,NaN,NaN,NaN,0.24,air,fluidised bed,olivine,1,pilot
+26,61.13,8.73,0.57,0.11,29.83,25.4,plastics,pellets,1.5,6.23,5.6,NaN,NaN,NaN,NaN,NaN,879,continuous,NaN,NaN,NaN,0.26,air,fluidised bed,olivine,1,pilot
+27,61.13,8.73,0.57,0.11,29.83,25.4,plastics,pellets,1.5,6.23,5.6,NaN,NaN,NaN,NaN,NaN,915,continuous,NaN,NaN,NaN,0.31,air,fluidised bed,olivine,1,pilot
+28,69.61,10.17,0.61,0.74,19.24,27.3,municipal solid waste,pellets,2,16.51,1.9,NaN,NaN,NaN,NaN,NaN,899,continuous,NaN,NaN,NaN,0.34,air,fluidised bed,olivine,1,pilot
+29,69.61,10.17,0.61,0.74,19.24,27.3,municipal solid waste,pellets,2,16.51,1.9,NaN,NaN,NaN,NaN,NaN,896,continuous,NaN,NaN,NaN,0.28,air,fluidised bed,olivine,1,pilot
+30,69.61,10.17,0.61,0.74,19.24,27.3,municipal solid waste,pellets,2,16.51,1.9,NaN,NaN,NaN,NaN,NaN,869,continuous,NaN,NaN,NaN,0.23,air,fluidised bed,olivine,1,pilot
+31,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,650,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+32,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,750,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+33,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,850,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+34,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,950,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+35,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,1050,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+36,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,770,continuous,atmospheric,NaN,NaN,0.17,air,fluidised bed,silica,0,pilot
+37,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,770,continuous,atmospheric,NaN,NaN,0.21,air,fluidised bed,silica,0,pilot
+38,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,770,continuous,atmospheric,NaN,NaN,0.28,air,fluidised bed,silica,0,pilot
+39,43.52,5.72,1.2,0.66,48.9,13.96,herbaceous biomass,fibres,4,4.88,7.8,86.05,9.07,NaN,NaN,NaN,770,continuous,atmospheric,NaN,NaN,0.32,air,fluidised bed,silica,0,pilot
+40,44.96,5.83,3.1,0.61,45.5,15.73,woody biomass,fibres,4,0.47,14.6,89.11,10.42,NaN,NaN,NaN,650,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+41,44.96,5.83,3.1,0.61,45.5,15.73,woody biomass,fibres,4,0.47,14.6,89.11,10.42,NaN,NaN,NaN,750,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+42,44.96,5.83,3.1,0.61,45.5,15.73,woody biomass,fibres,4,0.47,14.6,89.11,10.42,NaN,NaN,NaN,850,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+43,44.96,5.83,3.1,0.61,45.5,15.73,woody biomass,fibres,4,0.47,14.6,89.11,10.42,NaN,NaN,NaN,950,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+44,44.96,5.83,3.1,0.61,45.5,15.73,woody biomass,fibres,4,0.47,14.6,89.11,10.42,NaN,NaN,NaN,1050,continuous,atmospheric,NaN,NaN,0.25,air,fluidised bed,silica,0,pilot
+45,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,700,continuous,atmospheric,NaN,2.7,0.22,air + steam,fluidised bed,silica,0,lab
+46,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,750,continuous,atmospheric,NaN,2.7,0.22,air + steam,fluidised bed,silica,0,lab
+47,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,2.7,0.22,air + steam,fluidised bed,silica,0,lab
+48,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,850,continuous,atmospheric,NaN,2.7,0.22,air + steam,fluidised bed,silica,0,lab
+49,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,900,continuous,atmospheric,NaN,2.7,0.22,air + steam,fluidised bed,silica,0,lab
+50,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.19,air + steam,fluidised bed,silica,0,lab
+51,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.21,air + steam,fluidised bed,silica,0,lab
+52,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.23,air + steam,fluidised bed,silica,0,lab
+53,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.25,air + steam,fluidised bed,silica,0,lab
+54,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.27,air + steam,fluidised bed,silica,0,lab
+55,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,0,0.22,air + steam,fluidised bed,silica,0,lab
+56,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.35,0.22,air + steam,fluidised bed,silica,0,lab
+57,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,2.02,0.22,air + steam,fluidised bed,silica,0,lab
+58,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,2.7,0.22,air + steam,fluidised bed,silica,0,lab
+59,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,4.04,0.22,air + steam,fluidised bed,silica,0,lab
+60,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.75,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.23,air + steam,fluidised bed,silica,0,lab
+61,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.53,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.23,air + steam,fluidised bed,silica,0,lab
+62,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.38,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.23,air + steam,fluidised bed,silica,0,lab
+63,50.82,7.12,0.15,0.57,41.34,18.98,woody biomass,dust,0.25,0.55,8,82.29,17.16,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.56,0.23,air + steam,fluidised bed,silica,0,lab
+64,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,750,continuous,NaN,80,NaN,0.2,air,fluidised bed,silica,0,lab
+65,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,NaN,0.2,air,fluidised bed,silica,0,lab
+66,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,850,continuous,NaN,80,NaN,0.2,air,fluidised bed,silica,0,lab
+67,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,750,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,0,lab
+68,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,0,lab
+69,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,850,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,0,lab
+70,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,750,continuous,NaN,80,NaN,0.4,air,fluidised bed,silica,0,lab
+71,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,NaN,0.4,air,fluidised bed,silica,0,lab
+72,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,850,continuous,NaN,80,NaN,0.4,air,fluidised bed,silica,0,lab
+73,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,750,continuous,NaN,80,0.5,0.3,air + steam,fluidised bed,silica,0,lab
+74,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,0.5,0.3,air + steam,fluidised bed,silica,0,lab
+75,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,850,continuous,NaN,80,0.5,0.3,air + steam,fluidised bed,silica,0,lab
+76,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,750,continuous,NaN,80,1,0.3,air + steam,fluidised bed,silica,0,lab
+77,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,1,0.3,air + steam,fluidised bed,silica,0,lab
+78,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,850,continuous,NaN,80,1,0.3,air + steam,fluidised bed,silica,0,lab
+79,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,750,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,1,lab
+80,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,1,lab
+81,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,850,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,1,lab
+82,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,750,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,1,lab
+83,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,1,lab
+84,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,850,continuous,NaN,80,NaN,0.3,air,fluidised bed,silica,1,lab
+85,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,0.5,0.3,air + steam,fluidised bed,silica,1,lab
+86,48.75,8.57,7.32,1.61,33.75,11.5,sewage sludge,other,3.5,44,6.95,56,NaN,NaN,NaN,NaN,800,continuous,NaN,80,1,0.3,air + steam,fluidised bed,silica,1,lab
+87,46.4,5.7,0.2,0,47.7,12.15,woody biomass,chips,5,1.1,9.5,88.9,10,NaN,NaN,NaN,761,continuous,atmospheric,NaN,NaN,0.38,air,fluidised bed,silica,0,lab
+88,46.4,5.7,0.2,0,47.7,12.15,woody biomass,chips,5,1.1,18.1,88.9,10,NaN,NaN,NaN,730,continuous,atmospheric,NaN,NaN,0.38,air,fluidised bed,silica,0,lab
+89,46.4,5.7,0.2,0,47.7,12.15,woody biomass,chips,5,1.1,25.5,88.9,10,NaN,NaN,NaN,699,continuous,atmospheric,NaN,NaN,0.38,air,fluidised bed,silica,0,lab
+90,46.4,5.7,0.2,0,47.7,11.53,woody biomass,chips,5,1.1,27,88.9,10,NaN,NaN,NaN,705,continuous,atmospheric,NaN,NaN,0.36,air,fluidised bed,silica,0,lab
+91,46.4,5.7,0.2,0,47.7,11.53,woody biomass,chips,5,1.1,27,88.9,10,NaN,NaN,NaN,730,continuous,atmospheric,NaN,NaN,0.39,air,fluidised bed,silica,0,lab
+92,46.4,5.7,0.2,0,47.7,11.53,woody biomass,chips,5,1.1,27,88.9,10,NaN,NaN,NaN,740,continuous,atmospheric,NaN,NaN,0.42,air,fluidised bed,silica,0,lab
+93,46.4,5.7,0.2,0,47.7,11.53,woody biomass,chips,5,1.1,27,88.9,10,NaN,NaN,NaN,770,continuous,atmospheric,NaN,NaN,0.49,air,fluidised bed,silica,0,lab
+94,50.94,6.18,0.13,0.54,42.2,13.84,other,chips,5,1.59,24.4,86.63,11.9,NaN,NaN,NaN,725,continuous,atmospheric,NaN,NaN,0.3,air,fluidised bed,silica,0,lab
+95,50.94,6.18,0.13,0.54,42.2,13.86,other,chips,5,1.59,24.4,86.63,11.9,NaN,NaN,NaN,770,continuous,atmospheric,NaN,NaN,0.38,air,fluidised bed,silica,0,lab
+96,50.94,6.18,0.13,0.54,42.2,13.86,other,chips,5,1.59,24.4,86.63,11.9,NaN,NaN,NaN,785,continuous,atmospheric,NaN,NaN,0.43,air,fluidised bed,silica,0,lab
+97,50.94,6.18,0.13,0.54,42.2,13.86,other,chips,5,1.59,24.4,86.63,11.9,NaN,NaN,NaN,810,continuous,atmospheric,NaN,NaN,0.46,air,fluidised bed,silica,0,lab
+98,55.35,6.53,0.26,0.91,36.95,16.19,other,chips,5,2.05,21.8,84.36,13.8,NaN,NaN,NaN,745,continuous,atmospheric,NaN,NaN,0.3,air,fluidised bed,silica,0,lab
+99,55.35,6.53,0.26,0.91,36.95,16.22,other,chips,5,2.05,21.8,84.36,13.8,NaN,NaN,NaN,770,continuous,atmospheric,NaN,NaN,0.34,air,fluidised bed,silica,0,lab
+100,55.35,6.53,0.26,0.91,36.95,16.22,other,chips,5,2.05,21.8,84.36,13.8,NaN,NaN,NaN,775,continuous,atmospheric,NaN,NaN,0.38,air,fluidised bed,silica,0,lab
+101,55.35,6.53,0.26,0.91,36.95,16.22,other,chips,5,2.05,21.8,84.36,13.8,NaN,NaN,NaN,790,continuous,atmospheric,NaN,NaN,0.4,air,fluidised bed,silica,0,lab
+102,55.35,6.53,0.26,0.91,36.95,16.22,other,chips,5,2.05,21.8,84.36,13.8,NaN,NaN,NaN,825,continuous,atmospheric,NaN,NaN,0.45,air,fluidised bed,silica,0,lab
+103,50.65,5.63,0.12,0.02,43.62,20.01,woody biomass,chips,11,0.5,6.6,82.2,NaN,40.6,29.6,26.3,594,batch,NaN,255,NaN,0.49,air,fixed bed,NaN,0,lab
+104,50.65,5.63,0.12,0.02,43.62,20.01,woody biomass,chips,11,0.5,8.6,82.2,NaN,40.6,29.6,26.3,684,batch,NaN,366,NaN,0.49,air,fixed bed,NaN,0,lab
+105,50.65,5.63,0.12,0.02,43.62,20.01,woody biomass,chips,11,0.5,8.3,82.2,NaN,40.6,29.6,26.3,625,batch,NaN,336,NaN,0.5,air,fixed bed,NaN,0,lab
+106,49.59,6.09,0.2,0.02,44.12,18.9,woody biomass,chips,11,1.4,7.4,82.9,NaN,38.1,26.1,25.9,647,batch,NaN,282,NaN,0.52,air,fixed bed,NaN,0,lab
+107,49.59,6.09,0.2,0.02,44.12,18.9,woody biomass,chips,11,1.4,6.7,82.9,NaN,38.1,26.1,25.9,600,batch,NaN,250,NaN,0.57,air,fixed bed,NaN,0,lab
+108,49.59,6.09,0.2,0.02,44.12,18.9,woody biomass,chips,11,1.4,6.7,82.9,NaN,38.1,26.1,25.9,575,batch,NaN,347,NaN,0.52,air,fixed bed,NaN,0,lab
+109,51.06,6.04,0.14,0.01,42.7,20.27,woody biomass,chips,11,0.7,6.3,82.6,NaN,44.5,20.6,27.8,565,batch,NaN,250,NaN,0.49,air,fixed bed,NaN,0,lab
+110,51.06,6.04,0.14,0.01,42.7,20.27,woody biomass,chips,11,0.7,6.6,82.6,NaN,44.5,20.6,27.8,602,batch,NaN,283,NaN,0.46,air,fixed bed,NaN,0,lab
+111,51.06,6.04,0.14,0.01,42.7,20.27,woody biomass,chips,11,0.7,11,82.6,NaN,44.5,20.6,27.8,553,batch,NaN,241,NaN,0.43,air,fixed bed,NaN,0,lab
+112,49.85,6.05,0.22,0.02,43.9,19.67,woody biomass,chips,11,0.9,9.8,83.9,NaN,46.2,24.4,24.5,711,batch,NaN,403,NaN,0.53,air,fixed bed,NaN,0,lab
+113,49.85,6.05,0.22,0.02,43.9,19.67,woody biomass,chips,11,0.9,10,83.9,NaN,46.2,24.4,24.5,620,batch,NaN,297,NaN,0.48,air,fixed bed,NaN,0,lab
+114,49.85,6.05,0.22,0.02,43.9,19.67,woody biomass,chips,11,0.9,10.5,83.9,NaN,46.2,24.4,24.5,668,batch,NaN,275,NaN,0.43,air,fixed bed,NaN,0,lab
+115,50.56,5.98,0.54,0.04,42.96,19.8,woody biomass,chips,11,1.3,6.9,80.7,NaN,38.5,17.6,26.3,609,batch,NaN,325,NaN,0.53,air,fixed bed,NaN,0,lab
+116,50.56,5.98,0.54,0.04,42.96,19.8,woody biomass,chips,11,1.3,7.7,80.7,NaN,38.5,17.6,26.3,667,batch,NaN,275,NaN,0.31,air,fixed bed,NaN,0,lab
+117,50.56,5.98,0.54,0.04,42.96,19.8,woody biomass,chips,11,1.3,9.8,80.7,NaN,38.5,17.6,26.3,755,batch,NaN,346,NaN,0.52,air,fixed bed,NaN,0,lab
+118,50.11,5.9,2.88,0.3,40.88,15.23,herbaceous biomass,pellets,6,16.98,8.73,81.52,NaN,29.6,14,14,775,continuous,NaN,200,NaN,0.25,air,fluidised bed,silica,0,pilot
+119,50.11,5.9,2.88,0.3,40.88,15.23,herbaceous biomass,pellets,6,16.98,8.73,81.52,NaN,29.6,14,14,775,continuous,NaN,200,NaN,0.3,air,fluidised bed,silica,0,pilot
+120,50.11,5.9,2.88,0.3,40.88,15.23,herbaceous biomass,pellets,6,16.98,8.73,81.52,NaN,29.6,14,14,775,continuous,NaN,200,NaN,0.25,air,fluidised bed,silica,0,pilot
+121,50.11,5.9,2.88,0.3,40.88,15.23,herbaceous biomass,pellets,6,16.98,8.73,81.52,NaN,29.6,14,14,775,continuous,NaN,200,NaN,0.3,air,fluidised bed,silica,0,pilot
+122,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,665,continuous,NaN,NaN,NaN,0.25,air,fluidised bed,alumina,0,pilot
+123,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,744,continuous,NaN,NaN,NaN,0.3,air,fluidised bed,alumina,0,pilot
+124,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,811,continuous,NaN,NaN,NaN,0.35,air,fluidised bed,alumina,0,pilot
+125,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,670,continuous,NaN,NaN,NaN,0.25,air,fluidised bed,alumina,0,pilot
+126,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,750,continuous,NaN,NaN,NaN,0.3,air,fluidised bed,alumina,0,pilot
+127,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,822,continuous,NaN,NaN,NaN,0.35,air,fluidised bed,alumina,0,pilot
+128,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,700,continuous,NaN,NaN,NaN,0.25,air,fluidised bed,alumina,0,pilot
+129,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,766,continuous,NaN,NaN,NaN,0.3,air,fluidised bed,alumina,0,pilot
+130,47,6.78,0.48,0.04,45.7,14.22,herbaceous biomass,other,NaN,20,9.08,66.4,13.6,NaN,NaN,NaN,828,continuous,NaN,NaN,NaN,0.35,air,fluidised bed,alumina,0,pilot
+131,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,750,continuous,slightly above atmospheric,NaN,0.5,0.35,air + steam,fluidised bed,silica,0,lab
+132,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,800,continuous,slightly above atmospheric,NaN,0.5,0.3,air + steam,fluidised bed,silica,0,lab
+133,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,800,continuous,slightly above atmospheric,NaN,0.2,0.35,air + steam,fluidised bed,silica,0,lab
+134,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,800,continuous,slightly above atmospheric,NaN,0.5,0.35,air + steam,fluidised bed,silica,0,lab
+135,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,800,continuous,slightly above atmospheric,NaN,0.5,0.4,air + steam,fluidised bed,silica,0,lab
+136,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,850,continuous,slightly above atmospheric,NaN,0.5,0.35,air + steam,fluidised bed,silica,0,lab
+137,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,800,continuous,slightly above atmospheric,NaN,0.8,0.35,air + steam,fluidised bed,silica,0,lab
+138,49.07,3.79,0.63,0.09,46.42,14.83,herbaceous biomass,other,NaN,21.68,9.95,61.68,16.65,NaN,NaN,NaN,850,continuous,slightly above atmospheric,NaN,0.8,0.35,air + steam,fluidised bed,silica,0,lab
+139,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,700,continuous,atmospheric,60,NaN,0.21,oxygen,fluidised bed,alumina,0,lab
+140,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,700,continuous,atmospheric,75,NaN,0.21,oxygen,fluidised bed,alumina,1,lab
+141,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,700,continuous,atmospheric,55,NaN,0.21,oxygen,fluidised bed,alumina,0,lab
+142,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,700,continuous,atmospheric,68,NaN,0.21,oxygen,fluidised bed,alumina,1,lab
+143,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,700,continuous,atmospheric,45,NaN,0.21,oxygen,fluidised bed,alumina,0,lab
+144,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,700,continuous,atmospheric,75,NaN,0.21,oxygen,fluidised bed,alumina,1,lab
+145,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,750,continuous,atmospheric,40,NaN,0.25,oxygen,fluidised bed,alumina,0,lab
+146,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,750,continuous,atmospheric,50,NaN,0.25,oxygen,fluidised bed,alumina,1,lab
+147,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,750,continuous,atmospheric,50,NaN,0.24,oxygen,fluidised bed,alumina,0,lab
+148,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,750,continuous,atmospheric,50,NaN,0.24,oxygen,fluidised bed,alumina,1,lab
+149,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,750,continuous,atmospheric,55,NaN,0.24,oxygen,fluidised bed,alumina,0,lab
+150,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,750,continuous,atmospheric,51,NaN,0.24,oxygen,fluidised bed,alumina,1,lab
+151,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,800,continuous,atmospheric,40,NaN,0.23,oxygen,fluidised bed,alumina,0,lab
+152,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,800,continuous,atmospheric,54,NaN,0.23,oxygen,fluidised bed,alumina,1,lab
+153,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,800,continuous,atmospheric,45,NaN,0.23,oxygen,fluidised bed,alumina,0,lab
+154,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,800,continuous,atmospheric,45,NaN,0.23,oxygen,fluidised bed,alumina,1,lab
+155,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,800,continuous,atmospheric,30,NaN,0.22,oxygen,fluidised bed,alumina,0,lab
+156,49.2,6.12,0.1,0.01,44.58,19.3,woody biomass,other,1.25,0.4,7,NaN,NaN,NaN,NaN,NaN,800,continuous,atmospheric,61,NaN,0.22,oxygen,fluidised bed,alumina,1,lab
+157,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,700,continuous,atmospheric,NaN,1.16,NaN,steam,fixed bed,NaN,1,lab
+158,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,750,continuous,atmospheric,NaN,1.16,NaN,steam,fixed bed,NaN,1,lab
+159,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.16,NaN,steam,fixed bed,NaN,1,lab
+160,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,850,continuous,atmospheric,NaN,1.16,NaN,steam,fixed bed,NaN,1,lab
+161,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,900,continuous,atmospheric,NaN,1.16,NaN,steam,fixed bed,NaN,1,lab
+162,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,900,continuous,atmospheric,NaN,0.25,NaN,steam,fixed bed,NaN,1,lab
+163,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,900,continuous,atmospheric,NaN,0.4,NaN,steam,fixed bed,NaN,1,lab
+164,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,900,continuous,atmospheric,NaN,0.73,NaN,steam,fixed bed,NaN,1,lab
+165,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,900,continuous,atmospheric,NaN,0.91,NaN,steam,fixed bed,NaN,1,lab
+166,51.81,5.76,0.26,0.36,41.81,20.29,municipal solid waste,particles,5,5.64,0,79.9,14.46,NaN,NaN,NaN,900,continuous,atmospheric,NaN,1.16,NaN,steam,fixed bed,NaN,1,lab
+167,49.74,5.68,1.02,0.27,43.36,17.2,woody biomass,other,1.5,4.31,9.61,80.92,14.67,NaN,NaN,NaN,675,continuous,atmospheric,NaN,2,NaN,steam,fluidised bed,calcium oxide,1,pilot
+168,49.74,5.68,1.02,0.27,43.36,17.2,woody biomass,other,1.5,4.31,9.61,80.92,14.67,NaN,NaN,NaN,675,continuous,atmospheric,NaN,2,NaN,steam,fluidised bed,calcium oxide,1,pilot
+169,49.74,5.68,1.02,0.27,43.36,17.2,woody biomass,other,1.5,4.31,9.61,80.92,14.67,NaN,NaN,NaN,675,continuous,atmospheric,NaN,2,NaN,steam,fluidised bed,calcium oxide,1,pilot
+170,49.74,5.68,1.02,0.27,43.36,17.2,woody biomass,other,0.43,4.31,9.61,80.92,14.67,NaN,NaN,NaN,676,continuous,atmospheric,NaN,2,NaN,steam,fluidised bed,calcium oxide,1,pilot
+171,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,700,continuous,atmospheric,NaN,1.23,NaN,steam,fixed bed,NaN,1,lab
+172,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,750,continuous,atmospheric,NaN,1.23,NaN,steam,fixed bed,NaN,1,lab
+173,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.23,NaN,steam,fixed bed,NaN,1,lab
+174,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,850,continuous,atmospheric,NaN,1.23,NaN,steam,fixed bed,NaN,1,lab
+175,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,0,NaN,other,fixed bed,NaN,1,lab
+176,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,0.73,NaN,steam,fixed bed,NaN,1,lab
+177,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.23,NaN,steam,fixed bed,NaN,1,lab
+178,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,2.08,NaN,steam,fixed bed,NaN,1,lab
+179,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,2.77,NaN,steam,fixed bed,NaN,1,lab
+180,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,3.08,NaN,steam,fixed bed,NaN,1,lab
+181,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.23,NaN,steam,fixed bed,NaN,0,lab
+182,53.31,6.91,0.84,0.52,34.3,19.99,municipal solid waste,particles,5,7.12,9.34,77.52,15.36,NaN,NaN,NaN,800,continuous,atmospheric,NaN,1.23,NaN,steam,fixed bed,NaN,1,lab
+183,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.19,air,fluidised bed,silica,0,lab
+184,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.24,air,fluidised bed,silica,0,lab
+185,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.31,air,fluidised bed,silica,0,lab
+186,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.37,air,fluidised bed,silica,0,lab
+187,50.03,5.93,0.4,0.1,43.55,17.82,woody biomass,particles,1.25,0.27,0,83.17,16.56,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.19,air,fluidised bed,silica,0,lab
+188,50.03,5.93,0.4,0.1,43.55,17.82,woody biomass,particles,1.25,0.27,0,83.17,16.56,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.24,air,fluidised bed,silica,0,lab
+189,50.03,5.93,0.4,0.1,43.55,17.82,woody biomass,particles,1.25,0.27,0,83.17,16.56,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.31,air,fluidised bed,silica,0,lab
+190,50.03,5.93,0.4,0.1,43.55,17.82,woody biomass,particles,1.25,0.27,0,83.17,16.56,NaN,NaN,NaN,770,continuous,atmospheric,40,NaN,0.37,air,fluidised bed,silica,0,lab
+191,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,0.41,NaN,steam,fluidised bed,silica,0,lab
+192,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,0.63,NaN,steam,fluidised bed,silica,0,lab
+193,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,0.97,NaN,steam,fluidised bed,silica,0,lab
+194,54.84,5.5,0.44,0.12,39.1,18.2,woody biomass,particles,1.25,1.95,0,74.23,23.82,NaN,NaN,NaN,770,continuous,atmospheric,40,1.09,NaN,steam,fluidised bed,silica,0,lab
+195,50.03,5.93,0.4,0.1,43.55,17.82,woody biomass,particles,1.25,0.27,0,83.17,16.56,NaN,NaN,NaN,770,continuous,atmospheric,40,0.41,NaN,steam,fluidised bed,silica,0,lab
+196,50.03,5.93,0.4,0.1,43.55,17.82,woody biomass,particles,1.25,0.27,0,83.17,16.56,NaN,NaN,NaN,770,continuous,atmospheric,40,0.65,NaN,steam,fluidised bed,silica,0,lab
+197,50.03,5.93,0.4,0.1,43.55,17.82,woody biomass,particles,1.25,0.27,0,83.17,16.56,NaN,NaN,NaN,770,continuous,atmospheric,40,0.96,NaN,steam,fluidised bed,silica,0,lab
+198,47.52,6.5,0.05,0.01,46.36,18.1,woody biomass,pellets,12.7,0.47,8.9,81.23,18.29,NaN,NaN,NaN,800,continuous,205,NaN,NaN,0.19,air,fluidised bed,silica,1,pilot
+199,47.52,6.5,0.05,0.01,46.36,18.1,woody biomass,pellets,12.7,0.47,8.9,81.23,18.29,NaN,NaN,NaN,800,continuous,205,NaN,0.17,0.29,other,fluidised bed,silica,1,pilot
+200,47.52,6.5,0.05,0.01,46.36,18.1,woody biomass,pellets,12.7,0.47,8.9,81.23,18.29,NaN,NaN,NaN,800,continuous,205,NaN,0.17,0.29,other,fluidised bed,silica,1,pilot
+201,46.56,6.24,0.14,0.02,46.13,17.5,woody biomass,pellets,12.7,1.95,6.25,80.12,17.93,NaN,NaN,NaN,800,continuous,205,NaN,NaN,0.2,air,fluidised bed,silica,1,pilot
+202,46.56,6.24,0.14,0.02,46.13,17.5,woody biomass,pellets,12.7,1.95,6.25,80.12,17.93,NaN,NaN,NaN,800,continuous,205,NaN,0.15,0.28,other,fluidised bed,silica,1,pilot
+203,46.56,6.24,0.14,0.02,46.13,17.5,woody biomass,pellets,12.7,1.95,6.25,80.12,17.93,NaN,NaN,NaN,800,continuous,205,NaN,0.18,0.31,other,fluidised bed,silica,1,pilot
+204,40.07,7.1,1.4,0.17,50.5,15.62,herbaceous biomass,other,NaN,1.65,15.01,78.16,20.18,NaN,NaN,NaN,800,continuous,205,NaN,NaN,0.22,air,fluidised bed,silica,1,pilot
+205,40.07,7.1,1.4,0.17,50.5,15.62,herbaceous biomass,other,NaN,1.65,15.01,78.16,20.18,NaN,NaN,NaN,800,continuous,205,NaN,0.17,0.34,other,fluidised bed,silica,1,pilot
+206,40.07,7.1,1.4,0.17,50.5,15.62,herbaceous biomass,other,NaN,1.65,15.01,78.16,20.18,NaN,NaN,NaN,800,continuous,205,NaN,0.17,0.34,other,fluidised bed,silica,1,pilot
+207,49.33,6.06,0.04,0,44.57,18.45,woody biomass,particles,1.5,0.55,9.4,81.02,18.43,NaN,NaN,NaN,800,continuous,NaN,20,1.22,NaN,steam,fluidised bed,silica,0,lab
+208,49.33,6.06,0.04,0,44.57,18.45,woody biomass,particles,1.5,0.55,9.4,81.02,18.43,NaN,NaN,NaN,850,continuous,NaN,20,1.22,NaN,steam,fluidised bed,silica,0,lab
+209,49.33,6.06,0.04,0,44.57,18.45,woody biomass,particles,1.5,0.55,9.4,81.02,18.43,NaN,NaN,NaN,900,continuous,NaN,20,1.22,NaN,steam,fluidised bed,silica,0,lab
+210,49.33,6.06,0.04,0,44.57,18.45,woody biomass,particles,1.5,0.55,9.4,81.02,18.43,NaN,NaN,NaN,900,continuous,NaN,20,0.11,NaN,steam,fluidised bed,silica,0,lab
+211,49.33,6.06,0.04,0,44.57,18.45,woody biomass,particles,1.5,0.55,9.4,81.02,18.43,NaN,NaN,NaN,900,continuous,NaN,20,2.33,NaN,steam,fluidised bed,silica,0,lab
+212,49.33,6.06,0.04,0,44.57,18.45,woody biomass,particles,0.65,0.55,9.4,81.02,18.43,NaN,NaN,NaN,850,continuous,NaN,20,1.22,NaN,steam,fluidised bed,silica,0,lab
+213,49.33,6.06,0.04,0,44.57,18.45,woody biomass,particles,4,0.55,9.4,81.02,18.43,NaN,NaN,NaN,850,continuous,NaN,20,1.22,NaN,steam,fluidised bed,silica,0,lab
+214,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.3,air,fluidised bed,alumina,1,pilot
+215,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0.65,0.29,air + steam,fluidised bed,alumina,1,pilot
+216,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0.91,0.29,air + steam,fluidised bed,alumina,1,pilot
+217,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0.65,0.17,air + steam,fluidised bed,alumina,1,pilot
+218,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.3,air,fluidised bed,silica,0,pilot
+219,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0.65,0.29,air + steam,fluidised bed,silica,0,pilot
+220,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0.91,0.29,air + steam,fluidised bed,silica,0,pilot
+221,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.17,air,fluidised bed,silica,0,pilot
+222,49.4,5.9,0.1,0,44.5,18.5,woody biomass,pellets,6,0.33,8.5,80.98,18.69,NaN,NaN,NaN,780,continuous,atmospheric,40,0.65,0.17,air + steam,fluidised bed,silica,0,pilot
+223,54.9,6.8,0.5,0,37.8,21.9,other,pellets,6,1.48,5.7,82.61,15.91,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.23,air,fluidised bed,alumina,1,pilot
+224,54.9,6.8,0.5,0,37.8,21.9,other,pellets,6,1.48,5.7,82.61,15.91,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.19,air,fluidised bed,alumina,1,pilot
+225,54.9,6.8,0.5,0,37.8,21.9,other,pellets,6,1.48,5.7,82.61,15.91,NaN,NaN,NaN,780,continuous,atmospheric,40,0.6,0.12,air + steam,fluidised bed,alumina,1,pilot
+226,54.9,6.8,0.5,0,37.8,21.9,other,pellets,6,1.48,5.7,82.61,15.91,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.23,air,fluidised bed,silica,0,pilot
+227,54.9,6.8,0.5,0,37.8,21.9,other,pellets,6,1.48,5.7,82.61,15.91,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.19,air,fluidised bed,silica,0,pilot
+228,53.5,5.7,1,0,39.8,19.3,herbaceous biomass,pellets,6,3.51,8.9,74.86,21.62,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.17,air,fluidised bed,alumina,1,pilot
+229,53.5,5.7,1,0,39.8,19.3,herbaceous biomass,pellets,6,3.51,8.9,74.86,21.62,NaN,NaN,NaN,780,continuous,atmospheric,40,0.44,0.09,air + steam,fluidised bed,alumina,1,pilot
+230,53.5,5.7,1,0,39.8,19.3,herbaceous biomass,pellets,6,3.51,8.9,74.86,21.62,NaN,NaN,NaN,780,continuous,atmospheric,40,0,0.17,air,fluidised bed,silica,0,pilot
+231,53.5,5.7,1,0,39.8,19.3,herbaceous biomass,pellets,6,3.51,8.9,74.86,21.62,NaN,NaN,NaN,780,continuous,atmospheric,40,0.44,0.09,air + steam,fluidised bed,silica,0,pilot
+232,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,750,continuous,atmospheric,NaN,NaN,0.2,air,fixed bed,NaN,0,lab
+233,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,800,continuous,atmospheric,NaN,NaN,0.2,air,fixed bed,NaN,0,lab
+234,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,850,continuous,atmospheric,NaN,NaN,0.2,air,fixed bed,NaN,0,lab
+235,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,900,continuous,atmospheric,NaN,NaN,0.2,air,fixed bed,NaN,0,lab
+236,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,950,continuous,atmospheric,NaN,NaN,0.2,air,fixed bed,NaN,0,lab
+237,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,800,continuous,atmospheric,NaN,NaN,0.1,air,fixed bed,NaN,0,lab
+238,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,800,continuous,atmospheric,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+239,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,800,continuous,atmospheric,NaN,NaN,0.4,air,fixed bed,NaN,0,lab
+240,48.32,7.45,1.28,0.06,43.07,16.24,woody biomass,dust,2.5,0.91,9.28,84.85,14.22,NaN,NaN,NaN,800,continuous,atmospheric,NaN,NaN,0.5,air,fixed bed,NaN,0,lab
+241,43.83,5.95,0.97,0.13,45.01,15.83,herbaceous biomass,particles,3.75,5.93,6.17,75.95,13.75,NaN,NaN,NaN,900,continuous,atmospheric,NaN,NaN,0.18,air,fixed bed,NaN,0,lab
+242,43.83,5.95,0.97,0.13,45.01,15.83,herbaceous biomass,particles,3.75,5.93,6.17,75.95,13.75,NaN,NaN,NaN,950,continuous,atmospheric,NaN,NaN,0.21,air,fixed bed,NaN,0,lab
+243,43.83,5.95,0.97,0.13,45.01,15.83,herbaceous biomass,particles,3.75,5.93,6.17,75.95,13.75,NaN,NaN,NaN,965,continuous,atmospheric,NaN,NaN,0.24,air,fixed bed,NaN,0,lab
+244,43.83,5.95,0.97,0.13,45.01,15.83,herbaceous biomass,particles,3.75,5.93,6.17,75.95,13.75,NaN,NaN,NaN,975,continuous,atmospheric,NaN,NaN,0.28,air,fixed bed,NaN,0,lab
+245,43.83,5.95,0.97,0.13,45.01,15.83,herbaceous biomass,particles,3.75,5.93,6.17,75.95,13.75,NaN,NaN,NaN,985,continuous,atmospheric,NaN,NaN,0.32,air,fixed bed,NaN,0,lab
+246,43.83,5.95,0.97,0.13,45.01,15.83,herbaceous biomass,particles,3.75,5.93,6.17,75.95,13.75,NaN,NaN,NaN,995,continuous,atmospheric,NaN,NaN,0.36,air,fixed bed,NaN,0,lab
+247,43.83,5.95,0.97,0.13,45.01,15.83,herbaceous biomass,particles,3.75,5.93,6.17,75.95,13.75,NaN,NaN,NaN,1025,continuous,atmospheric,NaN,NaN,0.41,air,fixed bed,NaN,0,lab
+248,50,5.7,0.2,0.03,44.1,14.64,woody biomass,dust,2.4,0.85,23.5,82,16.5,NaN,NaN,NaN,800,continuous,atmospheric,300,NaN,0.32,air,fluidised bed,silica,0,pilot
+249,50,5.7,0.2,0.03,44.1,14.94,woody biomass,dust,2.4,0.85,21,82,16.5,NaN,NaN,NaN,800,continuous,atmospheric,300,NaN,0.37,air,fluidised bed,silica,0,pilot
+250,50,5.7,0.2,0.03,44.1,14.7,woody biomass,dust,2.4,0.85,23,82,16.5,NaN,NaN,NaN,810,continuous,atmospheric,162,NaN,0.47,air,fluidised bed,silica,0,pilot
+251,50,5.7,0.2,0.03,44.1,14.81,woody biomass,dust,2.4,0.85,22,82,16.5,NaN,NaN,NaN,800,continuous,atmospheric,240,NaN,0.26,air,fluidised bed,silica,0,pilot
+252,50,5.7,0.2,0.03,44.1,14.46,woody biomass,dust,2.4,0.85,25,82,16.5,NaN,NaN,NaN,790,continuous,atmospheric,300,NaN,0.36,air,fluidised bed,silica,0,pilot
+253,50,5.7,0.2,0.03,44.1,15.19,woody biomass,dust,2.4,0.85,19,82,16.5,NaN,NaN,NaN,800,continuous,atmospheric,312,NaN,0.32,air,fluidised bed,silica,0,pilot
+254,50.62,6.07,0.31,0.16,42.83,17.42,woody biomass,other,10,2.2,8.17,86.27,11.53,37.53,19.33,23.84,790,batch,slightly below atmospheric,16.3,NaN,0.58,air,fixed bed,NaN,0,pilot
+255,50.62,6.07,0.31,0.16,42.83,17.42,woody biomass,other,15,2.2,8.17,86.27,11.53,37.53,19.33,23.84,820,batch,slightly below atmospheric,18.6,NaN,0.67,air,fixed bed,NaN,0,pilot
+256,50.62,6.07,0.31,0.16,42.83,17.42,woody biomass,other,30,2.2,8.17,86.27,11.53,37.53,19.33,23.84,930,batch,slightly below atmospheric,20.3,NaN,0.73,air,fixed bed,NaN,0,pilot
+257,50.62,6.07,0.31,0.16,42.83,17.42,woody biomass,other,50,2.2,8.17,86.27,11.53,37.53,19.33,23.84,1030,batch,slightly below atmospheric,21.7,NaN,0.77,air,fixed bed,NaN,0,pilot
+258,50.62,6.07,0.31,0.16,42.83,17.42,woody biomass,other,70,2.2,8.17,86.27,11.53,37.53,19.33,23.84,1000,batch,slightly below atmospheric,24.8,NaN,0.87,air,fixed bed,NaN,0,pilot
+259,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,720,continuous,atmospheric,NaN,1.2,NaN,steam,fluidised bed,silica,0,lab
+260,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,770,continuous,atmospheric,NaN,1.2,NaN,steam,fluidised bed,silica,0,lab
+261,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,820,continuous,atmospheric,NaN,1.2,NaN,steam,fluidised bed,silica,0,lab
+262,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,870,continuous,atmospheric,NaN,1.2,NaN,steam,fluidised bed,silica,0,lab
+263,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,920,continuous,atmospheric,NaN,1.2,NaN,steam,fluidised bed,silica,0,lab
+264,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,820,continuous,atmospheric,NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+265,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,820,continuous,atmospheric,NaN,1,NaN,steam,fluidised bed,silica,0,lab
+266,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,820,continuous,atmospheric,NaN,1.2,NaN,steam,fluidised bed,silica,0,lab
+267,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,820,continuous,atmospheric,NaN,1.4,NaN,steam,fluidised bed,silica,0,lab
+268,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,820,continuous,atmospheric,NaN,1.7,NaN,steam,fluidised bed,silica,0,lab
+269,46.29,6.48,1.04,0.12,46.08,14.47,woody biomass,other,1.5,1.56,11.89,75.78,14.77,NaN,NaN,NaN,820,continuous,atmospheric,NaN,2,NaN,steam,fluidised bed,silica,0,lab
+270,47.6,6.1,0.52,NaN,45.78,17.3,herbaceous biomass,other,27.59,2.12,10.1,80.06,17.82,NaN,NaN,NaN,926.85,continuous,NaN,NaN,NaN,0.28,air,fixed bed,NaN,0,pilot
+271,47.6,6.1,0.52,NaN,45.78,17.3,herbaceous biomass,other,27.59,2.12,10.1,80.06,17.82,NaN,NaN,NaN,926.85,continuous,NaN,NaN,NaN,0.28,air,fixed bed,NaN,0,pilot
+272,47.6,6.1,0.52,NaN,45.78,17.3,herbaceous biomass,other,27.59,2.12,10.1,80.06,17.82,NaN,NaN,NaN,926.85,continuous,NaN,NaN,NaN,0.29,air,fixed bed,NaN,0,pilot
+273,48.91,5.8,0.18,NaN,45.11,18.4,woody biomass,other,24.02,2.1,9.5,80.63,17.27,NaN,NaN,NaN,926.85,continuous,NaN,NaN,NaN,0.27,air,fixed bed,NaN,0,pilot
+274,49.44,6.25,0.54,NaN,43.77,15.6,herbaceous biomass,other,3.15,16.6,12.5,67.95,15.45,NaN,NaN,NaN,926.85,continuous,NaN,NaN,NaN,0.38,air,fixed bed,NaN,0,pilot
+275,49.44,6.25,0.54,NaN,43.77,15.6,herbaceous biomass,other,3.15,16.6,12.5,67.95,15.45,NaN,NaN,NaN,926.85,continuous,NaN,NaN,NaN,0.41,air,fixed bed,NaN,0,pilot
+276,50.84,5.82,0.88,NaN,42.46,18.1,woody biomass,other,22.74,2.62,17.6,80.84,16.54,NaN,NaN,NaN,926.85,continuous,NaN,NaN,NaN,0.26,air,fixed bed,NaN,0,pilot
+277,48.39,5.86,2.04,NaN,39.21,21.65,woody biomass,chips,NaN,4.5,5,80.3,15.2,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+278,48.39,5.86,2.04,NaN,39.21,18.4,woody biomass,chips,NaN,4.5,20,80.3,15.2,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+279,44.43,6.16,1.65,NaN,41.9,19.06,woody biomass,chips,NaN,5.5,5,81.25,13.25,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+280,44.43,6.16,1.65,NaN,41.9,16.2,woody biomass,chips,NaN,5.5,20,81.25,13.25,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+281,45.1,6,1.7,NaN,41.5,19.53,woody biomass,chips,NaN,5.6,5,81.75,12.65,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+282,45.1,6,1.7,NaN,41.5,16.6,woody biomass,chips,NaN,5.6,20,81.75,12.65,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+283,44.85,5.98,1.65,NaN,41.84,18.76,woody biomass,chips,NaN,5.8,5,82,12.2,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+284,44.85,5.98,1.65,NaN,41.84,15.95,woody biomass,chips,NaN,5.8,20,82,12.2,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+285,45.85,5.8,1.6,NaN,40.25,20.18,woody biomass,chips,NaN,4.6,5,80,15.4,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+286,45.85,5.8,1.6,NaN,40.25,17.15,woody biomass,chips,NaN,4.6,20,80,15.4,NaN,NaN,NaN,850,NaN,NaN,NaN,NaN,0.3,air,fixed bed,NaN,0,lab
+287,42.5,6.3,0.2,NaN,51,16.98,woody biomass,dust,0.5,1.31,8.5,84.59,14.1,NaN,NaN,NaN,780,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+288,42.5,6.3,0.2,NaN,51,16.98,woody biomass,dust,0.5,1.31,8.5,84.59,14.1,NaN,NaN,NaN,750,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+289,42.5,6.3,0.2,NaN,51,16.98,woody biomass,dust,0.5,1.31,8.5,84.59,14.1,NaN,NaN,NaN,700,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+290,42.5,6.3,0.2,NaN,51,16.98,woody biomass,dust,0.5,1.31,8.5,84.59,14.1,NaN,NaN,NaN,650,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+291,43.7,6.1,0.4,NaN,49.8,12.34,herbaceous biomass,particles,5,15.29,7.8,66.81,17.9,NaN,NaN,NaN,780,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+292,43.7,6.1,0.4,NaN,49.8,12.34,herbaceous biomass,particles,5,15.29,7.8,66.81,17.9,NaN,NaN,NaN,750,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+293,43.7,6.1,0.4,NaN,49.8,12.34,herbaceous biomass,particles,5,15.29,7.8,66.81,17.9,NaN,NaN,NaN,700,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+294,43.7,6.1,0.4,NaN,49.8,12.34,herbaceous biomass,particles,5,15.29,7.8,66.81,17.9,NaN,NaN,NaN,650,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+295,41.8,5.3,0.2,NaN,52.7,16.06,woody biomass,chips,2,2.36,11.1,83.69,13.95,NaN,NaN,NaN,780,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+296,41.8,5.3,0.2,NaN,52.7,16.06,woody biomass,chips,2,2.36,11.1,83.69,13.95,NaN,NaN,NaN,750,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+297,41.8,5.3,0.2,NaN,52.7,16.06,woody biomass,chips,2,2.36,11.1,83.69,13.95,NaN,NaN,NaN,700,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+298,41.8,5.3,0.2,NaN,52.7,16.06,woody biomass,chips,2,2.36,11.1,83.69,13.95,NaN,NaN,NaN,650,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+299,40.8,5.5,0.3,NaN,53.4,12.3,herbaceous biomass,other,NaN,15.11,10,67.44,17.44,NaN,NaN,NaN,780,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+300,40.8,5.5,0.3,NaN,53.4,12.3,herbaceous biomass,other,NaN,15.11,10,67.44,17.44,NaN,NaN,NaN,750,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+301,40.8,5.5,0.3,NaN,53.4,12.3,herbaceous biomass,other,NaN,15.11,10,67.44,17.44,NaN,NaN,NaN,700,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+302,40.8,5.5,0.3,NaN,53.4,12.3,herbaceous biomass,other,NaN,15.11,10,67.44,17.44,NaN,NaN,NaN,650,continuous,slightly above atmospheric (1.1atm),NaN,0.8,NaN,steam,fluidised bed,silica,0,lab
+303,50.26,6.72,0.16,0.2,42.66,18.54,woody biomass,particles,1.75,0.36,5.01,81.81,17.83,43.5,19.5,33,700,batch,NaN,40,1,NaN,steam,fluidised bed,silica,0,lab
+304,50.26,6.72,0.16,0.2,42.66,18.54,woody biomass,particles,1.75,0.36,5.01,81.81,17.83,43.5,19.5,33,800,batch,NaN,40,1,NaN,steam,fluidised bed,silica,0,lab
+305,50.26,6.72,0.16,0.2,42.66,18.54,woody biomass,particles,1.75,0.36,5.01,81.81,17.83,43.5,19.5,33,900,batch,NaN,40,1,NaN,steam,fluidised bed,silica,0,lab
+306,50.26,6.72,0.16,0.2,42.66,18.54,woody biomass,particles,1.75,0.36,5.01,81.81,17.83,43.5,19.5,33,900,batch,NaN,40,0.5,NaN,steam,fluidised bed,silica,0,lab
+307,51.3,5.81,0.2,0.1,42.6,18.6,woody biomass,pellets,NaN,0.43,8,84.13,15.43,NaN,NaN,NaN,700,continuous,NaN,NaN,NaN,NaN,steam,fluidised bed,silica,0,pilot
+308,51.3,5.81,0.2,0.1,42.6,18.6,woody biomass,pellets,NaN,0.43,8,84.13,15.43,NaN,NaN,NaN,750,continuous,NaN,NaN,NaN,NaN,steam,fluidised bed,silica,0,pilot
+309,51.3,5.81,0.2,0.1,42.6,18.6,woody biomass,pellets,NaN,0.43,8,84.13,15.43,NaN,NaN,NaN,800,continuous,NaN,NaN,NaN,NaN,steam,fluidised bed,silica,0,pilot
+310,48.3,5.5,0.6,0.01,38.1,16.28,woody biomass,particles,15,7.5,0,71,21.5,NaN,NaN,NaN,850,continuous,NaN,6,0.6,NaN,steam,other,NaN,0,pilot
+311,48.3,5.5,0.6,0.01,38.1,16.28,woody biomass,particles,15,7.5,0,71,21.5,NaN,NaN,NaN,850,continuous,NaN,6,0.7,NaN,steam,other,NaN,0,pilot
+312,48.3,5.5,0.6,0.01,38.1,16.28,woody biomass,particles,15,7.5,0,71,21.5,NaN,NaN,NaN,850,continuous,NaN,6,1,NaN,steam,other,NaN,0,pilot
