@@ -19,10 +19,10 @@ def get_CO2_equ(*,CO2: float = 0, CH4_fossil: float = 0, CH4_non_fossil: float =
     """
 
     from config import settings
-    CO2_equ_factor = settings.general.CO2_equivalents.CO2_equ_factor
-    CH4_fossil_equ_factor = settings.general.CO2_equivalents.CH4_fossil_equ_factor
-    CH4_non_fossil_equ_factor = settings.general.CO2_equivalents.CH4_non_fossil_equ_factor
-    N2O_equ_factor = settings.general.CO2_equivalents.N2O_equ_factor
+    CO2_equ_factor = settings.data.CO2_equivalents.CO2_equ_factor
+    CH4_fossil_equ_factor = settings.data.CO2_equivalents.CH4_fossil_equ_factor
+    CH4_non_fossil_equ_factor = settings.data.CO2_equivalents.CH4_non_fossil_equ_factor
+    N2O_equ_factor = settings.data.CO2_equivalents.N2O_equ_factor
 
     # Calculate GWP of process
     GWP = (CO2 * CO2_equ_factor + CH4_fossil * CH4_fossil_equ_factor + CH4_non_fossil * CH4_non_fossil_equ_factor

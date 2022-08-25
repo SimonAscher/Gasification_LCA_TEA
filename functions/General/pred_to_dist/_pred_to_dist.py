@@ -1,8 +1,7 @@
-from functions.general.pred_to_dist.get_correct_sigma import get_correct_sigma
-from functions.general.pred_to_dist.make_dist.make_dist import *
+from functions.general.pred_to_dist import utils
+from .utils import make_dist, get_correct_sigma
 
-
-# TODO: Why do I have to call these differently? See line 25 - sigma =
+# TODO: Why do I have to call these differently? See line 25 - sigma = ... - FIX THIS
 
 def pred_to_dist(prediction, output_label):
     """
@@ -22,9 +21,7 @@ def pred_to_dist(prediction, output_label):
     """
 
     # Get correct error value
-    sigma = get_correct_sigma.get_correct_sigma(prediction, output_label)
+    sigma = get_correct_sigma(prediction, output_label)
     distribution = make_dist(prediction, sigma)
 
     return distribution
-
-
