@@ -19,13 +19,13 @@ def get_present_value(value: float, value_type: str, interest_rate: float = 0.05
         Present value of imputed cost or benefit object
     """
 
-    # TODO: Update default interest rate and discount period at later stage if necessary
+    # TODO: Update default interest rate and discount period at later stage if necessary - put these in settings files
 
     pv = []
-    if value_type == 'FV':
+    if value_type == "FV":
         pv = value * (1 / (1 + interest_rate)) ** discount_period
 
-    elif value_type == 'AV':
+    elif value_type == "AV":
         pv = value * ((((1 + interest_rate) ** discount_period) - 1) / (
                 interest_rate * ((1 + interest_rate) ** discount_period)))
     else:
