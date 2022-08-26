@@ -12,7 +12,6 @@ def get_models():
     # %% Load dataframe with models stored
     # Get directory path
     import os
-
     directory = os.getcwd()
     # Specify filename
     filename = "GBR_performance_summary"
