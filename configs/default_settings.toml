@@ -32,6 +32,11 @@ output_data = ["N2 [vol.% db]", "H2 [vol.% db]", "CO [vol.% db]", "CO2 [vol.% db
     "C2Hn [vol.% db]", "LHV [MJ/Nm3]", "Tar [g/Nm3]", "Gas yield [Nm3/kg wb]", "Char yield [g/kg wb]"]
 
 
+[default.fake]
+# Fake data arrau to test functions
+# data_array = [[49.09, 6.06, 0.08], 4, [5.88, 11.53], [800, 1], 0.3, [0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]]
+# toml does not seem to support mixed arrays/lists
+
 [default.data]
 
 

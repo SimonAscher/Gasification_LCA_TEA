@@ -12,12 +12,12 @@ def get_models():
     # %% Load dataframe with models stored
     # Get directory path
     import os
-    directory = os.getcwd()
     # Specify filename
-    filename = "GBR_performance_summary"
+    # filename = "GBR_performance_summary"
+    #TODO: CHange call to file path to dynamic call
 
     # Show full filepath
-    full_file_path = directory + r"\\data\\" + filename
+    full_file_path = r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data\GBR_performance_summary"
     # print("Full path to file:", full_file_path)
 
     # Load performance summary object

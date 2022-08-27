@@ -10,7 +10,7 @@ print(settings.data.CO2_equivalents.electricity)
 
 # %% Test some functions
 
-from functions.general.pred_to_dist._pred_to_dist import pred_to_dist
+from functions.general.pred_to_dist.convenience_functions import pred_to_dist
 
 test_label = settings.labels.output_data[1]
 predictions_dist = pred_to_dist(12, test_label)

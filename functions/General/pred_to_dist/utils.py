@@ -67,7 +67,7 @@ def make_dist(mean, sigma, dist_type="gaussian", length_array: int = settings.ba
 
     distribution = []  # initialise distribution array
     if dist_type == "gaussian":
-        np.random.seed(random_state)  # set random seed
+        #np.random.seed(random_state)  # set random seed
         distribution = np.random.default_rng().normal(loc=mean, scale=sigma,
                                                       size=length_array)  # create distribution array
 
