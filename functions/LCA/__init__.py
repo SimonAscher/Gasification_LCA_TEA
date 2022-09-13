@@ -1,1 +1,1 @@
-from ._get_CO2_equ import get_CO2_equ
+from .helpers import get_CO2_equ, natural_gas_for_heat_GWP
