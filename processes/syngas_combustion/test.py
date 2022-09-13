@@ -13,4 +13,10 @@ all_predictions = make_predictions(models_dict=models, data=fake_test_data_array
 all_pred_dists = get_all_prediction_distributions(all_predictions)
 
 # Calculate GWPs
-GWP_results = syngas_combustion_GWP(all_pred_dists)
+GWP_results, detailed_emissions_dict = syngas_combustion_GWP(all_pred_dists)
+
+# Show GWP as histogram
+import matplotlib.pyplot as plt
+
+plt.hist(GWP_results)
+plt.show()
