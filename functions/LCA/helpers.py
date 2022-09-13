@@ -20,7 +20,6 @@ def get_CO2_equ(*,CO2: float = 0, CH4_fossil: float = 0, CH4_non_fossil: float =
     Ensure all inputs have the same units. Function will return the GWP in the same units.
     """
 
-    from config import settings
     CO2_equ_factor = settings.data.CO2_equivalents.CO2_equ_factor
     CH4_fossil_equ_factor = settings.data.CO2_equivalents.CH4_fossil_equ_factor
     CH4_non_fossil_equ_factor = settings.data.CO2_equivalents.CH4_non_fossil_equ_factor
