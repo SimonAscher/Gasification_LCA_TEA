@@ -1,4 +1,52 @@
-# Values here will override previously loaded from default_settings.toml
+# Required User Inputs
+[default.user_inputs]
 
+# Country to be used in analysis
+country = "UK"
 
-# Still need to figure out how to use this properly
+# Feedstock type
+feedstock_category = "herbaceous biomass"
+
+# TODO: Add validator which checks the options for these inputs - should correspond with the options given in
+#  default_settings file - could also see how to add default values
+#  (see https://www.dynaconf.com/validation/#combining-validators)
+
+[default.user_inputs.prediction_model]
+# TODO: Add validators here at some point if time - i.e. Carbon 0-100%, some variables only allow for certain inputs etc.
+
+# TODO: Add moisture as AR and post drying - want to use post drying in prediction model and both in drying model
+#  Once implmented add these as default values for drying function
+
+## Elementary composition
+#"C [%daf]" =
+#"H [%daf]" =
+#"S [%daf]" =
+#"Particle size [mm]"
+#"Ash [%db]"
+#"Moisture [%wb]"
+#"Temperature [°C]"
+#"Operation (Batch/Continuous)"
+#"ER"
+#'Catalyst'
+#"Scale"
+## Could have one agent line and then later function which creates the array with 0s and 1s - similar for other 1 hot encoded variables
+#"Agent_air"
+#"Agent_air + steam"
+#"Agent_other"
+#"Agent_oxygen"
+#"Agent_steam"
+#"Reactor_fixed bed"
+#"Reactor_fluidised bed"
+#"Reactor_other"
+#"Bed_N/A"
+#"Bed_alumina"
+#"Bed_olivine"
+#"Bed_other"
+#"Bed_silica"
+
+[default.user_inputs.drying_process]
+dryer_type = "Direct fired dryer"
+specific_heat_reference_temp = "40 degC"
+electricity_reference = "GaBi (mean)"
+output_unit = "kWh"
+

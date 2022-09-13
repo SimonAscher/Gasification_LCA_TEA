@@ -70,7 +70,8 @@ def make_dist(mean, sigma, dist_type="gaussian", length_array: int = settings.ba
         #np.random.seed(random_state)  # set random seed
         distribution = np.random.default_rng().normal(loc=mean, scale=sigma,
                                                       size=length_array)  # create distribution array
-
+        # TODO: Consider implementing Latin Hypercube sampling or orthagonal sampling (for more info see:
+        #  https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.qmc.LatinHypercube.html)
     else:
         print("Warning: Distribution type not supported")
         # TODO: Turn this warning message into proper warning.

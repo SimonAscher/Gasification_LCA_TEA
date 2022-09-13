@@ -4,7 +4,6 @@
 from config import settings
 
 print(settings.background.iterations_MC)
-print(settings.general.country)
 print(settings.data.CO2_equivalents.electricity.UK)
 print(settings.data.CO2_equivalents.electricity)
 
@@ -16,3 +15,8 @@ test_label = settings.labels.output_data[1]
 predictions_dist = pred_to_dist(12, test_label)
 print(predictions_dist)
 
+# %% Check if settings.toml works
+
+test = (settings.data.biogenic_fractions)
+
+test2 = settings.prediction_model

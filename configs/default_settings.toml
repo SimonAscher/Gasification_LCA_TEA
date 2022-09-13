@@ -14,11 +14,11 @@ iterations_MC = 10
 # List of countries supported within the model
 countries = ["UK", "Germany", "USA", "World"]
 
-# Country to be used in analysis
-country = "UK"
+# Broad feedstock categories supported in analysis and ML prediction model
+feedstock_categories = ["plastics", "municipal solid waste", "herbaceous biomass", "woody biomass", "sewage sludge", "other"]
 
 # Functional unit (FU) used in LCA
-FU = 1 # 1 tonne of feedstock
+FU = 1000  # 1kg of feedstock
 
 
 [default.labels]
@@ -37,8 +37,12 @@ output_data = ["N2 [vol.% db]", "H2 [vol.% db]", "CO [vol.% db]", "CO2 [vol.% db
 # data_array = [[49.09, 6.06, 0.08], 4, [5.88, 11.53], [800, 1], 0.3, [0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]]
 # toml does not seem to support mixed arrays/lists
 
-[default.data]
 
+[default.unit_conversions]
+mmBtu_to_MJ = 1055.06  # One million British thermal units to MJ
+
+
+[default.data]
 
 [default.data.densities]
 # Densities of different gas species
@@ -50,6 +54,15 @@ CH4 = 0.656
 C2H4 = 1.18
 units = "kg/m3"
 
+[default.data.molar_masses]
+# Molar or molecular masses of different gas species
+N2 = 28
+H2 = 2
+CO = 28
+CO2 = 44
+CH4 = 16
+C2H4 = 28
+units = "g/mol"
 
 [default.data.CO2_equivalents]
 # Carbon dioxide equivalent factors
@@ -62,8 +75,68 @@ N2O_equ_factor = 273
 
 [default.data.CO2_equivalents.electricity]
 # Carbon intensity of grid electricity
-UK = 0.21233 # Ref: https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2021
-USA = 0.38 # Ref: https://www.eia.gov/environment/emissions/carbon/
+UK = 0.21233  # [kg CO2eq./kWh] Ref: https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2021
+USA = 0.38  # [kg CO2eq./kWh] Ref: https://www.eia.gov/environment/emissions/carbon/
+
+[default.data.CO2_equivalents.natural_gas_for_heat]
+# Carbon intensity of heat generation from natural gas
+UK = 0.222  # [kg CO2eq./kWh] Ref: GaBi model "Natural gas use"
+
+
+[default.data.biogenic_fractions]
+# Fraction of feedstock emissions considered biogenic
+# Ref: See preliminary analysis done in C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\analysis\preliminary\biogenic_fraction_of_feedstocks.ipynb
+"herbaceous biomass" = 0.9833
+"woody biomass" = 0.9878
+
+
+[default.data.feedstock_drying]
+# Assumed room temperature and temperature of drying process
+temp_drying_process = 40  # in deg C
+room_temperature = 18  # in deg C
+
+[default.data.feedstock_drying.dryer_efficiencies]
+# Efficiencies of different dryer types
+"Indirect-heated convection dryer" = 0.30
+"Contact dryer" = 0.65
+"Direct fired dryer" = 0.40  # energy generally supplied by natural gas (could use syngas)
+"Microwave drying" = 0.50
+
+[default.data.feedstock_drying.electricity_requirements]
+# Electricity requirements for auxiliary processes (Note difference in units)
+"GaBi (mean)" = 0.0037  # [kWh/kg of biomass input]
+"Huber Belt dryer" = 0.0375  # [kWh/kg of water evaporation]
+
+
+[default.data.heats_vaporisation.water]
+# Specific latent heat of vaporisation of water
+"18 degC" = 2458  # [kJ/kg] at room temperature
+"40 degC" = 2406  # [kJ/kg] at dryer temperature
+"100 degC" = 2260  # [kJ/kg] at boiling temperature
+
+
+[default.data.specific_heats.water_vapor]
+"18 degC" = 1.86  # [kJ/kg K] at room temperature
+"40 degC" = 1.87  # [kJ/kg K] at dryer temperature
+"100 degC" = 1.89  # [kJ/kg K] at boiling temperature
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
