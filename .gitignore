@@ -263,4 +263,14 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,pycharm+iml
 
+# Ignore secrets file in settings
 /configs/.secrets.toml
+
+# Ignore image files which are saved for writing of reports etc.
+
+# Tagged Image File Format
+*.tiff
+*.tif
+
+# Portable Network Graphics
+*.png

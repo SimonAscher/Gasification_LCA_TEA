@@ -31,9 +31,8 @@ input_data = ["C [%daf]", "H [%daf]", "S [%daf]", "Particle size [mm]", "Ash [%d
 output_data = ["N2 [vol.% db]", "H2 [vol.% db]", "CO [vol.% db]", "CO2 [vol.% db]", "CH4 [vol.% db]",
     "C2Hn [vol.% db]", "LHV [MJ/Nm3]", "Tar [g/Nm3]", "Gas yield [Nm3/kg wb]", "Char yield [g/kg wb]"]
 
-output_units = ["[vol.% db]", '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% db]', '[MJ/Nm3]',
-    '[g/Nm3]', '[Nm3/kg wb]', '[g/kg wb]']
-
+output_units = ["[vol.% db]", '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% db]', '[MJ/N$m^{3}$]',
+    '[g/N$m^{3}$]', '[N$m^{3}$/kg wb]', '[g/kg wb]']
 
 
 [default.fake]
