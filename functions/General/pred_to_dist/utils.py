@@ -73,6 +73,6 @@ def make_dist(mean, sigma, dist_type="gaussian", length_array: int = settings.ba
         # TODO: Consider implementing Latin Hypercube sampling or orthagonal sampling (for more info see:
         #  https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.qmc.LatinHypercube.html)
     else:
-        print("Warning: Distribution type not supported")
-        # TODO: Turn this warning message into proper warning.
+        raise ValueError("Warning: Distribution type not supported. Currently only 'gaussian' supported.")
+
     return distribution

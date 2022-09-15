@@ -14,7 +14,7 @@ def get_models():
     import os
     # Specify filename
     # filename = "GBR_performance_summary"
-    #TODO: CHange call to file path to dynamic call
+    #TODO: Change call to file path to dynamic call
 
     # Show full filepath
     full_file_path = r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data\GBR_performance_summary"

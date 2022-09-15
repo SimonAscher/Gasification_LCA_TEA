@@ -70,9 +70,10 @@ def syngas_combustion_GWP(predictions, FU=settings.general["FU"]):
         # Get gas molar masses
         mm = settings.data.molar_masses
 
+        # TODO: CHECK ALL THESE EQUATIONS AND MAKE SURE THEY ARE BALANCED AND THE CORRESPONDING RATIOS ARE CORRECT _ WRITE TESTS
         # Calculate conversion ratios to CO2
         CO_conv_ratio = (2 * mm["CO2"]) / (2 * mm["CO"])  # 2 CO + O2 -> 2 CO2
-        CH4_conv_ratio = (2 * mm["CO2"]) / mm["CH4"]  # CH4 + 2O2 -> 2 CO2
+        CH4_conv_ratio = (mm["CO2"]) / mm["CH4"]  # CH4 + 2O2 -> CO2 + 2 H2O
         C2H4_conv_ratio = (2 * mm["CO2"]) / mm["C2H4"]  # C2H4 + 3 O2 -> 2 CO2 + 2 H2O
 
         # Calculate GWPs for each MC iteration

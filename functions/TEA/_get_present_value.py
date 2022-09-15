@@ -29,6 +29,6 @@ def get_present_value(value: float, value_type: str, interest_rate: float = 0.05
         pv = value * ((((1 + interest_rate) ** discount_period) - 1) / (
                 interest_rate * ((1 + interest_rate) ** discount_period)))
     else:
-        print('Warning: This type of reference value is not supported!')
-        # TODO: Turn this warning statement into a proper warning
+        raise ValueError(r"Warning: This type of reference value is not supported. Only 'FV' or 'AV' supported.")
+
     return pv

@@ -1,5 +1,7 @@
 from config import settings
+
 user_inputs = settings.user_inputs.drying_process
+
 
 def energy_drying(mass_feedstock, moisture_ar, moisture_post_drying,
                   dryer_type=user_inputs.dryer_type,
@@ -36,7 +38,6 @@ def energy_drying(mass_feedstock, moisture_ar, moisture_post_drying,
     dict
         Dictionary of energy requirements in the form of heat and electricity including their sources and the units.
         Note: Heat requirement given as amount of raw heat source required (e.g. XYZ kWh of natural gas)
-
     -------
 
     """
@@ -60,16 +61,16 @@ def energy_drying(mass_feedstock, moisture_ar, moisture_post_drying,
     # Electricity requirements for auxiliary processes (Note difference in units)
     electricity_requirements = settings.data.feedstock_drying.electricity_requirements
 
-    # Calculate mass of evaporated water:
     if moisture_ar < moisture_post_drying:  # check for erroneous inputs
-        print('Warning: Moisture content of as received feedstock must be higher than moisture content post drying')
+        raise ValueError("Warning: Moisture content of as received feedstock must be higher than moisture content "
+                         "post drying.")
 
-    else:
-        mass_water_initial = mass_feedstock * moisture_ar
-        mass_feed_dry = mass_feedstock * (1 - moisture_ar)
-        mass_water_post_drying = (mass_feed_dry * moisture_post_drying) / (1 - moisture_post_drying)
-        mass_feedstock_post_drying = mass_feed_dry + mass_water_post_drying
-        mass_evaporated_water = mass_water_initial - mass_water_post_drying
+        # Calculate mass of evaporated water:
+    mass_water_initial = mass_feedstock * moisture_ar
+    mass_feed_dry = mass_feedstock * (1 - moisture_ar)
+    mass_water_post_drying = (mass_feed_dry * moisture_post_drying) / (1 - moisture_post_drying)
+    mass_feedstock_post_drying = mass_feed_dry + mass_water_post_drying
+    mass_evaporated_water = mass_water_initial - mass_water_post_drying
 
     # Heat requirement:
     # Calculate theoretical heat for drying
@@ -80,6 +81,8 @@ def energy_drying(mass_feedstock, moisture_ar, moisture_post_drying,
 
     # Electricity requirement:
     # Calculate auxiliary energy requirements (electricity) for screw feeders, pumps, fans, etc.
+    electricity_drying = []
+
     if electricity_reference == 'GaBi (mean)':
         electricity_drying = electricity_requirements[electricity_reference] * mass_feedstock
 
@@ -87,6 +90,8 @@ def energy_drying(mass_feedstock, moisture_ar, moisture_post_drying,
         electricity_drying = electricity_requirements[electricity_reference] * mass_evaporated_water
 
     # Determine fuel source for drying
+    energy_source_drying = []
+
     if dryer_type == 'Indirect-heated convection dryer' or dryer_type == 'Contact dryer' or \
             dryer_type == 'Direct fired dryer':
         energy_source_drying = 'natural gas'
@@ -98,6 +103,7 @@ def energy_drying(mass_feedstock, moisture_ar, moisture_post_drying,
     elif dryer_type == 'Microwave drying':
         energy_source_drying = 'electricity'
 
+    energies_out = []
     if output_unit == "kWh":
         energies_out = {"heat": heat_drying_post_dryer_efficiency / 3600, "electricity": electricity_drying,
                         "heat source": energy_source_drying, "units": output_unit}
