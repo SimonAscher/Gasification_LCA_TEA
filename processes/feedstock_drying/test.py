@@ -9,3 +9,4 @@ energy_drying_output = energy_drying(mass_feedstock, moisture_ar, moisture_post_
                                      output_unit='kWh', syngas_as_fuel=False, show_values=True)
 
 GWP_drying = drying_GWP(energy_drying_output)
+

@@ -56,8 +56,7 @@ def syngas_combustion_GWP(predictions, FU=settings.general["FU"]):
 
         Returns
         -------
-        list
-            GWP values in kg CO2eq. / FU.
+            GWP values in kg CO2eq./FU.
         """
 
         # Ensure inputs are the correct length
@@ -70,7 +69,7 @@ def syngas_combustion_GWP(predictions, FU=settings.general["FU"]):
         # Get gas molar masses
         mm = settings.data.molar_masses
 
-        # TODO: CHECK ALL THESE EQUATIONS AND MAKE SURE THEY ARE BALANCED AND THE CORRESPONDING RATIOS ARE CORRECT _ WRITE TESTS
+        # TODO: CHECK ALL THESE EQUATIONS AND MAKE SURE THEY ARE BALANCED AND THE CORRESPONDING RATIOS ARE CORRECT - WRITE TESTS
         # Calculate conversion ratios to CO2
         CO_conv_ratio = (2 * mm["CO2"]) / (2 * mm["CO"])  # 2 CO + O2 -> 2 CO2
         CH4_conv_ratio = (mm["CO2"]) / mm["CH4"]  # CH4 + 2O2 -> CO2 + 2 H2O
@@ -94,8 +93,10 @@ def syngas_combustion_GWP(predictions, FU=settings.general["FU"]):
 
     # Add output as biogenic/non-biogenic emissions
     biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock_category]
-    GWP_biogenic = list(np.array(GWP_syngas_combustion) * biogenic_fraction)
-    GWP_non_biogenic = list(np.array(GWP_syngas_combustion) * (1 - biogenic_fraction))
+    GWP_inc_biogenic = list(np.array(GWP_syngas_combustion) * biogenic_fraction)
+    GWP_exc_biogenic = list(np.array(GWP_syngas_combustion) * (1 - biogenic_fraction))
 
-    # Return final calculated GWPs from syngas combustion
-    return GWP_syngas_combustion, {"biogenic GWP": GWP_biogenic, "non-biogenic GWP": GWP_non_biogenic}
+    # TODO: I think GWP_exc_biogenic should be retunred instead as first function return - do not consider biogenic
+    #  emissions in analysis Return final calculated GWPs from syngas combustion
+    return GWP_syngas_combustion, {"inc. biogenic GWP": GWP_inc_biogenic, "exc. biogenic GWP": GWP_exc_biogenic,
+                                   "units": "kg CO2eq./FU"}

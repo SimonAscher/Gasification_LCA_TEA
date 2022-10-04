@@ -82,6 +82,7 @@ def energy_drying(mass_feedstock, moisture_ar, moisture_post_drying,
     # Electricity requirement:
     # Calculate auxiliary energy requirements (electricity) for screw feeders, pumps, fans, etc.
     electricity_drying = []
+    # TODO: Add auxiliary energy requirements and make sure to add to requirements below and LCA function
 
     if electricity_reference == 'GaBi (mean)':
         electricity_drying = electricity_requirements[electricity_reference] * mass_feedstock
@@ -185,4 +186,10 @@ def drying_GWP(energy_drying_dict):
     # Sum GWPs
     total_GWP = electricity_GWP + heat_GWP
 
+    # TODO: Implement solar drying and waste heat drying - would mean no energy req for drying
+    #  or much lower requirement, respectively
+
+    # TODO: Implement syngas use - make sure model accounts for less syngas being available for CHP etc. - would use
+    #  energy for drying - see how much syngas that corresponds to and then calculate emissions from combusting this
+    #  much syngas using existing function
     return total_GWP

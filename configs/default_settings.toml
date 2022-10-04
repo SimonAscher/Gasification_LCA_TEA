@@ -18,7 +18,7 @@ countries = ["UK", "Germany", "USA", "World"]
 feedstock_categories = ["plastics", "municipal solid waste", "herbaceous biomass", "woody biomass", "sewage sludge", "other"]
 
 # Functional unit (FU) used in LCA
-FU = 1000  # 1kg of feedstock
+FU = 1000  # 1 tonne of feedstock
 
 
 [default.labels]
@@ -58,13 +58,14 @@ C2H4 = 1.18
 units = "kg/m3"
 
 [default.data.molar_masses]
-# Molar or molecular masses of different gas species
+# Molar or molecular masses of different gas species and other elements
 N2 = 28
 H2 = 2
 CO = 28
 CO2 = 44
 CH4 = 16
 C2H4 = 28
+C = 12
 units = "g/mol"
 
 [default.data.CO2_equivalents]
@@ -119,11 +120,23 @@ room_temperature = 18  # in deg C
 
 
 [default.data.specific_heats.water_vapor]
+# Specific heat of water vapour
 "18 degC" = 1.86  # [kJ/kg K] at room temperature
 "40 degC" = 1.87  # [kJ/kg K] at dryer temperature
 "100 degC" = 1.89  # [kJ/kg K] at boiling temperature
 
 
+[default.data.biochar.carbon_fraction]
+# Lower, mode, and upper limit for recalcitrant carbon fraction of biochar
+lower = 0.30
+mode = 0.65
+upper = 0.90
+
+[default.data.biochar.recalcitrant_fraction]
+# Lower, mode, and upper limit for recalcitrant carbon fraction of biochar
+lower = 0.80
+mode = 0.90
+upper = 0.97
 
 
 
