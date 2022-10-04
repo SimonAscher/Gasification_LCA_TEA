@@ -1,18 +1,22 @@
 # %% Test subfunctions
 import time
-from functions.general.pred_to_dist.utils import get_correct_sigma, make_dist
+from functions.general.pred_distributions.utils import get_correct_sigma
+from functions.MC import make_dist
 
 prediction = 3.8
 output_label = "C2Hn [vol.% db]"
 correct_sigma = get_correct_sigma(prediction, output_label)
 print("Correct sigma:", correct_sigma)
 
-a = make_dist(mean=prediction, sigma=correct_sigma, dist_type="gaussian")
+from configs import gaussian
+
+a = make_dist(gaussian(prediction, correct_sigma))
+
 print("Distribution with separate functions:", a)
 
 # %% Test main function
 
-from functions.general.pred_to_dist import pred_to_dist
+from functions.general.pred_distributions import pred_to_dist
 
 dist = pred_to_dist(prediction, output_label)
 print("Distribution with convenience function:", dist)
@@ -31,7 +35,7 @@ end = time.time()
 print("The time of execution of above program is :", end - start)
 
 # %% Test func to get all predictions to distributions
-from functions.general.pred_to_dist import get_all_prediction_distributions
+from functions.general.pred_distributions import get_all_prediction_distributions
 from models.prediction_model import get_models, make_predictions
 
 fake_test_data_array = [49.09, 6.06, 0.08, 4, 5.88, 11.53, 800, 1, 0.3, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]

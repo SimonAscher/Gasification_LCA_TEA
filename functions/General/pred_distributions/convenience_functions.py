@@ -1,6 +1,8 @@
-from functions.general.pred_to_dist import utils
-from functions.general.pred_to_dist.utils import make_dist, get_correct_sigma
+from functions.general.pred_distributions import utils
+from functions.general.pred_distributions.utils import get_correct_sigma
+from functions.MC import make_dist
 from config import settings
+from configs import gaussian
 
 
 def pred_to_dist(prediction, output_label):
@@ -23,7 +25,7 @@ def pred_to_dist(prediction, output_label):
     # Get correct error value
     sigma = get_correct_sigma(prediction, output_label)
     # Get distribution
-    distribution = make_dist(prediction, sigma)
+    distribution = make_dist(gaussian(prediction, sigma))
 
     return distribution
 

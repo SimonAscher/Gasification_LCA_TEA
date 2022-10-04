@@ -1,5 +1,5 @@
 # Test to_MC_array function
-from functions.general.utility._to_MC_array import to_MC_array
+from functions.MC.utils import to_MC_array
 
 a = to_MC_array(3.3)
 print(to_MC_array(3.3))
