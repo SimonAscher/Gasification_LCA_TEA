@@ -7,6 +7,10 @@ country = "UK"
 # Feedstock type
 feedstock_category = "herbaceous biomass"
 
+# Feedstock moisture
+"Moisture pre drying" = 18  # Moisture content before drying [%wb]
+"Mositure post drying" = 11.53  # Moisture content post drying [%wb]
+
 # TODO: Add validator which checks the options for these inputs - should correspond with the options given in
 #  default_settings file - could also see how to add default values
 #  (see https://www.dynaconf.com/validation/#combining-validators)
@@ -16,33 +20,25 @@ feedstock_category = "herbaceous biomass"
 
 # TODO: Add moisture as AR and post drying - want to use post drying in prediction model and both in drying model
 #  Once implmented add these as default values for drying function
+# Elementary composition
+"C" = 49.09  # Carbon [%daf]
+"H" = 6.06  # Hydrogen [%daf]
+"S" = 0.08  # Sulphur [%daf]
 
-## Elementary composition
-#"C [%daf]" =
-#"H [%daf]" =
-#"S [%daf]" =
-#"Particle size [mm]"
-#"Ash [%db]"
-#"Moisture [%wb]"
-#"Temperature [°C]"
-#"Operation (Batch/Continuous)"
-#"ER"
-#'Catalyst'
-#"Scale"
-## Could have one agent line and then later function which creates the array with 0s and 1s - similar for other 1 hot encoded variables
-#"Agent_air"
-#"Agent_air + steam"
-#"Agent_other"
-#"Agent_oxygen"
-#"Agent_steam"
-#"Reactor_fixed bed"
-#"Reactor_fluidised bed"
-#"Reactor_other"
-#"Bed_N/A"
-#"Bed_alumina"
-#"Bed_olivine"
-#"Bed_other"
-#"Bed_silica"
+# Proximate composition and particle size
+"PS" = 4  # Particle size [mm]
+"Ash" = 5.88  #  Ash content [%db]
+"Moisture post drying" = 11.53  # Moisture content post drying [%wb]  #TODO: Note same as above - see if I can just call the other value instead of writing it again...
+
+# Operating Conditions
+"T" = 800  # Temperature [°C]
+"Operation" = "Continuous"  # Operation mode (Batch/Continuous)
+"ER" = 0.3  # Equivalence ratio
+"Catalyst" = false  # Catalyst use (true OR false)
+"Scale" = "Pilot"  # Operation scale ("Lab" OR "Pilot")
+"Agent" = "Air"  # Gasifying agent used ("Air" OR "Air + steam" OR "Other" OR "Oxygen" OR "Steam"
+"Reactor" = "Fluidised"  # Reactor type ("Fixed" OR "Fluidised" OR "Other")
+"Bed" = "Silica"  # Fluidised bed reactor bed material ("N/A" OR "Alumina" OR "Olivine" OR "Other" OR "Silica"
 
 [default.user_inputs.drying_process]
 dryer_type = "Direct fired dryer"
