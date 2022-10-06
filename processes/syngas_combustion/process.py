@@ -89,14 +89,13 @@ def syngas_combustion_GWP(predictions, FU=settings.general["FU"]):
         return GWP
 
     # Employ GWP calculation function
-    GWP_syngas_combustion = syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield)  # [kg CO2eq. / FU]
+    GWP_syngas_combustion = syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield)  # [kg CO2eq./FU]
 
     # Add output as biogenic/non-biogenic emissions
     biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock_category]
-    GWP_inc_biogenic = list(np.array(GWP_syngas_combustion) * biogenic_fraction)
     GWP_exc_biogenic = list(np.array(GWP_syngas_combustion) * (1 - biogenic_fraction))
 
-    # TODO: I think GWP_exc_biogenic should be retunred instead as first function return - do not consider biogenic
+    # TODO: I think GWP_exc_biogenic should be returned instead as first function return - do not consider biogenic
     #  emissions in analysis Return final calculated GWPs from syngas combustion
-    return GWP_syngas_combustion, {"inc. biogenic GWP": GWP_inc_biogenic, "exc. biogenic GWP": GWP_exc_biogenic,
-                                   "units": "kg CO2eq./FU"}
+    return GWP_exc_biogenic, {"inc. biogenic GWP": GWP_syngas_combustion, "exc. biogenic GWP": GWP_exc_biogenic,
+                              "units": "kg CO2eq./FU"}

@@ -37,9 +37,8 @@ print("The time of execution of above program is :", end - start)
 # %% Test func to get all predictions to distributions
 from functions.general.pred_distributions import get_all_prediction_distributions
 from models.prediction_model import get_models, make_predictions
-
-fake_test_data_array = [49.09, 6.06, 0.08, 4, 5.88, 11.53, 800, 1, 0.3, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]
+from models.prediction_model import fetch_inputs
 
 models = get_models()
-all_predictions = make_predictions(models_dict=models, data=fake_test_data_array)
+all_predictions = make_predictions(models_dict=models, data=fetch_inputs())
 all_pred_dists = get_all_prediction_distributions(all_predictions)

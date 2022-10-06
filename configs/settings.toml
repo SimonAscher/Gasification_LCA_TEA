@@ -7,6 +7,9 @@ country = "UK"
 # Feedstock type
 feedstock_category = "herbaceous biomass"
 
+# How to treat biogenic emissions. By default they are "ignored" - alternatively "considered"
+biogenic = "ignored"
+
 # Feedstock moisture
 "Moisture pre drying" = 18  # Moisture content before drying [%wb]
 "Mositure post drying" = 11.53  # Moisture content post drying [%wb]

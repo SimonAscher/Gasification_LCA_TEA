@@ -165,6 +165,7 @@ def drying_GWP(energy_drying_dict):
 
     Returns
     -------
+        GWP values in kg CO2eq./FU.
 
     """
     # Convert units to kWh if not given in kWh already
@@ -177,11 +178,11 @@ def drying_GWP(energy_drying_dict):
     electricity_CO2_eq = settings.data.CO2_equivalents.electricity[settings.user_inputs.country]
     electricity_GWP = energy_drying_dict["electricity"]
 
-    from functions.LCA.helpers import natural_gas_for_heat_GWP
+    from functions.LCA import thermal_energy_GWP
 
     # Calculate impact due to heat demands
     if energy_drying_dict["heat source"] == "natural gas":
-        heat_GWP = natural_gas_for_heat_GWP(energy_drying_dict["heat"], energy_drying_dict["units"])
+        heat_GWP = thermal_energy_GWP(energy_drying_dict["heat"], energy_drying_dict["units"])
 
     # Sum GWPs
     total_GWP = electricity_GWP + heat_GWP
