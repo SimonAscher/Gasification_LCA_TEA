@@ -1,7 +1,7 @@
 from config import settings
 
 
-def fetch_inputs():
+def fetch_ML_inputs():
     """
     Fetches user inputs and gets them in right format for prediction models.
 

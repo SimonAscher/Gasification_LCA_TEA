@@ -1,5 +1,5 @@
 # Get model predictions
-from functions.general.pred_distributions import get_all_prediction_distributions
+from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from models.prediction_model import get_models, make_predictions
 from models.prediction_model import fetch_inputs
 

@@ -1,5 +1,5 @@
 # # Test function
-from functions.general.pred_distributions import get_all_prediction_distributions
+from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from models.prediction_model import get_models, make_predictions
 from processes.syngas_combustion import syngas_combustion_GWP
 from models.prediction_model import fetch_inputs

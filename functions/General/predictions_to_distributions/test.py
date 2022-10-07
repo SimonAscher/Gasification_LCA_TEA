@@ -1,6 +1,6 @@
 # %% Test subfunctions
 import time
-from functions.general.pred_distributions.utils import get_correct_sigma
+from functions.general.predictions_to_distributions.utils import get_correct_sigma
 from functions.MC import make_dist
 
 prediction = 3.8
@@ -16,7 +16,7 @@ print("Distribution with separate functions:", a)
 
 # %% Test main function
 
-from functions.general.pred_distributions import pred_to_dist
+from functions.general.predictions_to_distributions import pred_to_dist
 
 dist = pred_to_dist(prediction, output_label)
 print("Distribution with convenience function:", dist)
@@ -35,7 +35,7 @@ end = time.time()
 print("The time of execution of above program is :", end - start)
 
 # %% Test func to get all predictions to distributions
-from functions.general.pred_distributions import get_all_prediction_distributions
+from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from models.prediction_model import get_models, make_predictions
 from models.prediction_model import fetch_inputs
 

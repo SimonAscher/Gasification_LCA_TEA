@@ -1,6 +1,6 @@
 from models.prediction_model import make_predictions
 from models.prediction_model import get_models
-from models.prediction_model import fetch_inputs
+from functions.general.utility import fetch_ML_inputs
 
 # Create data to make predictions on
 
@@ -8,9 +8,9 @@ from models.prediction_model import fetch_inputs
 
 # Test function
 fetched_models = get_models()
-output = make_predictions(models_dict=fetched_models, data=fetch_inputs())
+output = make_predictions(models_dict=fetched_models, data=fetch_ML_inputs())
 print(output)
 
-output_reduced = make_predictions(models_dict=fetched_models, data=fetch_inputs(),
+output_reduced = make_predictions(models_dict=fetched_models, data=fetch_ML_inputs(),
                                   output_selector=['CO [vol.% db]', 'CO2 [vol.% db]'])
 print(output_reduced)
