@@ -1,0 +1,6 @@
+[user_inputs]
+country11 = "spain"
+test = 5
+"test variable" = 25
+
+# TODO: Add user inputs toml file to config.
