@@ -1,3 +1,8 @@
+# Can be used to replace user_inputs.toml when no real user inputs are available - i.e. to creater Example
+
+[default]
+
+
 # Required User Inputs
 [default.user_inputs]
 

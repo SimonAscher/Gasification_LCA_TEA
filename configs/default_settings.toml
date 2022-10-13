@@ -35,12 +35,6 @@ output_units = ["[vol.% db]", '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% 
     '[g/N$m^{3}$]', '[N$m^{3}$/kg wb]', '[g/kg wb]']
 
 
-[default.fake]
-# Fake data arrau to test functions
-# data_array = [[49.09, 6.06, 0.08], 4, [5.88, 11.53], [800, 1], 0.3, [0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]]
-# toml does not seem to support mixed arrays/lists
-
-
 [default.unit_conversions]
 mmBtu_to_MJ = 1055.06  # One million British thermal units to MJ
 

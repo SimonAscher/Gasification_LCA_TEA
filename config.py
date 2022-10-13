@@ -5,12 +5,12 @@ from dynaconf import Dynaconf  # , Validator
 settings = Dynaconf(
     settings_files=[  # Paths to toml files
         "configs/default_settings.toml",  # a file for default settings
-        "configs/settings.toml",  # a file for main settings
+        # "configs/generic_user_inputs.toml",  # generic user inputs
+        "configs/user_inputs.toml",  # a file for user inputs
         "configs/.secrets.toml"  # a file for sensitive data (gitignored)
     ],
 
     environments=True,  # Enable layered environments
-    # dotenv_path="configs/.env"  # custom path for .env file to be loaded
 )
 
 # %% Set up validators and defaults

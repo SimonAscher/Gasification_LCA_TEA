@@ -1,6 +1,20 @@
-[user_inputs]
-country11 = "spain"
-test = 5
-"test variable" = 25
-
-# TODO: Add user inputs toml file to config.
+[default.user_inputs]
+iterations_MC = 1000
+country = "UK"
+feedstock_category = "woody biomass"
+feedstock_name = "Some tree"
+"particle size" = 10.0
+"carbon content" = 50.0
+"hydrogen content" = 30.0
+"sulphur content" = 20.0
+"as received moisture" = 20.0
+"desired moisture" = 12.0
+ash = 12.0
+temperature = 800.0
+ER = 0.3
+"operation mode" = "Continuous"
+"operation scale" = "Lab"
+"gasifying agent" = "Air"
+catalyst = false
+"reactor type" = "Fluidised"
+"bed material" = "Silica"

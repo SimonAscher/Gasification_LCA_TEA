@@ -15,7 +15,7 @@ test_label = settings.labels.output_data[1]
 predictions_dist = pred_to_dist(12, test_label)
 print(predictions_dist)
 
-# %% Check if settings.toml works
+# %% Check if generic_user_inputs.toml works
 
 test = (settings.data.biogenic_fractions)
 
