@@ -60,6 +60,8 @@ CO2 = 44
 CH4 = 16
 C2H4 = 28
 C = 12
+O = 16
+H2O = 18
 units = "g/mol"
 
 [default.data.CO2_equivalents]
@@ -79,6 +81,10 @@ USA = 0.38  # [kg CO2eq./kWh] Ref: https://www.eia.gov/environment/emissions/car
 [default.data.CO2_equivalents.thermal_energy.natural_gas]
 # Carbon intensity of thermal energy generation from natural gas
 UK = 0.222  # [kg CO2eq./kWh] Ref: GaBi model "Natural gas use"
+
+[default.data.CO2_equivalents.resource_requirements]
+# Carbon intensity of various resource requirements
+oxygen = 0.0913  # [kg CO2eq./kg O2] Ref: GaBi model "oxygen seperation"
 
 
 [default.data.biogenic_fractions]
@@ -106,12 +112,9 @@ room_temperature = 18  # in deg C
 "Huber Belt dryer" = 0.0375  # [kWh/kg of water evaporation]
 
 
-[default.data.heats_vaporisation.water]
-# Specific latent heat of vaporisation of water
-"18 degC" = 2458  # [kJ/kg] at room temperature
-"40 degC" = 2406  # [kJ/kg] at dryer temperature
-"100 degC" = 2260  # [kJ/kg] at boiling temperature
-
+[default.data.specific_heats]
+# Specific heat capacity of water
+water = 4.186  # [kJ/kg K] at room temperature
 
 [default.data.specific_heats.water_vapor]
 # Specific heat of water vapour
@@ -119,6 +122,12 @@ room_temperature = 18  # in deg C
 "40 degC" = 1.87  # [kJ/kg K] at dryer temperature
 "100 degC" = 1.89  # [kJ/kg K] at boiling temperature
 
+
+[default.data.heats_vaporisation.water]
+# Specific latent heat of vaporisation of water
+"18 degC" = 2458  # [kJ/kg] at room temperature
+"40 degC" = 2406  # [kJ/kg] at dryer temperature
+"100 degC" = 2260  # [kJ/kg] at boiling temperature
 
 [default.data.biochar.carbon_fraction]
 # Lower, mode, and upper limit for recalcitrant carbon fraction of biochar
@@ -135,12 +144,27 @@ upper = 0.97
 [default.data.conversion_efficiencies]
 
 [default.data.conversion_efficiencies.CHP]
-# CHP conversion efficiencies as decimals. Source: 10.1016/j.wasman.2017.03.028
+
+[default.data.conversion_efficiencies.CHP.SOFC]
+# CHP conversion efficiencies as decimals. Solid oxide fuel cell. Source: 10.1016/j.wasman.2017.03.028
 electrical = 0.35
 heat = 0.55
 parasitic = 0.02
-# TODO: Update CHP efficiencies if necessary or add more types
+size_kW = 1.7
+make = "ISM Sunfire"
 
-[default.data.conversion_efficiencies.gas_engine]
-electrical = 0.45
-# TODO: Update gas_engine efficiencies if necessary or add more types
+[default.data.conversion_efficiencies.CHP.stirling_engine]
+# CHP conversion efficiencies as decimals. Source: 10.1016/j.wasman.2017.03.028
+electrical = 0.12
+heat = 0.80
+parasitic = 0.02
+size_kW = 1.2
+make = "Whispergen WhisperTech"
+
+[default.data.conversion_efficiencies.CHP.micro_gas_turbine]
+# CHP conversion efficiencies as decimals. Solid oxide fuel cell. Source: 10.1016/j.wasman.2017.03.028
+electrical = 0.26
+heat = 0.52
+parasitic = 0.10
+size_kW = 30
+make = "Capstone Turbine Corporation"

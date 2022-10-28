@@ -4,9 +4,9 @@ import numpy as np
 
 
 def CHP_GWP(gas_supplied, LHV_gas, displaced_heat_source="natural gas",
-            efficiency_electrical=settings.data.conversion_efficiencies.CHP["electrical"],
-            efficiency_heat=settings.data.conversion_efficiencies.CHP["heat"],
-            demand_parasitic=settings.data.conversion_efficiencies.CHP["parasitic"],
+            efficiency_electrical=settings.data.conversion_efficiencies.CHP.SOFC["electrical"],
+            efficiency_heat=settings.data.conversion_efficiencies.CHP.SOFC["heat"],
+            demand_parasitic=settings.data.conversion_efficiencies.CHP.SOFC["parasitic"],
             FU=settings.general["FU"]):
     """
 

@@ -1,4 +1,5 @@
 from config import settings
+from functions.general.utility import kJ_to_kWh, MJ_to_kWh
 
 
 def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settings.user_inputs.country):
@@ -28,12 +29,9 @@ def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settin
 
     # Convert units if not kWh
     if units == "kJ":
-        amount = amount / 3600
-        carbon_intensity_natural_gas = carbon_intensity_natural_gas / 3600
-
+        amount = kJ_to_kWh(amount)  # amount in kWh
     elif units == "MJ":
-        amount = amount / 3.6
-        carbon_intensity_natural_gas = carbon_intensity_natural_gas / 3.6
+        amount = MJ_to_kWh(amount)  # amount in kWh
 
     # Calculate GWP value
     GWP = carbon_intensity_natural_gas * amount
@@ -41,7 +39,7 @@ def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settin
     return GWP
 
 
-def electricity_GWP(amount, country=settings.user_inputs.country):
+def electricity_GWP(amount, country=settings.user_inputs["country"]):
     """
     Function to determine the GWP of using (or avoiding) a certain amount of grid electricity.
 
