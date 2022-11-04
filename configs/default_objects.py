@@ -42,6 +42,7 @@ class process_GWP_output:
 class process_GWP_output_MC:
     """ Dataclass to store all Monte Carlo simulation results for a process' GWP calculations."""
     process_name: str
+    subprocess_abbreviations: tuple[str] = ()  # abbreviations of subprocesses used for plotting
     simulation_results: tuple[process_GWP_output] = ()  # Stores results objects.
     simulation_parameters: tuple[list] = ()  # Stores simulation parameters.
 

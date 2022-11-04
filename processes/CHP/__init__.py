@@ -1,1 +1,1 @@
-from .process import CHP_GWP
+from .process import CHP_GWP_MC

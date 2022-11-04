@@ -3,6 +3,8 @@ from functions.general.predictions_to_distributions.utils import get_correct_sig
 from functions.MC import make_dist
 from config import settings
 from configs import gaussian
+from models.prediction_model import get_models, make_predictions
+from functions.general.utility import fetch_ML_inputs
 
 
 def pred_to_dist(prediction, output_label):
@@ -30,7 +32,7 @@ def pred_to_dist(prediction, output_label):
     return distribution
 
 
-def get_all_prediction_distributions(predictions):
+def get_all_prediction_distributions(predictions=make_predictions(models_dict=get_models(), data=fetch_ML_inputs())):
     """
     Wrapper function to get prediction distributions for all outputs.
     Parameters

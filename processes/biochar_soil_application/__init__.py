@@ -1,1 +1,1 @@
-from .process import biochar_soil_CO2_eq
+from .process import biochar_soil_GWP_MC

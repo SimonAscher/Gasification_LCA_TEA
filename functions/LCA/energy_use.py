@@ -2,7 +2,7 @@ from config import settings
 from functions.general.utility import kJ_to_kWh, MJ_to_kWh
 
 
-def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settings.user_inputs.country):
+def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settings.user_inputs.country, displaced=False):
     """
     Function which calculates the GWP of thermal energy use.
 
@@ -16,6 +16,8 @@ def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settin
         Defines units used in analysis - either kWh or kJ or MJ
     country: str
         Reference country used in process.
+    displaced: bool
+        Determines whether energy is used (False) or displaces grid use (True).
     Returns
     -------
     float
@@ -36,10 +38,14 @@ def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settin
     # Calculate GWP value
     GWP = carbon_intensity_natural_gas * amount
 
+    # Check if energy used or displaced
+    if displaced:
+        GWP *= -1
+
     return GWP
 
 
-def electricity_GWP(amount, country=settings.user_inputs["country"]):
+def electricity_GWP(amount, country=settings.user_inputs["country"], displaced=False):
     """
     Function to determine the GWP of using (or avoiding) a certain amount of grid electricity.
 
@@ -49,6 +55,8 @@ def electricity_GWP(amount, country=settings.user_inputs["country"]):
         Takes the amount of electricity in kWh.
     country: str
         Specifies the reference country or region.
+    displaced: bool
+        Determines whether energy is used (False) or displaced (True).
     Returns
     -------
     float
@@ -56,5 +64,9 @@ def electricity_GWP(amount, country=settings.user_inputs["country"]):
     """
     electricity_intensity = settings.data.CO2_equivalents.electricity[country]
     GWP = electricity_intensity * amount
+
+    # Check if energy used or displaced
+    if displaced:
+        GWP *= -1
 
     return GWP

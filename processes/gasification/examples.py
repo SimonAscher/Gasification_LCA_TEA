@@ -16,5 +16,4 @@ oxygen_test = gasification_requirements(agent_type="Oxygen", agent_mass=mass_age
 test_oxygen_GWP = gasification_GWP(oxygen_test)
 
 # Test MC
-MC_steam = gasification_GWP_MC()
-MC_oxygen = gasification_GWP_MC()
+MC_default = gasification_GWP_MC()

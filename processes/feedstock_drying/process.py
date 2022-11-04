@@ -238,4 +238,6 @@ def drying_GWP_MC(MC_iterations=settings.background.iterations_MC):
         # Store in output object
         MC_outputs.add_GWP_object(GWP_object)
 
+    MC_outputs.subprocess_abbreviations = ("Elect.", "Heat", )  # add abbreviation of subprocess
+
     return MC_outputs
