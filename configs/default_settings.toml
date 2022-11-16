@@ -51,6 +51,7 @@ CO = 1.14
 CO2 = 1.98
 CH4 = 0.656
 C2H4 = 1.18
+O2 = 1.323
 units = "kg/m3"
 
 [default.data.molar_masses]
@@ -148,25 +149,43 @@ upper = 0.97
 [default.data.conversion_efficiencies.CHP]
 
 [default.data.conversion_efficiencies.CHP.SOFC]
-# CHP conversion efficiencies as decimals. Solid oxide fuel cell. Source: 10.1016/j.wasman.2017.03.028
+# CHP conversion efficiencies as decimals. Solid oxide fuel cell.
 electrical = 0.35
 heat = 0.55
 parasitic = 0.02
 size_kW = 1.7
 make = "ISM Sunfire"
+source = "https://doi.org/10.1016/j.wasman.2017.03.028"
+
 
 [default.data.conversion_efficiencies.CHP.stirling_engine]
-# CHP conversion efficiencies as decimals. Source: 10.1016/j.wasman.2017.03.028
+# CHP conversion efficiencies as decimals.
 electrical = 0.12
 heat = 0.80
 parasitic = 0.02
 size_kW = 1.2
 make = "Whispergen WhisperTech"
+source = "https://doi.org/10.1016/j.wasman.2017.03.028"
+
 
 [default.data.conversion_efficiencies.CHP.micro_gas_turbine]
-# CHP conversion efficiencies as decimals. Solid oxide fuel cell. Source: 10.1016/j.wasman.2017.03.028
+# CHP conversion efficiencies as decimals. Solid oxide fuel cell.
 electrical = 0.26
 heat = 0.52
 parasitic = 0.10
 size_kW = 30
 make = "Capstone Turbine Corporation"
+source = "https://doi.org/10.1016/j.wasman.2017.03.028"
+
+
+[default.data.power_requirements.air_separation_unit]
+# Electricity requirements of an air seperation unit for the production of Oxygen.
+"oxygen purity" = 0.95  # 95%
+"power consumption" = 225  # [kW/ton O2] Note: Given as power not energy consumption.
+source = "https://doi.org/10.1002/apj.354"
+
+[default.data.energy_requirements.air_separation_unit]
+# Electricity requirements of an air seperation unit for the production of Oxygen.
+"energy consumption low" = 0.360  # [kWh/ Nm3 O2]
+"energy consumption high" = 0.500  # [kWh/ Nm3 O2]
+source = "Energy saving air-separation plant based on exergy analysis. Taniguchi, Masaaki; Asaoka, Hitoshi; Ayuhara, Toshiyuki. KOBELCO TECHNOLOGY REVIEW NO. 33 FEB. 2015"

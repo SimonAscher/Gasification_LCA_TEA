@@ -15,7 +15,7 @@ class process_GWP_output:
     # Process name, overall GWP of process and GWP when not accounting for biogenic nature of carbon.
     process_name: str
     GWP: Union[float, str] = "empty"
-    GWP_inc_biogenic: Union[float, str] = "empty"
+    GWP_from_biogenic: Union[float, str] = "empty"
 
     # Tuples to store names and respective emissions of subprocesses.
     subprocess_names: tuple[str] = ()

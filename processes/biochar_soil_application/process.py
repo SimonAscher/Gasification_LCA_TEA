@@ -52,7 +52,7 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=get_all_prediction_distributio
                  carbon_fraction_array * labile_carbon_array
 
     GWP_total = list(GWP_recalcitrant)
-    GWP_inc_biogenic = list(GWP_recalcitrant + GWP_labile)
+    GWP_from_biogenic = list(GWP_labile)
 
     # Initialise MC output object
     name_process = "Biochar to soil"
@@ -62,7 +62,7 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=get_all_prediction_distributio
     # Store values in default MC output object
     for count, entry in enumerate(GWP_total):
         GWP_object = process_GWP_output(process_name=name_process, GWP=entry)
-        GWP_object.GWP_inc_biogenic = GWP_inc_biogenic[count]
+        GWP_object.GWP_from_biogenic = GWP_from_biogenic[count]
         GWP_object.add_subprocess(name=name_process, GWP=entry)
 
         MC_outputs.add_GWP_object(GWP_object)

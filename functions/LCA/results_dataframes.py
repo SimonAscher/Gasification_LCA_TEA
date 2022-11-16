@@ -26,7 +26,7 @@ def process_GWP_MC_to_df(process_GWP_output_MC):
     # Initialise lists to store extracted data
     process_name = []
     GWP = []
-    GWP_inc_biogenic = []
+    GWP_from_biogenic = []
     subprocess_names = []
     subprocess_GWP = []
     units = []
@@ -35,7 +35,7 @@ def process_GWP_MC_to_df(process_GWP_output_MC):
     for count in list(range(settings.background.iterations_MC)):
         process_name.append(process_GWP_output_MC.simulation_results[count].process_name)
         GWP.append(process_GWP_output_MC.simulation_results[count].GWP)
-        GWP_inc_biogenic.append(process_GWP_output_MC.simulation_results[count].GWP_inc_biogenic)
+        GWP_from_biogenic.append(process_GWP_output_MC.simulation_results[count].GWP_from_biogenic)
         subprocess_names.append(process_GWP_output_MC.simulation_results[count].subprocess_names)
         subprocess_GWP.append(process_GWP_output_MC.simulation_results[count].subprocess_GWP)
         units.append(process_GWP_output_MC.simulation_results[count].units)
@@ -43,7 +43,7 @@ def process_GWP_MC_to_df(process_GWP_output_MC):
     # Store data in dataframe
     df.loc["process_name", df.columns[0]] = process_name
     df.loc["GWP", df.columns[0]] = GWP
-    df.loc["GWP_inc_biogenic", df.columns[0]] = GWP_inc_biogenic
+    df.loc["GWP_from_biogenic", df.columns[0]] = GWP_from_biogenic
     df.loc["subprocess_names", df.columns[0]] = subprocess_names
     df.loc["subprocess_GWP", df.columns[0]] = subprocess_GWP
     df.loc["units", df.columns[0]] = units

@@ -44,9 +44,12 @@ def syngas_combustion_GWP_MC(predictions=get_all_prediction_distributions()):
     # Employ GWP calculation function
     GWP_syngas_combustion_inc_biogenic = syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield)  # [kg CO2eq./FU]
 
-    # Calculate non biogenic emission
+    # Calculate non biogenic emissions
     biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock_category]
     GWP_syngas_combustion_exc_biogenic = list(np.array(GWP_syngas_combustion_inc_biogenic) * (1 - biogenic_fraction))
+
+    # Calculate emissions from biogenic sources
+    GWP_syngas_combustion_from_biogenic = list(np.array(GWP_syngas_combustion_inc_biogenic) * biogenic_fraction)
 
     # Initialise MC output object
     name_process = "Syngas combustion"
@@ -55,7 +58,7 @@ def syngas_combustion_GWP_MC(predictions=get_all_prediction_distributions()):
     # Store values in default MC output object
     for count, entry in enumerate(GWP_syngas_combustion_exc_biogenic):
         GWP_object = process_GWP_output(process_name=name_process, GWP=entry,
-                                        GWP_inc_biogenic=GWP_syngas_combustion_inc_biogenic[count])
+                                        GWP_from_biogenic=GWP_syngas_combustion_from_biogenic[count])
         GWP_object.add_subprocess(name=name_process, GWP=entry)
         MC_outputs.add_GWP_object(GWP_object)
 
