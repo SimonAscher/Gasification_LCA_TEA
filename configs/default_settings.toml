@@ -157,6 +157,15 @@ size_kW = 1.7
 make = "ISM Sunfire"
 source = "https://doi.org/10.1016/j.wasman.2017.03.028"
 
+[default.data.conversion_efficiencies.CHP.jenbacher_type_6]
+# CHP conversion efficiencies as decimals. Jenbacher Type 6 gas engine.
+ # Note: Much larger size than some of the other units.
+electrical = 0.44
+heat = 0.44
+parasitic = 0
+size_kW = 1634
+make = "Jenbacher Type 6"
+source = "https://www.innio.com/en/jenbacher/gas-engines/type-6"
 
 [default.data.conversion_efficiencies.CHP.stirling_engine]
 # CHP conversion efficiencies as decimals.
@@ -166,7 +175,6 @@ parasitic = 0.02
 size_kW = 1.2
 make = "Whispergen WhisperTech"
 source = "https://doi.org/10.1016/j.wasman.2017.03.028"
-
 
 [default.data.conversion_efficiencies.CHP.micro_gas_turbine]
 # CHP conversion efficiencies as decimals. Solid oxide fuel cell.
@@ -184,8 +192,14 @@ source = "https://doi.org/10.1016/j.wasman.2017.03.028"
 "power consumption" = 225  # [kW/ton O2] Note: Given as power not energy consumption.
 source = "https://doi.org/10.1002/apj.354"
 
-[default.data.energy_requirements.air_separation_unit]
+
+[default.data.energy_requirements.air_separation_unit.A]
 # Electricity requirements of an air seperation unit for the production of Oxygen.
 "energy consumption low" = 0.360  # [kWh/ Nm3 O2]
 "energy consumption high" = 0.500  # [kWh/ Nm3 O2]
 source = "Energy saving air-separation plant based on exergy analysis. Taniguchi, Masaaki; Asaoka, Hitoshi; Ayuhara, Toshiyuki. KOBELCO TECHNOLOGY REVIEW NO. 33 FEB. 2015"
+
+[default.data.energy_requirements.air_separation_unit.B]
+# Electricity requirements of an air seperation unit for the production of Oxygen.
+"energy consumption" = 0.3056  # [kWh/ Nm3 O2]. Note: Given as 231kWh/tonne O2 in paper.
+source = "https://doi.org/10.1016/j.ijggc.2013.10.009"

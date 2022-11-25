@@ -21,7 +21,28 @@ def plot_global_GWP(GWP_df, bins=20):
     return ax
 
 
-def plot_average_GWP_byprocess(GWP_df, legend="in_plot", save=(False, "placeholder_save_location_str")):
+def plot_average_GWP_byprocess(GWP_df, legend_loc="plot", short_labels=True,
+                               save=(False, "placeholder_save_location_str")):
+    """
+
+
+    Notes: Generally legend_loc="plot" and short_labels=True OR legend_loc="box" and short_labels=False produces the
+    best results.
+
+    Parameters
+    ----------
+    GWP_df
+    legend_loc: str
+        Determine whether subprocess labels should be placed on plot ("plot") or in legend box ("box").
+    short_labels: bool
+        Determines whether shortened labels should be used (True) or not (False).
+    save
+
+    Returns
+    -------
+
+    """
+    # TODO: Add save functionality to this figure creation function and the other ones too.
     # Setup general variables
     sns.set_theme()
     bar_width = 0.5
@@ -34,7 +55,8 @@ def plot_average_GWP_byprocess(GWP_df, legend="in_plot", save=(False, "placehold
     for process_count in np.arange(len(GWP_df.columns) - 1):
         # Get arrays of subprocess GWP values and names
         subprocess_names = np.transpose(GWP_df.loc["subprocess_names", GWP_df.columns[process_count]])
-        subprocess_short_labels = np.transpose(GWP_df.loc["subprocess_abbreviations", GWP_df.columns[process_count]])
+        if short_labels:
+            subprocess_short_labels = np.transpose(GWP_df.loc["subprocess_abbreviations", GWP_df.columns[process_count]])
 
         subprocess_GWPs = np.transpose(GWP_df.loc["subprocess_GWP", GWP_df.columns[process_count]])
 
@@ -42,24 +64,41 @@ def plot_average_GWP_byprocess(GWP_df, legend="in_plot", save=(False, "placehold
         for subprocess_count, _ in enumerate(list(subprocess_GWPs)):
             subprocess_GWP_mean = np.mean(subprocess_GWPs[subprocess_count])  # calculate subprocess GWP mean
             subprocess_label = subprocess_names[subprocess_count][0]  # get subprocess name
-            subprocess_label_short = subprocess_short_labels[subprocess_count]  # get shorthand labels for plotting
+            if short_labels:
+                subprocess_label = subprocess_short_labels[subprocess_count]  # get shorthand labels for plotting
             y_array = np.zeros(len(x_array))  # Initialise y-array
             y_array[process_count] = subprocess_GWP_mean  # Update y-array with GWP in appropriate position
 
             # Plot stacked bar graph for individual process
             if subprocess_count == 0:  # plot first subprocess
                 ax.bar(x_array, y_array, bar_width, label=subprocess_label)
-                running_total = y_array
+                if subprocess_GWP_mean > 0:  # positive number case
+                    running_total_pos = y_array
+                    running_total_neg = np.zeros(len(x_array))  # Initialise other case as zero
+                else:  # negative number case
+                    running_total_neg = y_array
+                    running_total_pos = np.zeros(len(x_array))  # Initialise other case as zero
             else:  # plot other subprocesses
-                ax.bar(x_array, y_array, bar_width, bottom=running_total, label=subprocess_label)
-                running_total += y_array  # update running total
+                if subprocess_GWP_mean > 0:  # positive number case
+                    ax.bar(x_array, y_array, bar_width, bottom=running_total_pos, label=subprocess_label)
+                    running_total_pos += y_array  # update running total
+                else:  # negative number case
+                    ax.bar(x_array, y_array, bar_width, bottom=running_total_neg, label=subprocess_label)
+                    running_total_neg += y_array  # update running total
 
             # Plot labels on graph
-            if legend == "in_plot":
+            if legend_loc == "plot":
                 if abs(y_array[process_count]) > 50:  # Set threshold for minimum stack size to avoid overlapping labels
+                    if subprocess_GWP_mean > 0:
+                        y_position = (running_total_pos[process_count] - y_array[process_count]) \
+                                     + y_array[process_count] * 0.5
+                    else:
+                        y_position = (running_total_neg[process_count] - y_array[process_count]) \
+                                     + y_array[process_count] * 0.5
+
                     plt.text(x=x_array[process_count],
-                             y=(running_total[process_count] - y_array[process_count]) + y_array[process_count] * 0.5,
-                             s=subprocess_label_short,
+                             y=y_position,
+                             s=subprocess_label,
                              color="black",
                              fontsize=12,
                              horizontalalignment='center'
@@ -75,7 +114,7 @@ def plot_average_GWP_byprocess(GWP_df, legend="in_plot", save=(False, "placehold
     plt.xticks(rotation=45)
 
     # Display legend
-    if legend == "in_box":
+    if legend_loc == "box":
         ax.legend()
 
     # Display plot
@@ -120,6 +159,8 @@ def plot_single_process_GWP(GWP_df, process_name, bins=40, stacked=True, show_to
     # Display plot
     plt.tight_layout()
     plt.show()
+    # TODO: This function currently sometimes displays two figure objects (1 being empty). Not sure why this happens
+    #  as the syntax is similar to other plotting functions.
 
     return ax
 
@@ -167,5 +208,3 @@ def plot_global_GWP_byprocess(GWP_df, bins=50):
     plt.show()
 
     return ax
-
-

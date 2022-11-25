@@ -1,8 +1,9 @@
 from config import settings
+import numpy as np
 from configs import process_requirements, process_GWP_output, process_GWP_output_MC
 from functions.LCA import thermal_energy_GWP, electricity_GWP
 from functions.general.utility import kJ_to_kWh
-from processes.gasification import mass_agent
+from processes.gasification import mass_agent, air_separation_unit_rng_elect_req, steam_heat_req
 
 # file to calculate gasification outputs
 # i.e. how much biochar and how much syngas is produced
@@ -16,7 +17,7 @@ Energy requirements for:
 def gasification_requirements(operation_mode=settings.user_inputs["operation mode"],
                               operation_scale=settings.user_inputs["operation scale"],
                               agent_type=settings.user_inputs["gasifying agent"],
-                              agent_mass=mass_agent(),
+                              agent_mass=None,
                               catalyst=settings.user_inputs["catalyst"],
                               reactor_type=settings.user_inputs["reactor type"],
                               bed_material=settings.user_inputs["bed material"],
@@ -43,6 +44,11 @@ def gasification_requirements(operation_mode=settings.user_inputs["operation mod
             - Electricity [kWh/FU]
             - GWP [kg CO2eq./FU]
     """
+    # TODO: Add aux demands and demands based on reactor type etc.
+
+    # Define defaults
+    if agent_mass is None:
+        agent_mass = mass_agent()
 
     # Initialise dictionary to store all requirements - append to requirement lists
     requirements = process_requirements(name="gasification_requirements")
@@ -57,29 +63,20 @@ def gasification_requirements(operation_mode=settings.user_inputs["operation mod
 
     elif agent_type == "Oxygen":
         total_oxygen_mass = agent_mass["Oxygen"] * FU  # [kg/FU]
-        total_oxygen_GWP = total_oxygen_mass * settings.data.CO2_equivalents.resource_requirements["oxygen"]  # [kgCO2eq./FU]
-        requirements.add_subprocess("Agent", GWP=total_oxygen_GWP)  # add to requirements object
-        # TODO: Currently this value seems too low - 1/10th of steam - look into it again - maybe other source than GaBi
+        total_oxygen_electricity_req = total_oxygen_mass * air_separation_unit_rng_elect_req()
+        requirements.add_subprocess("Agent", electricity=total_oxygen_electricity_req)
 
     elif agent_type == "Steam":
-        # Get some reference parameters
-        room_temperature = settings.data.feedstock_drying.room_temperature  # in deg C
-        boiling_temperature = 100  # in deg C
-
-        # Calculate heat requirements
-        heat_raise = (boiling_temperature - room_temperature) * settings.data.specific_heats["water"]  # [kJ/kg]
-        heat_vaporisation = settings.data.heats_vaporisation.water["100 degC"]  # [kJ/kg]
-        unit_heat_required = heat_raise + heat_vaporisation  # in kJ/kg steam
-        total_heat_required_kJ = unit_heat_required * agent_mass["Steam"] * FU  # [kJ/FU]
-        total_heat_required = kJ_to_kWh(total_heat_required_kJ)  # [kWh/FU]
-        requirements.add_subprocess("Agent", heat=total_heat_required)  # add to requirements object
+        # Get heat requirement for steam production
+        heat_req_steam = steam_heat_req(mass_steam=agent_mass["Steam"])
+        requirements.add_subprocess("Agent", heat=heat_req_steam)  # add to requirements object
     else:
         raise ValueError("Wrong agent type given")
 
     return requirements
 
 
-def gasification_GWP(requirements=gasification_requirements()):
+def gasification_GWP(requirements=None):
     """
     Calculates the GWP resulting from the heat and electricity requirements of the gasification process.
 
@@ -92,6 +89,11 @@ def gasification_GWP(requirements=gasification_requirements()):
     -------
 
     """
+
+    # Use this syntax to assign default to ensure requirements is run new every time.
+    if requirements is None:
+        requirements = gasification_requirements()
+
     # Initialise output object
     output_GWP = process_GWP_output(process_name="Gasification")
 

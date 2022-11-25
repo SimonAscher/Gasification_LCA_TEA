@@ -62,6 +62,6 @@ def CHP_GWP_MC(gas_supplied=get_all_prediction_distributions()["Gas yield [Nm3/k
 
         MC_outputs.add_GWP_object(GWP_object)
 
-    MC_outputs.subprocess_abbreviations = ("Elect.", "Heat", )  # add abbreviation of subprocess
+    MC_outputs.subprocess_abbreviations = ("Elect.", "Heat", )  # add abbreviation of subprocess'
 
     return MC_outputs

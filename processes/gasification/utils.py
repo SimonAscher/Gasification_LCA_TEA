@@ -1,5 +1,9 @@
 from config import settings
 from functions.general.utility import ultimate_comp_daf_to_wb
+from configs import gaussian
+from functions.MC import make_dist
+import numpy as np
+from functions.general.utility import kJ_to_kWh
 
 
 def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"],
@@ -102,3 +106,90 @@ def mass_agent(agent_type=settings.user_inputs["gasifying agent"], ER=settings.u
         mass_agent_output = {"Air": mass_air, "Steam": mass_steam, "units": "kg agent/kg feedstock wb"}
 
     return mass_agent_output
+
+
+def air_separation_unit_rng_elect_req(country=settings.user_inputs.country):
+    """
+    Generates a randomised electricity requirement of an air separation unit (ASU) based on normal distribution
+    defined by literature values.
+
+    Parameters
+    ----------
+    country
+
+    Returns
+    -------
+    float
+        Randomised electricity requirement of ASU [kWh el./kg O2].
+
+    -------
+
+    """
+    # Get data - More info in analysis - air_separation_unit_comparison.ipynb
+    # Gabi
+    emissions_gabi = settings.data.CO2_equivalents.resource_requirements.oxygen
+    reqs_gabi = emissions_gabi / (1 / settings.data.densities["O2"]) / settings.data.CO2_equivalents.electricity[
+        country]
+
+    # Masaaki et al.
+    reqs_masaaki_low = settings.data.energy_requirements.air_separation_unit.A["energy consumption low"]
+    reqs_masaaki_high = settings.data.energy_requirements.air_separation_unit.A["energy consumption high"]
+
+    # Cormos et al. ("https://doi.org/10.1002/apj.354")
+    cormos_assumed_time = 1
+    emissions_cormos = (settings.data.power_requirements.air_separation_unit["power consumption"] / 1000) * \
+                       cormos_assumed_time * settings.data.CO2_equivalents.electricity[country]
+
+    reqs_cormos = emissions_cormos / (1 / settings.data.densities["O2"]) / \
+                  settings.data.CO2_equivalents.electricity[country]
+
+    # Ozcan et al. ("https://doi.org/10.1016/j.ijggc.2013.10.009")
+    reqs_ozcan = settings.data.energy_requirements.air_separation_unit.B["energy consumption"]
+
+    # Collect data
+    data_raw = np.array([reqs_gabi, reqs_masaaki_low, reqs_masaaki_high, reqs_cormos, reqs_ozcan])  # [kWh el./Nm3 O2]
+    data = (1 / settings.data.densities.O2) * data_raw  # [kWh el./kg O2]
+
+    # Calculate stats
+    mean = np.mean(data)
+    std = np.std(data)
+
+    # Generate random value
+    value = np.random.normal(mean, std)
+
+    return value
+
+
+def steam_heat_req(mass_steam, FU=settings.general.FU):
+    """
+    Calculates heat requirement for steam production after applying some uncertainty.
+
+    Parameters
+    ----------
+    mass_steam: float
+        Required mass of steam.
+
+    Returns
+    -------
+    float
+        Randomised heat requirement for steam production [kWh th./ FU].
+
+
+
+    """
+    # Get some reference parameters
+    room_temperature = settings.data.feedstock_drying.room_temperature  # in deg C
+    boiling_temperature = 100  # in deg C
+
+    # Calculate heat requirements
+    heat_raise = (boiling_temperature - room_temperature) * settings.data.specific_heats["water"]  # [kJ/kg]
+    heat_vaporisation = settings.data.heats_vaporisation.water["100 degC"]  # [kJ/kg]
+    unit_heat_required = heat_raise + heat_vaporisation  # in kJ/kg steam
+    total_heat_required_kJ = unit_heat_required * mass_steam * FU  # [kJ/FU]
+    total_heat_required = kJ_to_kWh(total_heat_required_kJ)  # [kWh/FU]
+
+    # Apply some uncertainty
+    std_heat_required = total_heat_required * 0.1  # take std as +/- 10%
+    randomised_heat_req = np.random.normal(total_heat_required, std_heat_required)
+
+    return randomised_heat_req

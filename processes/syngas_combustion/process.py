@@ -6,14 +6,14 @@ from processes.syngas_combustion.utils import syngas_combustion_CO2_eq
 from configs import process_GWP_output, process_GWP_output_MC
 
 
-def syngas_combustion_GWP_MC(predictions=get_all_prediction_distributions()):
+def syngas_combustion_GWP_MC(ML_predictions=None):
     """
     Calculates the GWP of syngas combustion.
     Note: Currently no function to calculate the GWP of an individual simulation exists for this process.
 
     Parameters
     ----------
-    predictions: dict
+    ML_predictions: dict
         Dictionary of all predicted model outputs as distributions.
 
     Returns
@@ -21,12 +21,15 @@ def syngas_combustion_GWP_MC(predictions=get_all_prediction_distributions()):
     list
         List the length of MC iterations with GWP values.
     """
+    # Get defaults
+    if ML_predictions is None:
+        ML_predictions = get_all_prediction_distributions()
 
     # Extract gas_yield for later use
-    gas_yield = predictions["Gas yield [Nm3/kg wb]"]
+    gas_yield = ML_predictions["Gas yield [Nm3/kg wb]"]
 
     # Create dictionary of gas species only
-    gas_fractions = predictions.copy()
+    gas_fractions = ML_predictions.copy()
 
     # Drop unrequired variables if they exist in dictionary:
     if "LHV [MJ/Nm3]" in gas_fractions:
@@ -62,7 +65,7 @@ def syngas_combustion_GWP_MC(predictions=get_all_prediction_distributions()):
         GWP_object.add_subprocess(name=name_process, GWP=entry)
         MC_outputs.add_GWP_object(GWP_object)
 
-    MC_outputs.subprocess_abbreviations = ("Syn. comb.", )  # add abbreviation of subprocess
-
+    # Add abbreviation of subprocess
+    MC_outputs.subprocess_abbreviations = ("Syn. comb.", )
 
     return MC_outputs

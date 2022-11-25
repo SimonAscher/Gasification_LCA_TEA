@@ -1,2 +1,2 @@
-from .utils import oxygen_for_stoichiometric_combustion, mass_agent
+from .utils import oxygen_for_stoichiometric_combustion, mass_agent, air_separation_unit_rng_elect_req, steam_heat_req
 from .process import gasification_requirements, gasification_GWP, gasification_GWP_MC

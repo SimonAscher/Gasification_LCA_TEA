@@ -168,7 +168,7 @@ def energy_drying(mass_feedstock=settings.general.FU,
     return energies_out
 
 
-def drying_GWP(energy_drying_dict=energy_drying()):
+def drying_GWP(energy_drying_dict=None):
     """
     Calculates the GWP due to energy demand for drying.
 
@@ -181,6 +181,10 @@ def drying_GWP(energy_drying_dict=energy_drying()):
     -------
         GWP values in kg CO2eq./FU.
     """
+    # Get defaults
+    if energy_drying_dict is None:
+        energy_drying_dict = energy_drying()
+
     # Initialise output object
     output_GWP = process_GWP_output(process_name="Feedstock drying")
 
