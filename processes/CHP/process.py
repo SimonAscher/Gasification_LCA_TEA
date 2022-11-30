@@ -42,7 +42,7 @@ def CHP_GWP_MC(gas_supplied=get_all_prediction_distributions()["Gas yield [Nm3/k
 
     # Calculate GWP due to electricity displacement
     electricity_out = (energy_produced * efficiency_electrical) * (1 - demand_parasitic) / 3.6  # [kWh/FU]
-    GWP_electricity = electricity_GWP(electricity_out, displaced=True)  # [kg CO2eq./FU]
+    GWP_electricity = electricity_GWP(amount=electricity_out, displaced=True)  # [kg CO2eq./FU]
 
     # Calculate GWP due to heat displacement
     heat_out = (energy_produced * efficiency_heat) / 3.6  # [kWh/FU]

@@ -1,5 +1,6 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from config import settings
 
 
@@ -47,7 +48,113 @@ def process_GWP_MC_to_df(process_GWP_output_MC):
     df.loc["subprocess_names", df.columns[0]] = subprocess_names
     df.loc["subprocess_GWP", df.columns[0]] = subprocess_GWP
     df.loc["units", df.columns[0]] = units
-    df.loc["subprocess_abbreviations", df.columns[0]] = process_GWP_output_MC.subprocess_abbreviations  # populate
+    df.loc["subprocess_abbreviations", df.columns[0]] = process_GWP_output_MC.subprocess_abbreviations
+
+    return df
+
+
+def absorb_process_df(master_df, absorbed_df, abbreviation_absorbed_process=None, absorb_subprocesses=True):
+    """
+    Absorb the MC GWP results dataframe of one process into the one of another (i.e. combine two processes into one).
+
+    Parameters
+    ----------
+    master_df: pd.DataFrame
+        Main dataframe which will absorb the other one.
+    absorbed_df: pd.DataFrame
+        Dataframe which is to be absorbed.
+    abbreviation_absorbed_process: str
+        Abbreviation label for absorbed process.
+    absorb_subprocesses: bool
+        Indicates whether subprocess in absorbed dataframe should be compressed into one process (False) or
+        maintained (True).
+
+    Returns
+    -------
+    pd.DataFrame
+        Updated master dataframe after absorbing other dataframe.
+    """
+
+    # Get defaults
+    if abbreviation_absorbed_process is None:
+        abbreviation_absorbed_process = absorbed_df.columns[0]  # use full name if no abbreviated name given
+
+    # Initialise dataframe
+    df = pd.DataFrame(index=master_df.index, columns=[master_df.columns[0]])
+
+    # Initialise lists to store extracted data
+
+    # Master df
+    process_name_master = []
+    GWP_master = []
+    GWP_from_biogenic_master = []
+    subprocess_names_master = []
+    subprocess_GWP_master = []
+    units_master = []
+
+    # Absorbed df
+    GWP_absorbed = []
+    GWP_from_biogenic_absorbed = []
+    subprocess_names_absorbed = []
+    subprocess_GWP_absorbed = []
+    units_absorbed = []
+
+    # Get data for storage in dataframe
+    for count in list(range(settings.background.iterations_MC)):
+        # Master df
+        process_name_master.append(master_df.loc["process_name"][master_df.columns[0]][count])
+        GWP_master.append(master_df.loc["GWP"][master_df.columns[0]][count])
+        GWP_from_biogenic_master.append(master_df.loc["GWP_from_biogenic"][master_df.columns[0]][count])
+        subprocess_names_master.append(master_df.loc["subprocess_names"][master_df.columns[0]][count])
+        subprocess_GWP_master.append(master_df.loc["subprocess_GWP"][master_df.columns[0]][count])
+        units_master.append(master_df.loc["units"][master_df.columns[0]][count])
+
+        # Absorbed df
+        current_process_name_absorbed = absorbed_df.loc["process_name"][absorbed_df.columns[0]][count]
+        GWP_absorbed.append(absorbed_df.loc["GWP"][absorbed_df.columns[0]][count])
+        GWP_from_biogenic_absorbed.append(absorbed_df.loc["GWP_from_biogenic"][absorbed_df.columns[0]][count])
+        process_names = (current_process_name_absorbed + " ",) * len(
+            absorbed_df.loc["subprocess_names"][absorbed_df.columns[0]][
+                count])  # create tuple to indicate subprocess belongs to absorbed process
+        subprocess_names_absorbed.append(tuple(
+            map(lambda x, y: x + y, process_names, absorbed_df.loc["subprocess_names"][absorbed_df.columns[0]][count])))
+        subprocess_GWP_absorbed.append(absorbed_df.loc["subprocess_GWP"][absorbed_df.columns[0]][count])
+        units_absorbed.append(absorbed_df.loc["units"][absorbed_df.columns[0]][count])
+
+    # Ascertain that units match
+    if units_absorbed != units_master:
+        raise ValueError("Units of to be combined dataframes do not match.")
+
+    # Get parameters to be stored in final df
+    process_name_combined = process_name_master
+    GWP_combined = list(np.array(GWP_master) + np.array(GWP_absorbed))
+    GWP_from_biogenic_combined = list(np.array(GWP_from_biogenic_master) + np.array(GWP_from_biogenic_absorbed))
+    subprocess_names_combined = list(map(lambda x, y: x + y, subprocess_names_master, subprocess_names_absorbed))
+    subprocess_GWP_combined = list(map(lambda x, y: x + y, subprocess_GWP_master, subprocess_GWP_absorbed))
+    units_combined = units_master
+
+    if absorb_subprocesses:
+        subprocess_names_combined = list(map(lambda x, y: x + y, subprocess_names_master, subprocess_names_absorbed))
+        subprocess_GWP_combined = list(map(lambda x, y: x + y, subprocess_GWP_master, subprocess_GWP_absorbed))
+
+        absorbed_process_name_abbreviations = (abbreviation_absorbed_process + " ",) * len(
+            absorbed_df.loc["subprocess_abbreviations"][
+                absorbed_df.columns[0]])  # create tuple to indicate subprocess belongs to absorbed process
+        subprocess_abbreviations_combined = master_df.loc["subprocess_abbreviations"][master_df.columns[0]] + tuple(
+            map(lambda x, y: x + y, absorbed_process_name_abbreviations,
+                absorbed_df.loc["subprocess_abbreviations"][absorbed_df.columns[0]]))
+    else:
+        # TODO: Add case where subprocess' get all compressed to one name, abbreviation, and GWP value.
+        pass
+
+    # Store data in dataframe
+    df.loc["process_name", df.columns[0]] = process_name_combined
+    df.loc["GWP", df.columns[0]] = GWP_combined
+    df.loc["GWP_from_biogenic", df.columns[0]] = GWP_from_biogenic_combined
+    df.loc["subprocess_names", df.columns[0]] = subprocess_names_combined
+    df.loc["subprocess_GWP", df.columns[0]] = subprocess_GWP_combined
+    df.loc["units", df.columns[0]] = units_combined
+    df.loc["subprocess_abbreviations", df.columns[0]] = subprocess_abbreviations_combined
 
     return df
 
