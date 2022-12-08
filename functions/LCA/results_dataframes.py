@@ -53,7 +53,7 @@ def process_GWP_MC_to_df(process_GWP_output_MC):
     return df
 
 
-def absorb_process_df(master_df, absorbed_df, abbreviation_absorbed_process=None, absorb_subprocesses=True):
+def absorb_process_df(master_df, absorbed_df, new_process_name=None, abbreviation_absorbed_process=None, absorb_subprocesses=True):
     """
     Absorb the MC GWP results dataframe of one process into the one of another (i.e. combine two processes into one).
 
@@ -63,6 +63,8 @@ def absorb_process_df(master_df, absorbed_df, abbreviation_absorbed_process=None
         Main dataframe which will absorb the other one.
     absorbed_df: pd.DataFrame
         Dataframe which is to be absorbed.
+    new_process_name: str
+        If given overwrites the process name. If not given name from master_df taken.
     abbreviation_absorbed_process: str
         Abbreviation label for absorbed process.
     absorb_subprocesses: bool
@@ -77,10 +79,14 @@ def absorb_process_df(master_df, absorbed_df, abbreviation_absorbed_process=None
 
     # Get defaults
     if abbreviation_absorbed_process is None:
-        abbreviation_absorbed_process = absorbed_df.columns[0]  # use full name if no abbreviated name given
+        abbreviation_absorbed_process = absorbed_df.columns[0]  # Use full name if no abbreviated name given
 
     # Initialise dataframe
-    df = pd.DataFrame(index=master_df.index, columns=[master_df.columns[0]])
+    if isinstance(new_process_name, str):
+        df = pd.DataFrame(index=master_df.index, columns=[new_process_name])
+    else:
+        df = pd.DataFrame(index=master_df.index, columns=[master_df.columns[0]])
+
 
     # Initialise lists to store extracted data
 
@@ -102,7 +108,10 @@ def absorb_process_df(master_df, absorbed_df, abbreviation_absorbed_process=None
     # Get data for storage in dataframe
     for count in list(range(settings.background.iterations_MC)):
         # Master df
-        process_name_master.append(master_df.loc["process_name"][master_df.columns[0]][count])
+        if isinstance(new_process_name, str):
+            process_name_master.append(new_process_name)
+        else:
+            process_name_master.append(master_df.loc["process_name"][master_df.columns[0]][count])
         GWP_master.append(master_df.loc["GWP"][master_df.columns[0]][count])
         GWP_from_biogenic_master.append(master_df.loc["GWP_from_biogenic"][master_df.columns[0]][count])
         subprocess_names_master.append(master_df.loc["subprocess_names"][master_df.columns[0]][count])

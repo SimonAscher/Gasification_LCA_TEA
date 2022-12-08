@@ -1,8 +1,8 @@
-import warnings
+import numpy as np
 from config import settings
-from configs import process_GWP_output, process_GWP_output_MC
+import warnings
+import random
 from functions.general.utility import kJ_to_kWh
-from functions.LCA import electricity_GWP, thermal_energy_GWP
 
 
 def energy_drying(mass_feedstock=settings.general.FU,
@@ -168,80 +168,87 @@ def energy_drying(mass_feedstock=settings.general.FU,
     return energies_out
 
 
-def drying_GWP(energy_drying_dict=None):
+# Define models for milling and pelleting process based on analysis in:
+# analysis\preliminary\milling_pelleting_energy_consumption_v0.ipynb
+
+def electricity_milling(screensize="3.2"):
     """
-    Calculates the GWP due to energy demand for drying.
+    Calculates the electricity requirements for milling 1 tonne of feedstock.
+    Original data from: "10.13031/aea.30.9719".
 
     Parameters
     ----------
-    energy_drying_dict: dict
-        Output from energy_drying function containing heat and electricity requirements and units and heat source.
+    screensize: str
+        Defines which size mill screen should be used in process. "3.2" results in a finer mill, whereas "6.5" results
+        in a coarser mill.
 
     Returns
     -------
-        GWP values in kg CO2eq./FU.
+    float
+        (1) Electricity requirement for milling [kWh/tonne].
+        (2) Particle size post milling [mm].
     """
+
+    # Define data:
+    if screensize == "3.2":
+        mean_energy_mill = 33.96  # [kWh/tonne]
+        std_energy_mill = 4.09  # [kWh/tonne]
+        particle_size = random.uniform(15, 18)  # [mm]
+    elif screensize == "6.5":
+        mean_energy_mill = 13.81  # [kWh/tonne]
+        std_energy_mill = 0.24  # [kWh/tonne]
+        particle_size = random.uniform(20, 31)  # [mm]
+
+    else:
+        raise ValueError("Wrong milling screensize given.")
+
+    # Calculate randomised electricity requirement
+    electricity_requirement = np.random.normal(mean_energy_mill, std_energy_mill)  # [kWh/tonne]
+
+    return electricity_requirement, particle_size
+
+
+def electricity_pelleting(particle_size=None, show_warnings=True):
+    """
+    Calculates the electricity requirements for pelleting 1 tonne of feedstock.
+    Original data from: "10.13031/aea.30.9719".
+
+    Parameters
+    ----------
+    particle_size: float
+        Particle size of feedstock either as received or after milling.
+
+    show_warnings: bool
+        Determine whether warnings should be displayed.
+
+    Returns
+    -------
+    float
+        Electricity requirement for pelleting [kWh/tonne].
+    """
+
     # Get defaults
-    if energy_drying_dict is None:
-        energy_drying_dict = energy_drying()
+    if particle_size is None:
+        try:
+            particle_size = settings.user_inputs["particle size after milling"]
+        except:
+            particle_size = settings.user_inputs["particle size"]
 
-    # Initialise output object
-    output_GWP = process_GWP_output(process_name="Feedstock drying")
+    # Define data:
+    if particle_size >= 19:
+        mean_energy_pelleting = 140.74  # [kWh/tonne]
+        std_energy_pelleting = 30.89  # [kWh/tonne]
+        if particle_size > 31 and show_warnings:
+            warnings.warn("Particle size larger than currently supported. Consider adding milling process.")
+    elif particle_size < 19:
+        mean_energy_pelleting = 109.92  # [kWh/tonne]
+        std_energy_pelleting = 11.90  # [kWh/tonne]
+        if particle_size < 15 and show_warnings:
+            warnings.warn("Particle size smaller than reference values. Pelleting not typical at this particle size.")
+    else:
+        raise ValueError("Supplied particle size in the wrong format")
 
-    # Convert units to kWh if not given in kWh already
-    if energy_drying_dict["units"] == "kJ":
-        energy_drying_dict["heat"] = kJ_to_kWh(energy_drying_dict["heat"])
-        energy_drying_dict["electricity"] = kJ_to_kWh(energy_drying_dict["electricity"])
-        energy_drying_dict["units"] = "kWh"
+    # Calculate randomised electricity requirement
+    electricity_requirement = np.random.normal(mean_energy_pelleting, std_energy_pelleting)  # [kWh/tonne]
 
-    # Calculate impact due to electricity usage
-    electric_GWP = electricity_GWP(energy_drying_dict["electricity"])
-
-    # Calculate impact due to heat demands
-    if energy_drying_dict["heat source"] == "natural gas":
-        heat_GWP = thermal_energy_GWP(amount=energy_drying_dict["heat"],
-                                      source=energy_drying_dict["heat source"],
-                                      units=energy_drying_dict["units"]
-                                      )
-
-    # Add values to output object
-    output_GWP.add_subprocess(name="Electricity", GWP=electric_GWP)
-    output_GWP.add_subprocess(name="Thermal energy", GWP=heat_GWP)
-    output_GWP.GWP = electric_GWP + heat_GWP
-
-    # TODO: Implement solar drying and waste heat drying - would mean no energy req for drying
-    #  or much lower requirement, respectively
-
-    # TODO: Implement syngas use - make sure model accounts for less syngas being available for CHP etc. - would use
-    #  energy for drying - see how much syngas that corresponds to and then calculate emissions from combusting this
-    #  much syngas using existing function
-    return output_GWP
-
-
-def drying_GWP_MC(MC_iterations=settings.background.iterations_MC):
-    """
-    Calculate the GWP of feedstock drying for all Monte Carlo runs.
-
-    Parameters
-    ----------
-    MC_iterations: int
-        Number of Monte Carlo iterations.
-
-    Returns
-    -------
-    object
-        process_GWP_output_MC object storing all simulation results.
-    """
-    # Initialise output object
-    MC_outputs = process_GWP_output_MC(process_name="Feedstock Drying")
-
-    for _ in list(range(MC_iterations)):
-        # Calculate individual GWPs
-        GWP_object = drying_GWP()
-
-        # Store in output object
-        MC_outputs.add_GWP_object(GWP_object)
-
-    MC_outputs.subprocess_abbreviations = ("Elect.", "Heat", )  # add abbreviation of subprocess
-
-    return MC_outputs
+    return electricity_requirement

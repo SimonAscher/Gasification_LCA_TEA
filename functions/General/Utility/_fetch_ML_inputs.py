@@ -16,13 +16,22 @@ def fetch_ML_inputs():
 
     # Get sub lists
 
-
     # Elementary composition
     elementary_composition = [settings_location["carbon content"], settings_location["hydrogen content"],
                               settings_location["sulphur content"]]
 
     # Proximate composition and particle size
-    proximate_and_PS = [settings_location["particle size"], settings_location["ash content"],
+
+    # Check if pelleting or milling have been selected. Order of priority: Pelleting -> Milling -> Default
+    try:
+        particle_size = settings_location["particle size after pelleting"]
+    except:
+        try:
+            particle_size = settings_location["particle size after milling"]
+        except:
+            particle_size = settings.user_inputs["particle size"]
+
+    proximate_and_PS = [particle_size, settings_location["ash content"],
                         settings_location["desired moisture"]]
 
     # Operating conditions

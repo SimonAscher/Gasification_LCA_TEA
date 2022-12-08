@@ -7,7 +7,7 @@ from processes.gasification import gasification_GWP_MC
 from processes.syngas_combustion import syngas_combustion_GWP_MC
 from processes.biochar_soil_application import biochar_soil_GWP_MC
 from processes.carbon_capture import carbon_capture_GWP_MC
-from functions.LCA import process_GWP_MC_to_df, combine_GWP_dfs
+from functions.LCA import process_GWP_MC_to_df, combine_GWP_dfs, absorb_process_df
 from functions.LCA import plot_average_GWP_byprocess, plot_global_GWP, plot_single_process_GWP,\
     plot_global_GWP_byprocess
 from functions.LCA import electricity_GWP, thermal_energy_GWP
