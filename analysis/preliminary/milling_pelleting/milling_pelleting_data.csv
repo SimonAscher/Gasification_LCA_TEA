@@ -1,15 +1,15 @@
-Energy consumption milling [kWh/tonne],Energy consumption pelleting [kWh/tonne],Screen size [mm],Particle size [mm],Feedstock,Feedstock type,Source
-18.55,45.2,4.76,0.52,switchgrass,herbaceous biomass,10.1166/jbmb.2013.1390
-49.97,124.13,4.76,0.81,eucalyptus,woody biomass,10.1166/jbmb.2013.1390
-43.21,48.94,4.76,0.65,lodgepole pine,woody biomass,10.1166/jbmb.2013.1390
-34.54,56.43,4.76,0.57,corn stover,herbaceous biomass,10.1166/jbmb.2013.1390
-38.58,122.86,3.2,15,corn stover,herbaceous biomass,10.13031/aea.30.9719
-32.26,92.8,3.2,15,sorghum stalks,herbaceous biomass,10.13031/aea.30.9719
-36.88,118.99,3.2,15,big bluestem,herbaceous biomass,10.13031/aea.30.9719
-28.13,105.04,3.2,18,wheat straw,herbaceous biomass,10.13031/aea.30.9719
-14.07,122.58,6.5,25,corn stover,herbaceous biomass,10.13031/aea.30.9719
-13.67,99.42,6.5,20,sorghum stalks,herbaceous biomass,10.13031/aea.30.9719
-13.49,168.08,6.5,31,big bluestem,herbaceous biomass,10.13031/aea.30.9719
-14,172.87,6.5,31,wheat straw,herbaceous biomass,10.13031/aea.30.9719
-29.4,NaN,2.4,NaN,alfalfa,herbaceous biomass,10.13031/2013.25658
-29,NaN,3.2,NaN,alfalfa,herbaceous biomass,10.13031/2013.25658
+Energy consumption milling [kWh/tonne],Energy consumption pelleting [kWh/tonne],Screen size [mm],Particle size [mm],Feedstock,Feedstock type,,Source,doi
+18.55,45.2,4.76,0.52,switchgrass,herbaceous biomass,,"Yancey et al., 2013",10.1166/jbmb.2013.1390
+49.97,124.13,4.76,0.81,eucalyptus,woody biomass,,"Yancey et al., 2013",10.1166/jbmb.2013.1390
+43.21,48.94,4.76,0.65,lodgepole pine,woody biomass,,"Yancey et al., 2013",10.1166/jbmb.2013.1390
+34.54,56.43,4.76,0.57,corn stover,herbaceous biomass,,"Yancey et al., 2013",10.1166/jbmb.2013.1390
+38.58,122.86,3.2,15,corn stover,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+32.26,92.8,3.2,15,sorghum stalks,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+36.88,118.99,3.2,15,big bluestem,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+28.13,105.04,3.2,18,wheat straw,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+14.07,122.58,6.5,25,corn stover,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+13.67,99.42,6.5,20,sorghum stalks,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+13.49,168.08,6.5,31,big bluestem,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+14,172.87,6.5,31,wheat straw,herbaceous biomass,,"Wilson et al., 2014",10.13031/aea.30.9719
+29.4,NaN,2.4,NaN,alfalfa,herbaceous biomass,,"Tabil et al., 1996",10.13031/2013.25658
+29,NaN,3.2,NaN,alfalfa,herbaceous biomass,,"Tabil et al., 1996",10.13031/2013.25658

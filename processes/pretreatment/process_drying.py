@@ -1,4 +1,3 @@
-import warnings
 from config import settings
 from configs import process_GWP_output, process_GWP_output_MC
 from functions.general.utility import kJ_to_kWh

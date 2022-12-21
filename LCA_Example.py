@@ -1,7 +1,7 @@
 # Get process models
 import numpy as np
 
-from processes.feedstock_drying import drying_GWP_MC
+from processes.pretreatment import drying_GWP_MC, milling_GWP_MC, pelleting_GWP_MC, shredding_GWP_MC
 from processes.CHP import CHP_GWP_MC
 from processes.gasification import gasification_GWP_MC
 from processes.syngas_combustion import syngas_combustion_GWP_MC
@@ -13,25 +13,34 @@ from functions.LCA import plot_average_GWP_byprocess, plot_global_GWP, plot_sing
 from functions.LCA import electricity_GWP, thermal_energy_GWP
 
 
-
 # Set up dataframe to store results
 # Get individual dataframes
 df_1 = process_GWP_MC_to_df(CHP_GWP_MC())
 df_2 = process_GWP_MC_to_df(drying_GWP_MC())
-df_3 = process_GWP_MC_to_df(gasification_GWP_MC())
-df_4 = process_GWP_MC_to_df(syngas_combustion_GWP_MC())
-df_5 = process_GWP_MC_to_df(biochar_soil_GWP_MC())
-df_6 = process_GWP_MC_to_df(carbon_capture_GWP_MC())
+df_2_5 = process_GWP_MC_to_df(shredding_GWP_MC())
+df_3 = process_GWP_MC_to_df(milling_GWP_MC())
+df_4 = process_GWP_MC_to_df(pelleting_GWP_MC())
+df_5 = process_GWP_MC_to_df(gasification_GWP_MC())
+df_6 = process_GWP_MC_to_df(syngas_combustion_GWP_MC())
+df_7 = process_GWP_MC_to_df(biochar_soil_GWP_MC())
+df_8 = process_GWP_MC_to_df(carbon_capture_GWP_MC())
+
+# Combine some dataframes
+df_2_3 = absorb_process_df(master_df=df_2, absorbed_df=df_3, update_master_process_subprocess_names=True,
+                           new_process_name="Pretreatment")
+df_2_3_4 = absorb_process_df(master_df=df_2_3, absorbed_df=df_4)
+df_pretreatment = absorb_process_df(master_df=df_2_3_4, absorbed_df=df_2_5)
 
 # Get overall dataframe
-summary_df = combine_GWP_dfs((df_1, df_2, df_3, df_4, df_5, df_6))
+summary_df = combine_GWP_dfs((df_1, df_pretreatment, df_5, df_6, df_7, df_8))
 
 # Create plots
 global_plot = plot_global_GWP(summary_df)
 avg_plot = plot_average_GWP_byprocess(summary_df, short_labels=True)
 individual_plot = plot_single_process_GWP(summary_df, process_name="CHP")
 individual_plot2 = plot_single_process_GWP(summary_df, process_name="Gasification", show_total=False)
-individual_plot3 = plot_single_process_GWP(summary_df, process_name="Carbon Capture", show_total=False)
+individual_plot3 = plot_single_process_GWP(summary_df, process_name="Carbon Capture", show_total=True)
+individual_plot4 = plot_single_process_GWP(summary_df, process_name="Pretreatment", show_total=True)
 
 global_byprocess_plot = plot_global_GWP_byprocess(summary_df)
 

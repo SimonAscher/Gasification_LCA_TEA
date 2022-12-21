@@ -119,12 +119,14 @@ def energy_drying(mass_feedstock=settings.general.FU,
     if output_unit == "kWh":
         energies_out = {"heat": kJ_to_kWh(heat_drying_post_dryer_efficiency),
                         "electricity": electricity_drying,
-                        "heat source": energy_source_drying, "units": output_unit
+                        "heat source": energy_source_drying,
+                        "units": output_unit
                         }
     elif output_unit == "kJ":
         energies_out = {"heat": heat_drying_post_dryer_efficiency,
                         "electricity": kJ_to_kWh(electricity_drying, reverse=True),
-                        "heat source": energy_source_drying, "units": output_unit
+                        "heat source": energy_source_drying,
+                        "units": output_unit
                         }
 
     # Print calculations if desired
@@ -283,5 +285,34 @@ def electricity_pelleting(particle_size=None, show_warnings=True):
 
     # Calculate randomised electricity requirement
     electricity_requirement = np.random.normal(prediction, rmse)  # [kWh/tonne]
+
+    return electricity_requirement
+
+
+def electricity_shredding():
+    """
+    Calculates the electricity requirements for shredding 1 tonne of baled feedstock to a length of 25 to 100 mm.
+    Source: 10.1166/jbmb.2013.1390
+    Parameters
+    ----------
+
+    Returns
+    -------
+    float
+        Electricity requirement for shredding [kWh/tonne].
+    """
+
+    # Get electricity requirements - Note reference suggests that substantial savings could be made but also that
+    # requirements could increase.
+    shredding_electricity_requirement_most_likely = 14.9  # [kWh/tonne]
+    shredding_electricity_requirement_lower_estimate = shredding_electricity_requirement_most_likely * 0.5
+    shredding_electricity_requirement_upper_estimate = shredding_electricity_requirement_most_likely * 1.5
+
+    # Calculate randomised electricity requirement
+    default_generator = np.random.default_rng()  # Initialise default generator
+    # Get req in [kWh/tonne]
+    electricity_requirement = default_generator.triangular(left=shredding_electricity_requirement_lower_estimate,
+                                                           mode=shredding_electricity_requirement_most_likely,
+                                                           right=shredding_electricity_requirement_upper_estimate)
 
     return electricity_requirement

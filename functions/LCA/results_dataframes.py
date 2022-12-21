@@ -53,7 +53,8 @@ def process_GWP_MC_to_df(process_GWP_output_MC):
     return df
 
 
-def absorb_process_df(master_df, absorbed_df, new_process_name=None, abbreviation_absorbed_process=None, absorb_subprocesses=True):
+def absorb_process_df(master_df, absorbed_df, new_process_name=None, update_master_process_subprocess_names=False,
+                      abbreviation_absorbed_process=None, absorb_subprocesses=True):
     """
     Absorb the MC GWP results dataframe of one process into the one of another (i.e. combine two processes into one).
 
@@ -65,6 +66,9 @@ def absorb_process_df(master_df, absorbed_df, new_process_name=None, abbreviatio
         Dataframe which is to be absorbed.
     new_process_name: str
         If given overwrites the process name. If not given name from master_df taken.
+    update_master_process_subprocess_names: bool
+        If false leaves subprocess names of master df unchanged. If True update subprocess names by adding name of
+        master process.
     abbreviation_absorbed_process: str
         Abbreviation label for absorbed process.
     absorb_subprocesses: bool
@@ -114,7 +118,20 @@ def absorb_process_df(master_df, absorbed_df, new_process_name=None, abbreviatio
             process_name_master.append(master_df.loc["process_name"][master_df.columns[0]][count])
         GWP_master.append(master_df.loc["GWP"][master_df.columns[0]][count])
         GWP_from_biogenic_master.append(master_df.loc["GWP_from_biogenic"][master_df.columns[0]][count])
-        subprocess_names_master.append(master_df.loc["subprocess_names"][master_df.columns[0]][count])
+
+        if update_master_process_subprocess_names:
+            current_process_name_master = master_df.loc["process_name"][master_df.columns[0]][count]
+            process_names_master = (current_process_name_master + " ",) * len(
+                master_df.loc["subprocess_names"][master_df.columns[0]][
+                    count])  # create tuple to indicate subprocess belongs to absorbed process
+            subprocess_names_master.append(tuple(
+                map(lambda x, y: x + y, process_names_master,
+                    master_df.loc["subprocess_names"][master_df.columns[0]][count])))
+        else:
+            subprocess_names_master.append(master_df.loc["subprocess_names"][master_df.columns[0]][count])
+
+
+
         subprocess_GWP_master.append(master_df.loc["subprocess_GWP"][master_df.columns[0]][count])
         units_master.append(master_df.loc["units"][master_df.columns[0]][count])
 
@@ -122,11 +139,11 @@ def absorb_process_df(master_df, absorbed_df, new_process_name=None, abbreviatio
         current_process_name_absorbed = absorbed_df.loc["process_name"][absorbed_df.columns[0]][count]
         GWP_absorbed.append(absorbed_df.loc["GWP"][absorbed_df.columns[0]][count])
         GWP_from_biogenic_absorbed.append(absorbed_df.loc["GWP_from_biogenic"][absorbed_df.columns[0]][count])
-        process_names = (current_process_name_absorbed + " ",) * len(
+        process_names_absorbed = (current_process_name_absorbed + " ",) * len(
             absorbed_df.loc["subprocess_names"][absorbed_df.columns[0]][
                 count])  # create tuple to indicate subprocess belongs to absorbed process
         subprocess_names_absorbed.append(tuple(
-            map(lambda x, y: x + y, process_names, absorbed_df.loc["subprocess_names"][absorbed_df.columns[0]][count])))
+            map(lambda x, y: x + y, process_names_absorbed, absorbed_df.loc["subprocess_names"][absorbed_df.columns[0]][count])))
         subprocess_GWP_absorbed.append(absorbed_df.loc["subprocess_GWP"][absorbed_df.columns[0]][count])
         units_absorbed.append(absorbed_df.loc["units"][absorbed_df.columns[0]][count])
 
