@@ -1,4 +1,6 @@
 # %% Import shared packages
+import numpy as np
+
 from functions.LCA import process_GWP_MC_to_df
 
 # %% Milling and pelleting
@@ -7,6 +9,7 @@ from processes.pretreatment import milling_GWP_MC, pelleting_GWP_MC
 milling_GWP = process_GWP_MC_to_df(milling_GWP_MC())
 pelleting_GWP = process_GWP_MC_to_df(pelleting_GWP_MC())
 
+print("Mean GWP milling:", np.mean(milling_GWP.loc["GWP"]["Milling"]))
 # %% Drying
 from processes.pretreatment import drying_GWP, drying_GWP_MC
 from processes.pretreatment.utils import energy_drying

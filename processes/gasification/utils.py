@@ -1,9 +1,10 @@
-from config import settings
-from functions.general.utility import ultimate_comp_daf_to_wb
-from configs import gaussian
-from functions.MC import make_dist
+import pickle
+
 import numpy as np
+
+from config import settings
 from functions.general.utility import kJ_to_kWh
+from functions.general.utility import ultimate_comp_daf_to_wb
 
 
 def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"],
@@ -20,7 +21,6 @@ def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"
     -------
     float
         Required oxygen for stoichiometric combustion [kg oxygen / kg of feedstock wb]
-
     """
     # Get ultimate composition as wet basis
     ultimate_comp_wb = ultimate_comp_daf_to_wb(C, H, N, S, O, moisture, ash)
@@ -51,7 +51,6 @@ def mass_agent(agent_type=settings.user_inputs["gasifying agent"], ER=settings.u
     -------
     dict
         Agent mass [kg agent / kg of feedstock wb]
-
     """
 
     # Get oxygen requirement for stoichiometric combustion in kg oxygen per kg wb feedstock
@@ -108,6 +107,30 @@ def mass_agent(agent_type=settings.user_inputs["gasifying agent"], ER=settings.u
     return mass_agent_output
 
 
+def load_air_separation_unit_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
+                                                 r"\air_separation_unit_results"):
+    """
+    Load pickled data done in analysis on air separation unit electricity demands.
+    Analysis done in: analysis/preliminary/air_separation_unit/air_separation_unit_comparison.ipynb.
+
+    Parameters
+    ----------
+    full_file_path: str
+    "r" string specifying the file path to pickle object.
+
+    Returns
+    -------
+    dict
+        Loaded air separation unit data
+    """
+
+    # Load pickled data
+    loaded_data = pickle.load(open(full_file_path, "rb"))
+    # TODO: Change call to file path to dynamic call - could try something like sys.path[-1]
+
+    return loaded_data
+
+
 def air_separation_unit_rng_elect_req(country=settings.user_inputs.country):
     """
     Generates a randomised electricity requirement of an air separation unit (ASU) based on normal distribution
@@ -121,38 +144,12 @@ def air_separation_unit_rng_elect_req(country=settings.user_inputs.country):
     -------
     float
         Randomised electricity requirement of ASU [kWh el./kg O2].
-
-    -------
-
     """
+
     # Get data - More info in analysis - air_separation_unit_comparison.ipynb
-    # Gabi
-    emissions_gabi = settings.data.CO2_equivalents.resource_requirements.oxygen
-    reqs_gabi = emissions_gabi / (1 / settings.data.densities["O2"]) / settings.data.CO2_equivalents.electricity[
-        country]
-
-    # Masaaki et al.
-    reqs_masaaki_low = settings.data.energy_requirements.air_separation_unit.A["energy consumption low"]
-    reqs_masaaki_high = settings.data.energy_requirements.air_separation_unit.A["energy consumption high"]
-
-    # Cormos et al. ("https://doi.org/10.1002/apj.354")
-    cormos_assumed_time = 1
-    emissions_cormos = (settings.data.power_requirements.air_separation_unit["power consumption"] / 1000) * \
-                       cormos_assumed_time * settings.data.CO2_equivalents.electricity[country]
-
-    reqs_cormos = emissions_cormos / (1 / settings.data.densities["O2"]) / \
-                  settings.data.CO2_equivalents.electricity[country]
-
-    # Ozcan et al. ("https://doi.org/10.1016/j.ijggc.2013.10.009")
-    reqs_ozcan = settings.data.energy_requirements.air_separation_unit.B["energy consumption"]
-
-    # Collect data
-    data_raw = np.array([reqs_gabi, reqs_masaaki_low, reqs_masaaki_high, reqs_cormos, reqs_ozcan])  # [kWh el./Nm3 O2]
-    data = (1 / settings.data.densities.O2) * data_raw  # [kWh el./kg O2]
-
-    # Calculate stats
-    mean = np.mean(data)
-    std = np.std(data)
+    data = load_air_separation_unit_data()
+    mean = data["Mean"]
+    std = data["Std"]
 
     # Generate random value
     value = np.random.normal(mean, std)
@@ -173,10 +170,8 @@ def steam_heat_req(mass_steam, FU=settings.general.FU):
     -------
     float
         Randomised heat requirement for steam production [kWh th./ FU].
-
-
-
     """
+
     # Get some reference parameters
     room_temperature = settings.data.feedstock_drying.room_temperature  # in deg C
     boiling_temperature = 100  # in deg C

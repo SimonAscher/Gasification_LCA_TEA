@@ -192,7 +192,7 @@ def load_milling_pelleting_data(full_file_path=r"C:\Users\2270577A\PycharmProjec
     """
     # Load pickled data
     loaded_data = pickle.load(open(full_file_path, "rb"))
-    # TODO: Change call to file path to dynamic call
+    # TODO: Change call to file path to dynamic call (could try something like sys.path[-1])
 
     return loaded_data
 
@@ -292,7 +292,7 @@ def electricity_pelleting(particle_size=None, show_warnings=True):
 def electricity_shredding():
     """
     Calculates the electricity requirements for shredding 1 tonne of baled feedstock to a length of 25 to 100 mm.
-    Source: 10.1166/jbmb.2013.1390
+    Source: https://doi.org/10.13140/RG.2.2.17486.25922
     Parameters
     ----------
 

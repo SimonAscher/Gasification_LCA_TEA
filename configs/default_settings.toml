@@ -203,3 +203,8 @@ source = "Energy saving air-separation plant based on exergy analysis. Taniguchi
 # Electricity requirements of an air seperation unit for the production of Oxygen.
 "energy consumption" = 0.3056  # [kWh/ Nm3 O2]. Note: Given as 231kWh/tonne O2 in paper.
 source = "https://doi.org/10.1016/j.ijggc.2013.10.009"
+
+[default.data.energy_requirements.air_separation_unit.C]
+# Electricity requirements for air seperation units for the production of Oxygen.
+"energy consumption" = [0.280, 0.464, 0.639, 0.631]  # [kWh/ Nm3 O2]
+source = "https://doi.org/10.4186/ej.2014.18.2.67"
