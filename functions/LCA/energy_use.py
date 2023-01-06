@@ -2,7 +2,7 @@ from config import settings
 from functions.general.utility import kJ_to_kWh, MJ_to_kWh
 
 
-def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settings.user_inputs.country, displaced=False):
+def thermal_energy_GWP(amount, source=None, units="kWh", country=settings.user_inputs.country, displaced=False):
     """
     Function which calculates the GWP of thermal energy use.
 
@@ -23,6 +23,10 @@ def thermal_energy_GWP(amount, source="natural gas", units="kWh", country=settin
     float
         GWP value in kg CO2eq.
     """
+    # Load defaults
+    if source is None:
+        source = "natural gas"
+
     # Get country specific carbon intensity of thermal energy
     if source == "natural gas":
         carbon_intensity_natural_gas = settings.data.CO2_equivalents.thermal_energy.natural_gas[settings.user_inputs.country]

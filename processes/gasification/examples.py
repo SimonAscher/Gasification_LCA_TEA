@@ -1,8 +1,9 @@
 from processes.gasification import oxygen_for_stoichiometric_combustion, mass_agent, gasification_requirements, \
-    gasification_GWP, gasification_GWP_MC, air_separation_unit_rng_elect_req
+    gasification_GWP, gasification_GWP_MC
+from processes.general import oxygen_rng_elect_req
 
 # Test oxygen req subfunction
-oxygen_ele_req = air_separation_unit_rng_elect_req()  # [kWh el./kg O2]
+oxygen_ele_req = oxygen_rng_elect_req()  # [kWh el./kg O2]
 
 
 oxygen_req = oxygen_for_stoichiometric_combustion()

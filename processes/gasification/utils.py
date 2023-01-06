@@ -1,9 +1,4 @@
-import pickle
-
-import numpy as np
-
 from config import settings
-from functions.general.utility import kJ_to_kWh
 from functions.general.utility import ultimate_comp_daf_to_wb
 
 
@@ -15,7 +10,7 @@ def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"
                                          moisture=settings.user_inputs["desired moisture"],
                                          ash=settings.user_inputs["ash content"]):
     """
-    Get the oxygen required for the complete combustion of a given feedstock.
+    Calculates the oxygen required for the complete combustion of a given feedstock.
 
     Returns
     -------
@@ -32,7 +27,7 @@ def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"
     return oxygen_required
 
 
-def mass_agent(agent_type=settings.user_inputs["gasifying agent"], ER=settings.user_inputs["ER"], **kwargs):
+def mass_agent(agent_type=None, ER=None, **kwargs):
     """
     Calculates the agent mass required for gasification.
 
@@ -52,6 +47,11 @@ def mass_agent(agent_type=settings.user_inputs["gasifying agent"], ER=settings.u
     dict
         Agent mass [kg agent / kg of feedstock wb]
     """
+    # Get defaults
+    if agent_type is None:
+        agent_type = settings.user_inputs["gasifying agent"]
+    if ER is None:
+        ER = settings.user_inputs["ER"]
 
     # Get oxygen requirement for stoichiometric combustion in kg oxygen per kg wb feedstock
     max_oxygen = oxygen_for_stoichiometric_combustion()
@@ -105,86 +105,3 @@ def mass_agent(agent_type=settings.user_inputs["gasifying agent"], ER=settings.u
         mass_agent_output = {"Air": mass_air, "Steam": mass_steam, "units": "kg agent/kg feedstock wb"}
 
     return mass_agent_output
-
-
-def load_air_separation_unit_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
-                                                 r"\air_separation_unit_results"):
-    """
-    Load pickled data done in analysis on air separation unit electricity demands.
-    Analysis done in: analysis/preliminary/air_separation_unit/air_separation_unit_comparison.ipynb.
-
-    Parameters
-    ----------
-    full_file_path: str
-    "r" string specifying the file path to pickle object.
-
-    Returns
-    -------
-    dict
-        Loaded air separation unit data
-    """
-
-    # Load pickled data
-    loaded_data = pickle.load(open(full_file_path, "rb"))
-    # TODO: Change call to file path to dynamic call - could try something like sys.path[-1]
-
-    return loaded_data
-
-
-def air_separation_unit_rng_elect_req(country=settings.user_inputs.country):
-    """
-    Generates a randomised electricity requirement of an air separation unit (ASU) based on normal distribution
-    defined by literature values.
-
-    Parameters
-    ----------
-    country
-
-    Returns
-    -------
-    float
-        Randomised electricity requirement of ASU [kWh el./kg O2].
-    """
-
-    # Get data - More info in analysis - air_separation_unit_comparison.ipynb
-    data = load_air_separation_unit_data()
-    mean = data["Mean"]
-    std = data["Std"]
-
-    # Generate random value
-    value = np.random.normal(mean, std)
-
-    return value
-
-
-def steam_heat_req(mass_steam, FU=settings.general.FU):
-    """
-    Calculates heat requirement for steam production after applying some uncertainty.
-
-    Parameters
-    ----------
-    mass_steam: float
-        Required mass of steam.
-
-    Returns
-    -------
-    float
-        Randomised heat requirement for steam production [kWh th./ FU].
-    """
-
-    # Get some reference parameters
-    room_temperature = settings.data.feedstock_drying.room_temperature  # in deg C
-    boiling_temperature = 100  # in deg C
-
-    # Calculate heat requirements
-    heat_raise = (boiling_temperature - room_temperature) * settings.data.specific_heats["water"]  # [kJ/kg]
-    heat_vaporisation = settings.data.heats_vaporisation.water["100 degC"]  # [kJ/kg]
-    unit_heat_required = heat_raise + heat_vaporisation  # in kJ/kg steam
-    total_heat_required_kJ = unit_heat_required * mass_steam * FU  # [kJ/FU]
-    total_heat_required = kJ_to_kWh(total_heat_required_kJ)  # [kWh/FU]
-
-    # Apply some uncertainty
-    std_heat_required = total_heat_required * 0.1  # take std as +/- 10%
-    randomised_heat_req = np.random.normal(total_heat_required, std_heat_required)
-
-    return randomised_heat_req

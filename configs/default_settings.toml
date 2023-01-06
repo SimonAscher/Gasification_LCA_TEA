@@ -132,18 +132,6 @@ water = 4.186  # [kJ/kg K] at room temperature
 "40 degC" = 2406  # [kJ/kg] at dryer temperature
 "100 degC" = 2260  # [kJ/kg] at boiling temperature
 
-[default.data.biochar.carbon_fraction]
-# Lower, mode, and upper limit for recalcitrant carbon fraction of biochar
-lower = 0.30
-mode = 0.65
-upper = 0.90
-
-[default.data.biochar.recalcitrant_fraction]
-# Lower, mode, and upper limit for recalcitrant carbon fraction of biochar
-lower = 0.80
-mode = 0.90
-upper = 0.97
-
 [default.data.conversion_efficiencies]
 
 [default.data.conversion_efficiencies.CHP]

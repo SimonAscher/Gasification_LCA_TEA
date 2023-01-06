@@ -3,7 +3,8 @@ import numpy as np
 from configs import process_requirements, process_GWP_output, process_GWP_output_MC
 from functions.LCA import thermal_energy_GWP, electricity_GWP
 from functions.general.utility import kJ_to_kWh
-from processes.gasification import mass_agent, air_separation_unit_rng_elect_req, steam_heat_req
+from processes.gasification.utils import mass_agent
+from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
 
 # file to calculate gasification outputs
 # i.e. how much biochar and how much syngas is produced
@@ -63,12 +64,12 @@ def gasification_requirements(operation_mode=settings.user_inputs["operation mod
 
     elif agent_type == "Oxygen":
         total_oxygen_mass = agent_mass["Oxygen"] * FU  # [kg/FU]
-        total_oxygen_electricity_req = total_oxygen_mass * air_separation_unit_rng_elect_req()
+        total_oxygen_electricity_req = total_oxygen_mass * oxygen_rng_elect_req()
         requirements.add_subprocess("Agent", electricity=total_oxygen_electricity_req)
 
     elif agent_type == "Steam":
         # Get heat requirement for steam production
-        heat_req_steam = steam_heat_req(mass_steam=agent_mass["Steam"])
+        heat_req_steam = steam_rng_heat_req(mass_steam=agent_mass["Steam"])
         requirements.add_subprocess("Agent", heat=heat_req_steam)  # add to requirements object
     else:
         raise ValueError("Wrong agent type given")
