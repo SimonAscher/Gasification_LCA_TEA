@@ -1,7 +1,10 @@
 import pandas as pd
 
+from models.prediction_model._get_models import get_models
+from functions.general.utility import fetch_ML_inputs
 
-def make_predictions(models_dict, data, output_selector="all"):
+
+def make_predictions(models_dict=None, data=None, output_selector="all"):
     """
     Function that makes prediction
 
@@ -20,16 +23,20 @@ def make_predictions(models_dict, data, output_selector="all"):
         Dictionary of predictions.
 
     """
-    # Convert data to right format
-    data = [data]
+    # Get defaults
+    if models_dict is None:
+        models_dict = get_models()
+
+    if data is None:
+        data = [fetch_ML_inputs()]
 
     # Define function to check if data is in right format (i.e. pandas dataframe)
-    def to_df(data):
+    def to_df(data_to_check):
         """
         Check if data is given as pandas dataframe - otherwise turn into one.
         Parameters
         ----------
-        data :
+        data_to_check :
             Input data used to make predictions on.
 
         Returns
@@ -38,7 +45,7 @@ def make_predictions(models_dict, data, output_selector="all"):
         """
 
         # Check whether object is already a pandas DataFrame
-        if isinstance(data, pd.DataFrame):
+        if isinstance(data_to_check, pd.DataFrame):
             pass
         else:
             # Define labels of data
@@ -46,10 +53,10 @@ def make_predictions(models_dict, data, output_selector="all"):
             input_data_labels = settings.labels.input_data
 
             # Change data to pandas dataframe
-            data = pd.DataFrame(data=data,
+            data_to_check = pd.DataFrame(data=data_to_check,
                                 index=["data"],
                                 columns=input_data_labels)
-        return data
+        return data_to_check
 
     # Check if data is a pandas dataframe - if not call function and try to turn into one
     if not isinstance(data, pd.DataFrame):

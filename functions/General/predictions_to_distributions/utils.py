@@ -1,7 +1,7 @@
 import pickle
 
 
-def get_correct_sigma(prediction: float, output_label: str) -> float:
+def get_correct_sigma(prediction, output_label):
     """
     Function to get the error value associated with a prediction.
 

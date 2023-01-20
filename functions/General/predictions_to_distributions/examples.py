@@ -1,7 +1,7 @@
 # %% Test subfunctions
 import time
 from functions.general.predictions_to_distributions.utils import get_correct_sigma
-from functions.MC import make_dist
+from functions.MonteCarloAnalysis import make_dist
 
 prediction = 3.8
 output_label = "C2Hn [vol.% db]"
@@ -37,8 +37,8 @@ print("The time of execution of above program is :", end - start)
 # %% Test func to get all predictions to distributions
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from models.prediction_model import get_models, make_predictions
-from models.prediction_model import fetch_inputs
+from functions.general.utility import fetch_ML_inputs
 
 models = get_models()
-all_predictions = make_predictions(models_dict=models, data=fetch_inputs())
+all_predictions = make_predictions(models_dict=models, data=fetch_ML_inputs())
 all_pred_dists = get_all_prediction_distributions(all_predictions)

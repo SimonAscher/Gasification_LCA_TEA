@@ -62,10 +62,31 @@ CO = 28
 CO2 = 44
 CH4 = 16
 C2H4 = 28
+H = 1
 C = 12
 O = 16
 H2O = 18
 units = "g/mol"
+
+[default.data.LHV]
+# Lower heating values (LHV) of different gas species and other elements
+CO = 12.633
+CH4 = 35.883
+H2 = 10.783
+C2H4 = 59.457
+units = "MJ/m3"
+source = " HEATING VALUE OF GASES FROM BIOMASS GASIFICATION Report prepared for: IEA Bioenergy Agreement, Task 20 - Thermal Gasification of Biomass Lars Waldheim, Torbjörn Nilsson TPS Termiska Processer AB May 2001"
+
+[default.data.HHV]
+# Higher heating values (HHV) of different gas species and other elements
+CO = 12.633
+CH4 = 39.819
+H2 = 12.745
+C2H4 = 63.414
+units = "MJ/m3"
+source = " HEATING VALUE OF GASES FROM BIOMASS GASIFICATION Report prepared for: IEA Bioenergy Agreement, Task 20 - Thermal Gasification of Biomass Lars Waldheim, Torbjörn Nilsson TPS Termiska Processer AB May 2001"
+
+
 
 [default.data.CO2_equivalents]
 # Carbon dioxide equivalent factors

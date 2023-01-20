@@ -1,6 +1,6 @@
 from functions.general.predictions_to_distributions import utils
 from functions.general.predictions_to_distributions.utils import get_correct_sigma
-from functions.MC import make_dist
+from functions.MonteCarloAnalysis import make_dist
 from config import settings
 from configs import gaussian
 from models.prediction_model import get_models, make_predictions

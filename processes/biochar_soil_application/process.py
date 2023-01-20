@@ -1,5 +1,5 @@
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
-from functions.MC import to_MC_array, make_dist
+from functions.MonteCarloAnalysis import to_MC_array, make_dist
 from config import settings
 from configs import triangular, gaussian, process_GWP_output, process_GWP_output_MC
 from .utils import load_biochar_properties_data
