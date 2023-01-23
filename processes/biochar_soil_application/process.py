@@ -39,6 +39,13 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=None, carbon_fraction="default
     feedstock_type = settings.user_inputs.feedstock_category.lower()
     feedstock_description = feedstock_type + " " + feedstock_name
 
+    # Initialise some variables
+    carbon_fraction_else_case = False
+    carbon_fraction_min = None
+    carbon_fraction_max = None
+    carbon_fraction_mean = None
+    carbon_fraction_std = None
+
     # Get Monte Carlo array of carbon fraction in biochar
     if carbon_fraction == "default":
         # Get data
@@ -73,11 +80,16 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=None, carbon_fraction="default
             carbon_fraction_std = carbon_fraction_data["biosolids (paper sludge, sewage sludge)"]["std"]
 
         else:
-            carbon_fraction_mean = carbon_fraction_data["general"]["mean"]
-            carbon_fraction_std = carbon_fraction_data["general"]["std"]
+            carbon_fraction_else_case = True
+            carbon_fraction_min = carbon_fraction_data.loc["mean"].min()
+            carbon_fraction_max = 0.8985  # Ref: https://doi.org/10.1016/j.biortech.2017.06.177
 
         # Create Monte Carlo array
-        carbon_fraction_array = make_dist(gaussian(mean=carbon_fraction_mean, std=carbon_fraction_std))
+        if carbon_fraction_else_case:
+            carbon_fraction_array = np.random.default_rng().uniform(low=carbon_fraction_min, high=carbon_fraction_max,
+                                                                    size=settings.background.iterations_MC)
+        else:
+            carbon_fraction_array = make_dist(gaussian(mean=carbon_fraction_mean, std=carbon_fraction_std))
 
     else:  # Fixed value scenario
         carbon_fraction_array = to_MC_array(carbon_fraction)
