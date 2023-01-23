@@ -1,13 +1,13 @@
+import numpy as np
+
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.MonteCarloAnalysis import to_MC_array, make_dist
 from config import settings
 from configs import triangular, gaussian, process_GWP_output, process_GWP_output_MC
 from .utils import load_biochar_properties_data
-import numpy as np
 
 
-def biochar_soil_GWP_MC(biochar_yield_predictions=None,
-                        carbon_fraction="default", stability="default"):
+def biochar_soil_GWP_MC(biochar_yield_predictions=None, carbon_fraction="default", stability="default"):
     """
     Calculate the GWP of applying biochar to soil for all Monte Carlo runs.
 
@@ -23,6 +23,7 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=None,
     -------
         GWP values in kg CO2eq. / FU.
     """
+    # Get defaults
     if biochar_yield_predictions is None:
         biochar_yield_predictions = get_all_prediction_distributions()["Char yield [g/kg wb]"]
 
@@ -33,20 +34,63 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=None,
     if carbon_fraction == "default" or stability == "default":
         biochar_properties_data = load_biochar_properties_data()
 
-    # Get Monte Carlo array of carbon fractions in biochar
+    # Extract user data on feedstock type and name
+    feedstock_name = settings.user_inputs.feedstock_name.lower()
+    feedstock_type = settings.user_inputs.feedstock_category.lower()
+    feedstock_description = feedstock_type + " " + feedstock_name
+
+    # Get Monte Carlo array of carbon fraction in biochar
     if carbon_fraction == "default":
-        carbon_fraction_array = make_dist(gaussian(mean=biochar_properties_data["Biochar carbon fraction"]["Mean"],
-                                                   sigma=biochar_properties_data["Biochar carbon fraction"]["Std"]))
+        # Get data
+        carbon_fraction_data = biochar_properties_data["Biochar carbon fraction"]
+
+        # Select appropriate data
+        if "rice husk" in feedstock_name or "rice straw" in feedstock_name:
+            carbon_fraction_mean = carbon_fraction_data["rice husk and rice straw"]["mean"]
+            carbon_fraction_std = carbon_fraction_data["rice husk and rice straw"]["std"]
+
+        elif ("nut" in feedstock_name and "pit" in feedstock_name) or (
+                "nut" in feedstock_name and "shell" in feedstock_name) or (
+                "nut" in feedstock_name and "stone" in feedstock_name):
+            carbon_fraction_mean = carbon_fraction_data["nut shells, pits, and stones"]["mean"]
+            carbon_fraction_std = carbon_fraction_data["nut shells, pits, and stones"]["std"]
+
+        elif "wood" in feedstock_type:
+            carbon_fraction_mean = carbon_fraction_data["wood"]["mean"]
+            carbon_fraction_std = carbon_fraction_data["wood"]["std"]
+
+        elif "manure" in feedstock_type:
+            carbon_fraction_mean = carbon_fraction_data["animal manure"]["mean"]
+            carbon_fraction_std = carbon_fraction_data["animal manure"]["std"]
+
+        elif "herbaceous" in feedstock_type:
+            carbon_fraction_mean = carbon_fraction_data["herbaceous biomass"]["mean"]
+            carbon_fraction_std = carbon_fraction_data["herbaceous biomass"]["std"]
+
+        elif ("sludge" in feedstock_name and "sewage" in feedstock_description) or (
+                "sludge" in feedstock_name and "paper" in feedstock_description):
+            carbon_fraction_mean = carbon_fraction_data["biosolids (paper sludge, sewage sludge)"]["mean"]
+            carbon_fraction_std = carbon_fraction_data["biosolids (paper sludge, sewage sludge)"]["std"]
+
+        else:
+            carbon_fraction_mean = carbon_fraction_data["general"]["mean"]
+            carbon_fraction_std = carbon_fraction_data["general"]["std"]
+
+        # Create Monte Carlo array
+        carbon_fraction_array = make_dist(gaussian(mean=carbon_fraction_mean, std=carbon_fraction_std))
 
     else:  # Fixed value scenario
         carbon_fraction_array = to_MC_array(carbon_fraction)
 
     # Get Monte Carlo arrays of recalcitrant and labile carbon fractions
     if stability == "default":  # Use default distribution
+        # Get data
+        recalcitrant_carbon_data = biochar_properties_data["Biochar recalcitrant carbon fraction"]
+
         recalcitrant_carbon_array = make_dist(
-            triangular(lower=biochar_properties_data["Biochar recalcitrant carbon fraction"]["Lower"],
-                       mode=biochar_properties_data["Biochar recalcitrant carbon fraction"]["Mode"],
-                       upper=biochar_properties_data["Biochar recalcitrant carbon fraction"]["Upper"]))
+            triangular(lower=recalcitrant_carbon_data.lower,
+                       mode=recalcitrant_carbon_data.mode,
+                       upper=recalcitrant_carbon_data.upper))
 
     else:  # Fixed value scenario
         recalcitrant_carbon_array = to_MC_array(stability)
@@ -79,7 +123,3 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=None,
     MC_outputs.subprocess_abbreviations = ("Char", )  # add abbreviation of subprocess
 
     return MC_outputs
-
-    # TODO: Carbon fraction and recalcitrant carbon fractions are functions of feedstock type (C, Ash content), temp,
-    #  etc. - ideally the model would be able to incorporate that. Phyllis database could be used to group different
-    #  feedstock types and based on those select realistic carbon fractions etc.

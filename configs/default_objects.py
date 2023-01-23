@@ -6,7 +6,7 @@ import warnings
 
 # Named tuple objects - used for making distributions for Monte Carlo simulation
 triangular = namedtuple("triangular", "lower mode upper")
-gaussian = namedtuple("gaussian", "mean sigma")
+gaussian = namedtuple("gaussian", "mean std")
 
 
 @dataclass

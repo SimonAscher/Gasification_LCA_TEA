@@ -33,7 +33,7 @@ def make_dist(values, length_array: int = settings.background.iterations_MC,
     ----------
     values: triangular or gaussian
         Named tuple of the type triangular or gaussian. Defined in configs/default_objects.py.
-        Contains variables (e.g. mean, sigma, lower, upper, mode) defining the given distribution.
+        Contains variables (e.g. mean, std, lower, upper, mode) defining the given distribution.
     length_array: int
         Length of created array. Default value is the number of Monte Carlo iterations loaded from settings.
     random_state: int
@@ -48,7 +48,7 @@ def make_dist(values, length_array: int = settings.background.iterations_MC,
     distribution = []  # initialise distribution array
     # np.random.seed(random_state)  # set random seed
     if isinstance(values, gaussian):
-        distribution = np.random.default_rng().normal(loc=values.mean, scale=values.sigma,
+        distribution = np.random.default_rng().normal(loc=values.mean, scale=values.std,
                                                       size=length_array)
         # TODO: Consider implementing Latin Hypercube sampling or orthogonal sampling (for more info see:
         #  https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.qmc.LatinHypercube.html)

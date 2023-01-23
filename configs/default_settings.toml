@@ -201,7 +201,6 @@ source = "https://doi.org/10.1016/j.wasman.2017.03.028"
 "power consumption" = 225  # [kW/ton O2] Note: Given as power not energy consumption.
 source = "https://doi.org/10.1002/apj.354"
 
-
 [default.data.energy_requirements.air_separation_unit.A]
 # Electricity requirements of an air seperation unit for the production of Oxygen.
 "energy consumption low" = 0.360  # [kWh/ Nm3 O2]
@@ -217,3 +216,28 @@ source = "https://doi.org/10.1016/j.ijggc.2013.10.009"
 # Electricity requirements for air seperation units for the production of Oxygen.
 "energy consumption" = [0.280, 0.464, 0.639, 0.631]  # [kWh/ Nm3 O2]
 source = "https://doi.org/10.4186/ej.2014.18.2.67"
+
+[default.data.CEPCI]
+# Chemical Enginnering Plant Cost Index (CEPCI) values
+2001 = 394.3
+2002 = 395.6
+2003 = 402
+2004 = 444.2
+2005 = 468.2
+2006 = 499.6
+2007 = 525.4
+2008 = 575.4
+2009 = 521.9
+2010 = 550.8
+2011 = 585.7
+2012 = 584.6
+2013 = 567.3
+2014 = 576.1
+2015 = 556.8
+2016 = 541.7
+2017 = 567.5
+2018 = 603.1
+2019 = 619.2
+2020 = 597.5
+# TODO add values for 2021 and 2022
+source = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.191", "10.1016/j.biortech.2020.123076" ]

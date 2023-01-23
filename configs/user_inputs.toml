@@ -2,7 +2,7 @@
 iterations_MC = 1000
 country = "UK"
 feedstock_category = "woody biomass"
-feedstock_name = "test"
+feedstock_name = "blank"
 "particle size" = 1
 "carbon content" = 50.0
 "hydrogen content" = 10.0

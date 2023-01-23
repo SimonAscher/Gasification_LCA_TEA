@@ -27,6 +27,8 @@ def make_predictions(models_dict=None, data=None, output_selector="all"):
     if models_dict is None:
         models_dict = get_models()
 
+    data = [data]
+
     if data is None:
         data = [fetch_ML_inputs()]
 
@@ -54,8 +56,8 @@ def make_predictions(models_dict=None, data=None, output_selector="all"):
 
             # Change data to pandas dataframe
             data_to_check = pd.DataFrame(data=data_to_check,
-                                index=["data"],
-                                columns=input_data_labels)
+                                         index=["data"],
+                                         columns=input_data_labels)
         return data_to_check
 
     # Check if data is a pandas dataframe - if not call function and try to turn into one
