@@ -83,6 +83,7 @@ def biochar_soil_GWP_MC(biochar_yield_predictions=None, carbon_fraction="default
             carbon_fraction_else_case = True
             carbon_fraction_min = carbon_fraction_data.loc["mean"].min()
             carbon_fraction_max = 0.8985  # Ref: https://doi.org/10.1016/j.biortech.2017.06.177
+            # TODO: Find data on plastic and municipal solid waste biochar carbon content if possible.
 
         # Create Monte Carlo array
         if carbon_fraction_else_case:

@@ -31,19 +31,28 @@ def pred_to_dist(prediction, output_label):
     return distribution
 
 
-def get_all_prediction_distributions(predictions=make_predictions(models_dict=get_models(), data=fetch_ML_inputs())):
+def get_all_prediction_distributions(predictions=None, data=None):
     """
     Wrapper function to get prediction distributions for all outputs.
     Parameters
     ----------
     predictions: dict
         Dictionary of predictions for all 10 model outputs.
+    data
 
     Returns
     -------
     dict
         Dictionary of distribution associated with each model output.
     """
+
+    # Get defaults
+    if predictions is None:
+        predictions = make_predictions(models_dict=get_models())
+
+    if data is None:
+        data = [fetch_ML_inputs()]
+
 
     output_labels = settings.labels.output_data  # get labels
     distributions = {}  # initialise distributions dictionary

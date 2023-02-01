@@ -1,0 +1,3 @@
+# Ignore some folders with large number of jupyter notebooks in github language documentation
+notebooks/Interpretable_ML_Gasification_Publication/** linguist-vendored
+analysis/preliminary/** linguist-vendored

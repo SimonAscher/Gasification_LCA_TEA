@@ -1,5 +1,12 @@
+import pickle
+
+import pandas as pd
+import numpy as np
+
 from config import settings
 from functions.general.utility import ultimate_comp_daf_to_wb
+from functions.general import calculate_LHV_HHV_feedstock
+from functions.general.utility import MJ_to_kWh
 
 
 def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"],
@@ -11,6 +18,7 @@ def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"
                                          ash=settings.user_inputs["ash content"]):
     """
     Calculates the oxygen required for the complete combustion of a given feedstock.
+    By default, takes feedstock data given by user.
 
     Returns
     -------
@@ -30,6 +38,7 @@ def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"
 def mass_agent(agent_type=None, ER=None, **kwargs):
     """
     Calculates the agent mass required for gasification.
+    By default, takes agent type and ER data given by user.
 
     Parameters
     ----------
@@ -57,6 +66,9 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
     max_oxygen = oxygen_for_stoichiometric_combustion()
 
     # Initialise agent mass
+    agent_mass = None
+    mass_air = None
+    mass_steam = None
 
     if agent_type == "Air":
         agent_mass = max_oxygen * (100 / 23)  # air is 23% oxygen by weight
@@ -105,3 +117,83 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
         mass_agent_output = {"Air": mass_air, "Steam": mass_steam, "units": "kg agent/kg feedstock wb"}
 
     return mass_agent_output
+
+
+
+
+def load_gasification_aux_demands_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
+                                               r"\gasification_aux_demands_results"):
+    """
+    Load pickled data done in analysis on biochar properties (e.g. carbon fraction and carbon stability)
+    Analysis done in: analysis/preliminary/gas_cleaning_and_aux_demands/gas_cleaning_and_aux_demands.ipynb.
+
+    Parameters
+    ----------
+    full_file_path: str
+    "r" string specifying the file path to pickle object.
+
+    Returns
+    -------
+    dict
+        Loaded data on requirements for gas cleaning and auxiliary gasification demands.
+    """
+    # Load pickled data
+    loaded_data = pickle.load(open(full_file_path, "rb"))
+    # TODO: Change call to file path to dynamic call (could try something like sys.path[-1])
+
+    return loaded_data
+
+
+def demands_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
+                             H=settings.user_inputs["hydrogen content"],
+                             S=settings.user_inputs["sulphur content"],
+                             moisture=settings.user_inputs["desired moisture"]):
+    """
+    Calculates electricity requirements for auxiliary gasification operations and syngas cleaning.
+
+    Parameters
+    ----------
+    C: float
+        Carbon content of feedstock [% daf].
+    H: float
+        Hydrogen content of feedstock [% daf].
+
+    S: float
+        Sulphur content of feedstock [% daf].
+
+    moisture: float
+        Moisture content of feedstock [% wb].
+
+    Returns
+    -------
+    float
+        Electricity requirement for auxiliary gasification demands and gas cleaning.
+    """
+
+    # Get feedstock LHV
+
+    # Get data in right format
+    feedstock_data_index = "feedstock data"
+    feedstock_df = pd.DataFrame(index=[feedstock_data_index], columns=settings.labels.input_data)
+    feedstock_df.loc[feedstock_data_index]["C [%daf]"] = C
+    feedstock_df.loc[feedstock_data_index]["H [%daf]"] = H
+    feedstock_df.loc[feedstock_data_index]["S [%daf]"] = S
+    feedstock_df.loc[feedstock_data_index]["Moisture [%wb]"] = moisture
+
+    # Calculate feedstock LHV
+    feedstock_LHV = calculate_LHV_HHV_feedstock(predictor_data=feedstock_df)  # MJ/kg wb
+
+    feedstock_mass = settings.general.FU
+    total_feedstock_energy = MJ_to_kWh(value=(feedstock_mass * feedstock_LHV))
+
+    # Get data on requirements for auxiliary and gas cleaning
+    aux_requirements_data = load_gasification_aux_demands_data()
+
+    # Draw sample from triangular distribution.
+    aux_fraction = np.random.default_rng().triangular(left=aux_requirements_data.lower,
+                                                      mode=aux_requirements_data.mode,
+                                                      right=aux_requirements_data.upper)
+    # Calculate auxiliary energy requirements
+    aux_energy = aux_fraction * total_feedstock_energy
+
+    return aux_energy

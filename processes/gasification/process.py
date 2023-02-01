@@ -1,41 +1,21 @@
 from config import settings
-import numpy as np
 from configs import process_requirements, process_GWP_output, process_GWP_output_MC
-from functions.LCA import thermal_energy_GWP, electricity_GWP
-from functions.general.utility import kJ_to_kWh
-from processes.gasification.utils import mass_agent
+from processes.gasification.utils import mass_agent, demands_aux_gas_cleaning
 from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
 
-# file to calculate gasification outputs
-# i.e. how much biochar and how much syngas is produced
-# prediction model can be used for that
 
-"""
-Energy requirements for:
-    - operation of gasifier (fixed, fluidised, aux demands, scale, etc)
-    - provision of agent (air, steam, O2)
-"""
-def gasification_requirements(operation_mode=settings.user_inputs["operation mode"],
-                              operation_scale=settings.user_inputs["operation scale"],
-                              agent_type=settings.user_inputs["gasifying agent"],
-                              agent_mass=None,
-                              catalyst=settings.user_inputs["catalyst"],
-                              reactor_type=settings.user_inputs["reactor type"],
-                              bed_material=settings.user_inputs["bed material"],
-                              FU=settings.general["FU"]):
+def gasification_requirements(agent_type=None, agent_mass=None, FU=settings.general["FU"]):
     """
     Calculates all electricity, heat, and direct GWP requirements from the gasification process.
 
     Parameters
     ----------
-    operation_mode
-    operation_scale
-    agent_type
-    agent_mass
-    catalyst
-    reactor_type
-    bed_material
-    FU
+    agent_type: str
+        String specifying which gasifying agent is used.
+    agent_mass: dict
+        Dictionary with the required mass of agents and their units.
+    FU: int
+        Functional unit of process in kg.
 
     Returns
     -------
@@ -45,9 +25,11 @@ def gasification_requirements(operation_mode=settings.user_inputs["operation mod
             - Electricity [kWh/FU]
             - GWP [kg CO2eq./FU]
     """
-    # TODO: Add aux demands and demands based on reactor type etc.
 
     # Define defaults
+    if agent_type is None:
+        agent_type = settings.user_inputs["gasifying agent"]
+
     if agent_mass is None:
         agent_mass = mass_agent()
 
@@ -57,7 +39,7 @@ def gasification_requirements(operation_mode=settings.user_inputs["operation mod
     # Model emissions and energy requirements based on agent type
     if agent_type == "Air" or agent_type == "Other":
         # Note: Currently agent_type = "Other" treated as air.
-        # Note: Currently no direct emissions due to agent
+        # Note: Currently no direct requirements due to air as agent
         pass
     elif agent_type == "Air + steam":
         pass
@@ -65,14 +47,18 @@ def gasification_requirements(operation_mode=settings.user_inputs["operation mod
     elif agent_type == "Oxygen":
         total_oxygen_mass = agent_mass["Oxygen"] * FU  # [kg/FU]
         total_oxygen_electricity_req = total_oxygen_mass * oxygen_rng_elect_req()
-        requirements.add_subprocess("Agent", electricity=total_oxygen_electricity_req)
+        requirements.add_subprocess(name="Agent", electricity=total_oxygen_electricity_req)
 
     elif agent_type == "Steam":
         # Get heat requirement for steam production
         heat_req_steam = steam_rng_heat_req(mass_steam=agent_mass["Steam"])
-        requirements.add_subprocess("Agent", heat=heat_req_steam)  # add to requirements object
+        requirements.add_subprocess(name="Agent", heat=heat_req_steam)  # add to requirements object
     else:
         raise ValueError("Wrong agent type given")
+
+    # Add auxiliary requirements:
+    aux_electricity_req = demands_aux_gas_cleaning()
+    requirements.add_subprocess(name="Auxiliary and gas cleaning", electricity=aux_electricity_req)
 
     return requirements
 
@@ -88,6 +74,8 @@ def gasification_GWP(requirements=None):
 
     Returns
     -------
+    object
+        process_GWP_output object containing the related emissions due to gasification requirements.
 
     """
 
@@ -136,6 +124,6 @@ def gasification_GWP_MC(MC_iterations=settings.background.iterations_MC):
         # Store in output object
         MC_outputs.add_GWP_object(GWP_object)
 
-    MC_outputs.subprocess_abbreviations = ("Agent",)  # add abbreviation of subprocess
+    MC_outputs.subprocess_abbreviations = ("Agent", "Aux.")  # add abbreviation of subprocess
 
     return MC_outputs

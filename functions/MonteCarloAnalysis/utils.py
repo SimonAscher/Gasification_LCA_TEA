@@ -27,7 +27,7 @@ def to_MC_array(value: float, no_iterations: int = settings.background.iteration
 def make_dist(values, length_array: int = settings.background.iterations_MC,
               random_state: int = settings.background.random_seed):
     """
-    Function to turn a singular value to a distribution.
+    Function to create a distribution.
 
     Parameters
     ----------

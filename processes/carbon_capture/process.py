@@ -27,7 +27,6 @@ def carbon_capture_GWP_MC(ML_predictions=None, syngas_combustion_outputs=None, c
     -------
 
     """
-
     # Get defaults
     if ML_predictions is None:
         ML_predictions = get_all_prediction_distributions()
@@ -46,7 +45,6 @@ def carbon_capture_GWP_MC(ML_predictions=None, syngas_combustion_outputs=None, c
 
     # Initialise MC output object
     MC_outputs = process_GWP_output_MC(process_name="Carbon Capture")
-
 
     # Do analysis for post combustion process' which act on the flue gas
     if cc_method in ["Amine post comb", "VPSA post combustion"]:
@@ -77,7 +75,6 @@ def carbon_capture_GWP_MC(ML_predictions=None, syngas_combustion_outputs=None, c
 
         # add abbreviations of subprocess'
         MC_outputs.subprocess_abbreviations = ("CC", "Elect.", "Heat",)
-
 
     # Do analysis for pre combustion process which acts on the syngas
     elif cc_method == "VPSA pre combustion":

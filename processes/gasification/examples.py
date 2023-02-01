@@ -1,5 +1,7 @@
-from processes.gasification import oxygen_for_stoichiometric_combustion, mass_agent, gasification_requirements, \
-    gasification_GWP, gasification_GWP_MC
+from processes.gasification import gasification_requirements, gasification_GWP, gasification_GWP_MC
+
+from processes.gasification.utils import oxygen_for_stoichiometric_combustion, mass_agent
+
 from processes.general import oxygen_rng_elect_req
 
 # Test oxygen req subfunction

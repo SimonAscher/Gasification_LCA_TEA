@@ -7,6 +7,8 @@ def ultimate_comp_daf_to_wb(C=settings.user_inputs["carbon content"], H=settings
                             ash=settings.user_inputs["ash content"]):
     """
     Converts ultimate composition of a material from % daf (dry ash free)basis to % wb (wet basis).
+    By default, takes feedstock data given by user.
+
     """
 
     sum_percentages = C + H + N + S + O + moisture + ash

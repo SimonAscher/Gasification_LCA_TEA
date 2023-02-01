@@ -6,7 +6,7 @@ from functions.general.utility import fetch_ML_inputs
 
 # Get models and make predictions with them
 models = get_models()
-all_predictions = make_predictions(models_dict=models, data=fetch_ML_inputs())
+all_predictions = make_predictions(models_dict=models, data=[fetch_ML_inputs()])
 
 # Turn predictions into distributions
 all_pred_dists = get_all_prediction_distributions(all_predictions)

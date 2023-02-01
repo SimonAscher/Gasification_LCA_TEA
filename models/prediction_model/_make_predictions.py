@@ -27,8 +27,6 @@ def make_predictions(models_dict=None, data=None, output_selector="all"):
     if models_dict is None:
         models_dict = get_models()
 
-    data = [data]
-
     if data is None:
         data = [fetch_ML_inputs()]
 
