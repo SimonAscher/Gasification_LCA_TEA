@@ -119,8 +119,6 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
     return mass_agent_output
 
 
-
-
 def load_gasification_aux_demands_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
                                                r"\gasification_aux_demands_results"):
     """

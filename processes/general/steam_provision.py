@@ -30,19 +30,19 @@ def load_boiler_efficiency_data(full_file_path=r"C:\Users\2270577A\PycharmProjec
     return loaded_data
 
 
-def steam_rng_heat_req(mass_steam, FU=settings.general.FU):
+def steam_rng_heat_req(mass_steam):
     """
     Calculates heat requirement for steam production after applying some uncertainty.
 
     Parameters
     ----------
     mass_steam: float
-        Required mass of steam.
+        Required mass of steam [kg].
 
     Returns
     -------
     float
-        Randomised heat requirement for steam production [kWh th./ FU].
+        Randomised heat requirement for steam production [kWh th].
     """
 
     # Get some reference parameters
@@ -53,8 +53,8 @@ def steam_rng_heat_req(mass_steam, FU=settings.general.FU):
     heat_raise = (boiling_temperature - room_temperature) * settings.data.specific_heats["water"]  # [kJ/kg]
     heat_vaporisation = settings.data.heats_vaporisation.water["100 degC"]  # [kJ/kg]
     unit_heat_required = heat_raise + heat_vaporisation  # in kJ/kg steam
-    total_theoretical_heat_required_kJ = unit_heat_required * mass_steam * FU  # [kJ/FU]
-    total_theoretical_heat_required = kJ_to_kWh(total_theoretical_heat_required_kJ)  # [kWh/FU]
+    total_theoretical_heat_required_kJ = unit_heat_required * mass_steam  # [kJ]
+    total_theoretical_heat_required = kJ_to_kWh(total_theoretical_heat_required_kJ)  # [kWh]
 
     # Get boiler efficiency
     boiler_efficiency_data = load_boiler_efficiency_data()

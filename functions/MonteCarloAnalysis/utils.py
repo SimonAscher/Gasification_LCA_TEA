@@ -3,7 +3,7 @@ import numpy as np
 from configs import triangular, gaussian
 
 
-def to_MC_array(value: float, no_iterations: int = settings.background.iterations_MC) -> object:
+def to_MC_array(value: float, no_iterations: int = settings.background.iterations_MC) -> np.array:
     """
     Convenience function to turn any value into a repeating array the length of Monte Carlo iterations.
 
@@ -17,7 +17,7 @@ def to_MC_array(value: float, no_iterations: int = settings.background.iteration
 
     Returns
     -------
-    array
+    np.array
         Numpy array repeating the input value.
     """
     mc_array = np.repeat(value, no_iterations)

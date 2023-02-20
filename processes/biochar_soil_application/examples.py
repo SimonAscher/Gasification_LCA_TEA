@@ -2,6 +2,7 @@ from functions.general.predictions_to_distributions import get_all_prediction_di
 from models.prediction_model import get_models, make_predictions
 from processes.biochar_soil_application import biochar_soil_GWP_MC
 from functions.general.utility import fetch_ML_inputs
+from processes.biochar_soil_application.object_oriented_process import BiocharSoilApplication
 
 
 # Get models and make predictions with them
@@ -16,3 +17,7 @@ biochar_yield = all_pred_dists["Char yield [g/kg wb]"]
 
 # Calculate GWPs
 GWP_results = biochar_soil_GWP_MC(biochar_yield)
+
+# Test object oriented approach
+
+test_obj = BiocharSoilApplication()

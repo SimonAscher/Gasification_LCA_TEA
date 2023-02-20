@@ -1,6 +1,4 @@
-# These are the first values loaded
 [default]
-
 
 [default.background]
 # Random number seed
@@ -8,6 +6,11 @@ random_seed = 42
 
 # Number of Monte Carlo iterations to be used by the model
 iterations_MC = 1000
+
+# Default value how biogenic carbon is to be treated: 0 - completely biogenic (i.e. no net GWP); 1 - equivalent to fossil fuels
+biogenic_carbon_equivalency = 0.0
+# this can be changed later to different approaches ideally - i.e. normal 100 time horizon and biogenic carbon assumed as zero
+# or a temporal approach - see supplementary material of 10.1007/s11367-020-01853-2 (e.g. S1 and S11)
 
 
 [default.general]
@@ -54,6 +57,7 @@ C2H4 = 1.18
 O2 = 1.323
 units = "kg/m3"
 
+
 [default.data.molar_masses]
 # Molar or molecular masses of different gas species and other elements
 N2 = 28
@@ -68,6 +72,7 @@ O = 16
 H2O = 18
 units = "g/mol"
 
+
 [default.data.LHV]
 # Lower heating values (LHV) of different gas species and other elements
 CO = 12.633
@@ -76,6 +81,7 @@ H2 = 10.783
 C2H4 = 59.457
 units = "MJ/m3"
 source = " HEATING VALUE OF GASES FROM BIOMASS GASIFICATION Report prepared for: IEA Bioenergy Agreement, Task 20 - Thermal Gasification of Biomass Lars Waldheim, Torbjörn Nilsson TPS Termiska Processer AB May 2001"
+
 
 [default.data.HHV]
 # Higher heating values (HHV) of different gas species and other elements
@@ -87,7 +93,6 @@ units = "MJ/m3"
 source = " HEATING VALUE OF GASES FROM BIOMASS GASIFICATION Report prepared for: IEA Bioenergy Agreement, Task 20 - Thermal Gasification of Biomass Lars Waldheim, Torbjörn Nilsson TPS Termiska Processer AB May 2001"
 
 
-
 [default.data.CO2_equivalents]
 # Carbon dioxide equivalent factors
 # Factors are based on the IPCC Sixth Assessment Report (AR6) and are for a 100-year time horizon
@@ -95,7 +100,6 @@ CO2_equ_factor = 1
 CH4_fossil_equ_factor = 29.8
 CH4_non_fossil_equ_factor = 27.2
 N2O_equ_factor = 273
-
 
 [default.data.CO2_equivalents.electricity]
 # Carbon intensity of grid electricity
@@ -116,6 +120,9 @@ oxygen = 0.0913  # [kg CO2eq./kg O2] Ref: GaBi model "oxygen seperation"
 # Ref: See preliminary analysis done in C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\analysis\preliminary\biogenic_fraction_of_feedstocks.ipynb
 "herbaceous biomass" = 0.9833
 "woody biomass" = 0.9878
+
+"plastics" = 0
+"municipal solid waste" = 0
 
 
 [default.data.feedstock_drying]
@@ -217,8 +224,22 @@ source = "https://doi.org/10.1016/j.ijggc.2013.10.009"
 "energy consumption" = [0.280, 0.464, 0.639, 0.631]  # [kWh/ Nm3 O2]
 source = "https://doi.org/10.4186/ej.2014.18.2.67"
 
-[default.data.CEPCI]
-# Chemical Enginnering Plant Cost Index (CEPCI) values
+
+# Economic data
+[default.data.economic]
+
+currencies = ["GBP", "USD", "EURO"]  # Currencies supported by the model
+
+[default.data.economic.conversion_rates]  # Currency conversion rates
+
+[default.data.economic.conversion_rates.most_recent]
+GBP_to_USD = 1.22501
+GBP_to_EURO = 1.12070
+USD_to_EURO = 0.91485
+date = "03.02.2023"
+
+
+[default.data.economic.CEPCI]  # Chemical Enginnering Plant Cost Index (CEPCI) values
 2001 = 394.3
 2002 = 395.6
 2003 = 402
@@ -239,5 +260,7 @@ source = "https://doi.org/10.4186/ej.2014.18.2.67"
 2018 = 603.1
 2019 = 619.2
 2020 = 597.5
+2021 = "unavailable"
+2022 = "unavailable"
+source = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.191", "10.1016/j.biortech.2020.123076"]
 # TODO add values for 2021 and 2022
-source = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.191", "10.1016/j.biortech.2020.123076" ]

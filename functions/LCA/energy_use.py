@@ -13,7 +13,7 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=settings.user_i
     source: str
         Defines which source is considered for heat production.
     units: str
-        Defines units used in analysis - either kWh or kJ or MJ
+        Defines units used in analysis - either kWh or kJ or MJ.
     country: str
         Reference country used in process.
     displaced: bool
@@ -49,7 +49,7 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=settings.user_i
     return GWP
 
 
-def electricity_GWP(amount, country=settings.user_inputs["country"], displaced=False):
+def electricity_GWP(amount, source=None, units="kWh", country=settings.user_inputs["country"], displaced=False):
     """
     Function to determine the GWP of using (or avoiding) a certain amount of grid electricity.
 
@@ -57,6 +57,10 @@ def electricity_GWP(amount, country=settings.user_inputs["country"], displaced=F
     ----------
     amount: float
         Takes the amount of electricity in kWh.
+    source: str
+        Defines which source is considered for electricity production.
+    units: str
+        Defines units used in analysis - currently only kWh supported.
     country: str
         Specifies the reference country or region.
     displaced: bool
@@ -66,8 +70,19 @@ def electricity_GWP(amount, country=settings.user_inputs["country"], displaced=F
     float
         GWP value in kg CO2eq.
     """
-    electricity_intensity = settings.data.CO2_equivalents.electricity[country]
-    GWP = electricity_intensity * amount
+
+    # Get defaults
+    if source is None:
+        source = "grid"
+
+    if source == "grid":
+        electricity_intensity = settings.data.CO2_equivalents.electricity[country]
+        GWP = electricity_intensity * amount
+    else:
+        raise TypeError("Electricity source not supported.")
+
+    if units != "kWh":
+        raise TypeError("Other units currently not supported.")
 
     # Check if energy used or displaced
     if displaced:

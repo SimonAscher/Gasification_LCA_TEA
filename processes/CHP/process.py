@@ -6,12 +6,12 @@ from configs import process_GWP_output, process_GWP_output_MC
 
 
 def CHP_GWP_MC(gas_supplied=get_all_prediction_distributions()["Gas yield [Nm3/kg wb]"],
-            LHV_gas=get_all_prediction_distributions()['LHV [MJ/Nm3]'],
-            displaced_heat_source="natural gas",
-            efficiency_electrical=settings.data.conversion_efficiencies.CHP.SOFC["electrical"],
-            efficiency_heat=settings.data.conversion_efficiencies.CHP.SOFC["heat"],
-            demand_parasitic=settings.data.conversion_efficiencies.CHP.SOFC["parasitic"],
-            FU=settings.general["FU"]):
+               LHV_gas=get_all_prediction_distributions()['LHV [MJ/Nm3]'],
+               displaced_heat_source="natural gas",
+               efficiency_electrical=settings.data.conversion_efficiencies.CHP.SOFC["electrical"],
+               efficiency_heat=settings.data.conversion_efficiencies.CHP.SOFC["heat"],
+               demand_parasitic=settings.data.conversion_efficiencies.CHP.SOFC["parasitic"],
+               FU=settings.general["FU"]):
     """
     Calculate the GWP of syngas use through CHP for all Monte Carlo runs.
 
@@ -62,6 +62,6 @@ def CHP_GWP_MC(gas_supplied=get_all_prediction_distributions()["Gas yield [Nm3/k
 
         MC_outputs.add_GWP_object(GWP_object)
 
-    MC_outputs.subprocess_abbreviations = ("Elect.", "Heat", )  # add abbreviation of subprocess'
+    MC_outputs.subprocess_abbreviations = ("Elect.", "Heat",)  # add abbreviation of subprocess'
 
     return MC_outputs

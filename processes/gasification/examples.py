@@ -1,11 +1,7 @@
 from processes.gasification import gasification_requirements, gasification_GWP, gasification_GWP_MC
-
+from processes.gasification.object_oriented_process import Gasification
 from processes.gasification.utils import oxygen_for_stoichiometric_combustion, mass_agent
-
 from processes.general import oxygen_rng_elect_req
-
-# Test oxygen req subfunction
-oxygen_ele_req = oxygen_rng_elect_req()  # [kWh el./kg O2]
 
 
 oxygen_req = oxygen_for_stoichiometric_combustion()
@@ -25,3 +21,12 @@ test_oxygen_GWP = gasification_GWP(oxygen_test)
 
 # Test MC
 MC_default = gasification_GWP_MC()
+
+# Test object oriented approach
+# Automated workflow
+testObject = Gasification(instantiate_with_default_reqs=True)
+
+# Manual workflow
+testObject2 = Gasification(instantiate_with_default_reqs=False)
+testObject2.calculate_requirements()
+testObject2.calculate_GWP()

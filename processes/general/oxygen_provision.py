@@ -29,27 +29,28 @@ def load_air_separation_unit_data(full_file_path=r"C:\Users\2270577A\PycharmProj
     return loaded_data
 
 
-def oxygen_rng_elect_req(country=settings.user_inputs.country):
+def oxygen_rng_elect_req(mass_oxygen):
     """
     Generates a randomised electricity requirement of an air separation unit (ASU) for the provision of oxygen based
     on a normal distribution defined by literature values.
 
     Parameters
     ----------
-    country
+    mass_oxygen: float
+        Required mass of oxygen. [kg]
 
     Returns
     -------
     float
-        Randomised electricity requirement of ASU for oxygen production [kWh el./kg O2].
+        Randomised electricity requirement of ASU for oxygen production [kWh el].
     """
 
     # Get data - More info in analysis - air_separation_unit_comparison.ipynb
     data = load_air_separation_unit_data()
-    mean = data["Mean"]
-    std = data["Std"]
+    mean = data["Mean"]  # [kWh el./Nm3 O2]
+    std = data["Std"]  # [kWh el./Nm3 O2]
 
     # Generate random value
-    value = np.random.normal(mean, std)
+    value = np.random.normal(mean, std) * mass_oxygen  # [kWh el]
 
     return value
