@@ -42,6 +42,9 @@ class Results:
         self.processes += (process, )
 
     def calculate_total_GWP(self):
+        """
+        Calculates the overall global warming potential (GWP) of the system.
+        """
         # Calculate totals for each Monte Carlo instance
         GWP_totals = []
         for process in self.processes:
@@ -52,70 +55,219 @@ class Results:
         # Calculate overall sum
         self.GWP_mean = float(np.mean(self.GWP_total))
 
-    def calculate_electricity_heat_output(self):
-        electricity_arrays = []
-        heat_arrays = []
 
-        def extract_heat_electricity_from_requirement(requirement_obj, electricity_storage_array, heat_storage_array):
-            for requirement_instance in requirement_obj.electricity:  # electricity requirements
+    def calculate_total_TEA(self):
+        pass
+
+    def calculate_electricity_heat_output(self):
+        """
+        Calculates the overall energy outputs in the form of electricity and heat of the system.
+        """
+        # Storage lists
+        electricity = []
+        electricity_names = []
+        heat = []
+        heat_names = []
+
+        # Define helper function
+        def extract_heat_electricity_from_requirement(requirement_obj, electricity_storage_array, heat_storage_array,
+                                                      electricity_names_array, heat_names_array):
+            # electricity requirements
+            for requirement_instance in requirement_obj.electricity:
+                electricity_names_array.append(requirement_instance.name)
                 if requirement_instance.generated:
                     values = [-x for x in requirement_instance.values]
                     electricity_storage_array.append(values)
                 else:
                     electricity_storage_array.append(requirement_instance.values)
 
-            for requirement_instance in requirement_obj.oxygen:  # oxygen requirements - also result in electricity
+            # oxygen requirements - also result in electricity
+            for requirement_instance in requirement_obj.oxygen:
                 ele_oxygen = []
+                electricity_names_array.append(requirement_instance.name)
                 for oxygen_req_value in requirement_instance.values:
                     ele_oxygen.append(electricity_GWP(amount=oxygen_rng_elect_req(mass_oxygen=oxygen_req_value)))
                 electricity_storage_array.append(ele_oxygen)
 
-            for requirement_instance in requirement_obj.heat:  # heat requirements
+            # heat requirements
+            for requirement_instance in requirement_obj.heat:
+                heat_names_array.append(requirement_instance.name)
                 if requirement_instance.generated:
                     values = [-x for x in requirement_instance.values]
                     heat_storage_array.append(values)
                 else:
                     heat_storage_array.append(requirement_instance.values)
 
-            for requirement_instance in requirement_obj.steam:  # steam requirements - also result in heat
+            # steam requirements - also result in heat
+            for requirement_instance in requirement_obj.steam:
                 heat_steam = []
+                heat_names_array.append(requirement_instance.name)
                 for steam_req_value in requirement_instance.values:
                     heat_steam.append(thermal_energy_GWP(amount=steam_rng_heat_req(mass_steam=steam_req_value)))
                 heat_storage_array.append(heat_steam)
 
-            return electricity_storage_array, heat_storage_array
+            return electricity_storage_array, heat_storage_array, electricity_names_array, heat_names_array
 
+        # Employ helper function up to the third layer of subprocesses
         for process in self.processes:  # iterate through processes
             for requirement in process.requirements:  # iterate through requirements of each process.
-                electricity_arrays, heat_arrays = extract_heat_electricity_from_requirement(requirement,
-                                                                                            electricity_arrays,
-                                                                                            heat_arrays)
+                electricity, heat, electricity_names, heat_names = \
+                    extract_heat_electricity_from_requirement(requirement, electricity, heat,
+                                                              electricity_names, heat_names)
             for subprocess in process.subprocesses:
                 for sub_requirement in subprocess.requirements:
-                    electricity_arrays, heat_arrays = extract_heat_electricity_from_requirement(sub_requirement,
-                                                                                                electricity_arrays,
-                                                                                                heat_arrays)
+                    electricity, heat, electricity_names, heat_names = \
+                        extract_heat_electricity_from_requirement(sub_requirement, electricity, heat,
+                                                                  electricity_names, heat_names)
 
                     for sub_sub_requirement in subprocess.subprocesses:
-                        electricity_arrays, heat_arrays = extract_heat_electricity_from_requirement(sub_sub_requirement,
-                                                                                                    electricity_arrays,
-                                                                                                    heat_arrays)
+                        electricity, heat, electricity_names, heat_names = \
+                            extract_heat_electricity_from_requirement(sub_sub_requirement, electricity, heat,
+                                                                      electricity_names, heat_names)
 
-        # Calculate net output
-        electricity_output_distribution = list(np.sum(np.array(electricity_arrays), axis=0) * -1)
-        heat_output_distribution = list(np.sum(np.array(heat_arrays), axis=0) * -1)
+        # Calculate net output in different forms
+        electricity_components = np.array(electricity) * -1
+        heat_components = np.array(heat) * -1
+        electricity_output_distribution = list(np.sum(electricity_components, axis=0))
+        heat_output_distribution = list(np.sum(heat_components, axis=0))
 
-        self.electricity_output = {"Mean:": np.mean(electricity_output_distribution),
-                                   "Distribution:": electricity_output_distribution}
-        self.heat_output = {"Mean:": np.mean(heat_output_distribution),
-                            "Distribution:": heat_output_distribution}
+        electricity_output = {"Total mean": np.mean(electricity_output_distribution),
+                              "Total MC distribution": electricity_output_distribution,
+                              "Component distributions": electricity_components,
+                              "Component means": np.mean(electricity_components, axis=1),
+                              "Component names": electricity_names}
 
-    def calculate_total_TEA(self):
-        pass
+        heat_output = {"Total mean": np.mean(heat_output_distribution),
+                       "Total MC distribution": heat_output_distribution,
+                       "Component distributions": heat_components,
+                       "Component means": np.mean(heat_components, axis=1),
+                       "Component names": heat_names}
+
+        return electricity_output, heat_output
+
+    def plot_energy_generation(self, plot_global=True, plot_electricity=True, plot_heat=True, bins_global=None,
+                               bins_electricity=None, bins_heat=None, show_total=True):
+        """
+        Creates plots to illustrate the energy generation performance of the system.
+
+        Parameters
+        ----------
+        plot_global: bool
+            Plots overall energy generation (electricity and heat) of the system.
+        plot_electricity: bool
+            Plots electricity generation and consumption by inidividual subprocesses.
+        plot_heat: bool
+            Plots heat generation and consumption by inidividual subprocesses.
+        bins_global: int
+            Defines how many bins should be used for histograms in global plot.
+        bins_electricity: int
+            Defines how many bins should be used for histograms in electricity plot.
+        bins_heat: int
+            Defines how many bins should be used for histograms in heat plot.
+        show_total: bool
+            Determines whether total should be shown in the electricity and heat plots.
+
+        Returns
+        -------
+        list[list[matplotlib.pyplot.figure, matplotlib.pyplot.axes]]
+            List of the resulting matplotlib figure and axes objects.
+        """
+        # Get required data
+        electricity_data, heat_data = self.calculate_electricity_heat_output()
+
+        fig_and_ax = []  # to store created objects
+
+        # Plot global results
+        if plot_global:
+            # Get defaults
+            if bins_global is None:
+                bins_global = 10
+
+            sns.set_theme()
+            fig, ax = plt.subplots()
+            ax.hist(electricity_data["Total MC distribution"], bins_global, alpha=0.8)
+            ax.hist(heat_data["Total MC distribution"], bins_global, alpha=0.8)
+
+            # Set title and labels
+            ax.legend(["Electricity", "Heat"])
+            ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]")
+            ax.set_ylabel("Monte Carlo Iterations")
+
+            # Display plot
+            plt.tight_layout()
+            plt.show()
+
+            # Store
+            fig_and_ax.append([fig, ax])
+
+        # Define helper function to plot contributions
+        def plot_energy_byprocess(energy_data, bin_no=None, display_total=True):
+
+            # Get defaults
+            if bin_no is None:
+                bin_no = 40
+
+            # Extract required values
+            process_names = energy_data["Component names"]
+            GWP_matrix = list(energy_data["Component distributions"])
+
+            # Add total and prepare plotting format
+            process_names.append("Total")
+            GWP_matrix.append(energy_data["Total MC distribution"])
+            GWP_matrix = np.transpose(np.array(GWP_matrix))  # convert to right format
+            GWP_exc_total = GWP_matrix[:, 0:-1]  # get list without the total
+            GWP_total = GWP_matrix[:, -1]  # get list of total GWP
+
+            # Turn bin number into a bin vector which can be used to plot histograms and total
+            bin_width = round((np.max(GWP_matrix) - np.min(GWP_matrix)) / bin_no)
+            min_value = math.floor(np.min(GWP_matrix))
+            max_value = math.ceil(np.max(GWP_matrix))
+            bin_vector = range(min_value, max_value + bin_width, bin_width)
+
+            # Get total marker coordinates
+            marker_x = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[1][0:-1])
+            marker_y = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[0])
+            plt.clf()  # to prevent interference with actual plot
+            marker_threshold = settings.background.iterations_MC * 0.01  # threshold below which markers are not displayed
+
+            # Plot histograms and total
+            sns.set_theme()  # Use seaborn style
+            fig, ax = plt.subplots()
+
+            # Plot histograms
+            ax.hist(GWP_exc_total, bins=bin_vector, histtype='bar', stacked=True, label=process_names[0:-1])
+
+            if display_total:  # Plot total whilst excluding zeros or very low values for plotting
+                ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
+                           label=process_names[-1],
+                           marker="x", color="black", alpha=0.8)
+
+            # Set legend and labels
+            ax.legend()
+            ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]")
+            ax.set_ylabel("Monte Carlo Iterations")
+
+            # Display plot
+            plt.tight_layout()
+            plt.show()
+
+            return fig, ax
+
+        # Employ helper function to plot electricity and heat
+        if plot_electricity:
+            fig_el, ax_el = plot_energy_byprocess(energy_data=electricity_data, bin_no=bins_electricity,
+                                                  display_total=show_total)
+            fig_and_ax.append([fig_el, ax_el])
+
+        if plot_heat:
+            fig_heat, ax_heat = plot_energy_byprocess(energy_data=heat_data, bin_no=bins_heat, display_total=show_total)
+            fig_and_ax.append([fig_heat, ax_heat])
+
+        return fig_and_ax
 
     def plot_global_GWP(self, bins=20):
         """
-
+        Creates plot of the systems overall global warming potential (GWP).
         Parameters
         ----------
         bins: int
@@ -123,6 +275,8 @@ class Results:
 
         Returns
         -------
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+            Resulting matplotlib figure and axes object.
 
         """
         sns.set_theme()
@@ -130,7 +284,7 @@ class Results:
         ax.hist(self.GWP_total, bins=bins)
 
         # Set title and labels
-        ax.set_xlabel(settings.labels.LCA_output_plotting_string)
+        ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string)
         ax.set_ylabel("Monte Carlo Iterations")
 
         # Display plot
@@ -139,12 +293,10 @@ class Results:
 
         return fig, ax
 
-    def plot_average_GWP_byprocess(self, legend_loc="plot", short_labels=True,
-                                   save=(False, "placeholder_save_location_str")):
+    def plot_average_GWP_byprocess(self, legend_loc="plot", short_labels=True):
         """
-
-
-        Notes: Generally legend_loc="plot" and short_labels=True OR legend_loc="box" and short_labels=False
+        Creates plot of the systems average global warming potential (GWP) shown for each process.
+        Note: Generally legend_loc="plot" and short_labels=True OR legend_loc="box" and short_labels=False
         produces the best results.
 
         Parameters
@@ -153,11 +305,11 @@ class Results:
             Determine whether subprocess labels should be placed on plot ("plot") or in legend box ("box").
         short_labels: bool
             Determines whether shortened labels should be used (True) or not (False).
-        save
 
         Returns
         -------
-
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+            Resulting matplotlib figure and axes object.
         """
         # Setup general variables
         sns.set_theme()
@@ -239,7 +391,7 @@ class Results:
         ax.bar(x_array, y_array, bar_width, label="Total")
 
         # Set labels
-        ax.set_ylabel(settings.labels.LCA_output_plotting_string)
+        ax.set_ylabel("GWP " + settings.labels.LCA_output_plotting_string)
         plt.xticks(rotation=45)
 
         # Display legend
@@ -254,7 +406,7 @@ class Results:
 
     def plot_global_GWP_byprocess(self, bins=50, short_labels=False, show_total=True):
         """
-        Plots Monte Carlo distribution of each process' GWP.
+        Creates plot of the Monte Carlo distributions of each process' global warming potential (GWP).
 
         Parameters
         ----------
@@ -266,7 +418,8 @@ class Results:
             Show total GWP of process in addition to processes.
         Returns
         -------
-
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+            Resulting matplotlib figure and axes object.
         """
         # Extract required values
         process_names = []
@@ -314,7 +467,7 @@ class Results:
 
         # Set legend and labels
         ax.legend()
-        ax.set_xlabel(settings.labels.LCA_output_plotting_string)
+        ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string)
         ax.set_ylabel("Monte Carlo Iterations")
 
         # Display plot
@@ -329,13 +482,28 @@ class Results:
     def plot_sankey_diagram(self):
         pass
 
-    def plot_results(self, show_GWP=True, show_TEA=True):
+    def plot_results(self, show_GWP=True, show_TEA=True, show_energy_generation=True):
+        """
+        Convenience function to generate all plots.
+
+        Parameters
+        ----------
+        show_GWP: bool
+            Show environmental analysis results.
+        show_TEA: bool
+            Show economic analysis results.
+        show_energy_generation: bool
+            Show energy generation results.
+        """
         if show_GWP:
             self.plot_global_GWP()
             self.plot_global_GWP_byprocess()
             self.plot_average_GWP_byprocess()
         if show_TEA:
             self.plot_TEA()
+
+        if show_energy_generation:
+            self.plot_energy_generation()
 
     def save_report(self, storage_path):
         """
@@ -353,7 +521,9 @@ class Results:
         fig1, ax1 = self.plot_global_GWP()
         fig2, ax2 = self.plot_global_GWP_byprocess()
         fig3, ax3 = self.plot_average_GWP_byprocess()
-        # fig4, ax4 = self.plot_TEA()
+        fig_ax_4 = self.plot_energy_generation()
+
+        # fig5, ax5 = self.plot_TEA()
 
         filename = r"\report_" + self.ID + ".pdf"
         full_path = storage_path + filename
@@ -361,5 +531,9 @@ class Results:
         file.savefig(fig1)
         file.savefig(fig2)
         file.savefig(fig3)
-        # file.savefig(fig4)
+        file.savefig(fig_ax_4[0][0])
+        file.savefig(fig_ax_4[1][0])
+        file.savefig(fig_ax_4[2][0])
+
+        # file.savefig(fig5)
         file.close()

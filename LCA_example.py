@@ -39,11 +39,13 @@ pretreatment_new.plot_GWP()
 # Results object
 example_results = Results(processes=(CHP_new, gasification_new, biochar_new, carbon_capture_new, pretreatment_new))
 example_results.calculate_total_GWP()
+example_results.calculate_electricity_heat_output()
 
 # # Plot results
 # example_results.plot_global_GWP()
 # example_results.plot_average_GWP_byprocess()
 # example_results.plot_global_GWP_byprocess()
+example_results.plot_energy_generation()
 example_results.save_report(r"C:\Users\2270577A\OneDrive - University of Glasgow\Desktop\LCA_report")
 
 

@@ -72,39 +72,6 @@ class GlobalWarmingPotential:
         self.mean = np.mean(self.values)
 
 
-def process_requirements_to_GWP(requirements):
-    """
-    Convert a process' requirements to their corresponding Global Warming Potential (GWP).
-
-    Parameters
-    ----------
-    requirements: tuple[Requirements]
-        Requirements attribute of "Process" object.
-
-    Returns
-    -------
-    tuple[GlobalWarmingPotential]
-        Global warming potentials resulting from process requirements.
-    """
-
-    GWP_results = ()
-    for requirement_no in range(len(requirements)):  # iterate through requirements objects
-        for fossil_GWP_requirements in requirements[requirement_no].fossil_GWP:
-            GWP_results += (GlobalWarmingPotential(fossil_GWP_requirements),)
-        for biogenic_GWP_requirements in requirements[requirement_no].biogenic_GWP:
-            GWP_results += (GlobalWarmingPotential(biogenic_GWP_requirements),)
-        for electricity_requirements in requirements[requirement_no].electricity:
-            GWP_results += (GlobalWarmingPotential(electricity_requirements),)
-        for heat_requirements in requirements[requirement_no].heat:
-            GWP_results += (GlobalWarmingPotential(heat_requirements),)
-        for steam_requirements in requirements[requirement_no].steam:
-            GWP_results += (GlobalWarmingPotential(steam_requirements),)
-        for oxygen_requirements in requirements[requirement_no].oxygen:
-            GWP_results += (GlobalWarmingPotential(oxygen_requirements),)
-
-    return GWP_results
-
-
 # Dataclass to store process requirements
 @dataclass
 class Process:
@@ -213,6 +180,41 @@ class Process:
         tuple[GlobalWarmingPotential]
             Global warming potentials resulting from process requirements.
         """
+
+        # Define helper function
+        def process_requirements_to_GWP(requirements):
+            """
+            Convert a process' requirements to their corresponding Global Warming Potential (GWP).
+
+            Parameters
+            ----------
+            requirements: tuple[Requirements]
+                Requirements attribute of "Process" object.
+
+            Returns
+            -------
+            tuple[GlobalWarmingPotential]
+                Global warming potentials resulting from process requirements.
+            """
+
+            GWP_results = ()
+            for requirement_no in range(len(requirements)):  # iterate through requirements objects
+                for fossil_GWP_requirements in requirements[requirement_no].fossil_GWP:
+                    GWP_results += (GlobalWarmingPotential(fossil_GWP_requirements),)
+                for biogenic_GWP_requirements in requirements[requirement_no].biogenic_GWP:
+                    GWP_results += (GlobalWarmingPotential(biogenic_GWP_requirements),)
+                for electricity_requirements in requirements[requirement_no].electricity:
+                    GWP_results += (GlobalWarmingPotential(electricity_requirements),)
+                for heat_requirements in requirements[requirement_no].heat:
+                    GWP_results += (GlobalWarmingPotential(heat_requirements),)
+                for steam_requirements in requirements[requirement_no].steam:
+                    GWP_results += (GlobalWarmingPotential(steam_requirements),)
+                for oxygen_requirements in requirements[requirement_no].oxygen:
+                    GWP_results += (GlobalWarmingPotential(oxygen_requirements),)
+
+            return GWP_results
+
+        # Employ helper function
         self.GWP_results = process_requirements_to_GWP(self.requirements)  # calculate GWP for process' requirements.
 
         if consider_subprocesses:  # add requirements in subprocess.

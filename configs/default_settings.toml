@@ -37,7 +37,7 @@ output_data = ["N2 [vol.% db]", "H2 [vol.% db]", "CO [vol.% db]", "CO2 [vol.% db
 output_units = ["[vol.% db]", '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% db]', '[MJ/N$m^{3}$]',
     '[g/N$m^{3}$]', '[N$m^{3}$/kg wb]', '[g/kg wb]']
 
-LCA_output_plotting_string = "$kgCO_{2 eq.}FU^{-1}$"
+LCA_output_plotting_string = "[$kgCO_{2 eq.}FU^{-1}$]"
 
 
 [default.unit_conversions]
