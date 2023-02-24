@@ -1,8 +1,11 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
+from config import settings
 from dataclasses import dataclass, InitVar
-from configs.requirement_objects import _Requirement, Requirements
 from typing import Type
+from configs.requirement_objects import _Requirement, Requirements
 from configs.requirement_objects import Heat, Electricity, Steam, Oxygen, FossilGWP, BiogenicGWP
 from functions.LCA import electricity_GWP, thermal_energy_GWP
 from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
@@ -19,7 +22,7 @@ class GlobalWarmingPotential:
     requirement : InitVar[Type[_Requirement]]
         A "_Requirement" child object which is to be converted to its equivalent GWP.
     """
-    # TODO: Update type hint so it properly shows children of _Requirement class.
+    # TODO: Update type hint, so it properly shows children of _Requirement class.
 
     # Update defaults
     requirement: InitVar[Type[_Requirement]]
@@ -153,15 +156,23 @@ class Process:
             self.calculate_GWP()
             self.calculate_TEA()
 
-    def add_subprocess(self, subprocess):
+    def add_subprocess(self, subprocess, update_results=True):
         """
         Add a new subprocess to current process object.
         Parameters
         ----------
         subprocess: Type[Process]
             Process object which is to be added as a subprocess.
+        update_results: bool
+            Determines whether results should be updated based on newly added subprocess.
         """
         self.subprocesses += (subprocess, )
+
+        if update_results:
+            self.calculate_GWP()
+            self.calculate_TEA()
+        else:
+            raise Warning("Recalculate GWP and TEA results for main process to take into account subprocesses.")
 
     def add_requirements(self, requirements):
         """
@@ -207,37 +218,105 @@ class Process:
         if consider_subprocesses:  # add requirements in subprocess.
             # Consider subprocesses
             for subprocess_no in range(len(self.subprocesses)):
-                self.GWP_results += process_requirements_to_GWP(self.subprocesses[subprocess_no].requirements)
+                if self.subprocesses[subprocess_no].GWP_results is None:  # Calculate from requirements
+                    self.GWP_results += process_requirements_to_GWP(self.subprocesses[subprocess_no].requirements)
+                else:  # add if already calculated
+                    self.GWP_results += self.subprocesses[subprocess_no].GWP_results
                 # Consider sub-subprocesses
                 for sub_subprocess_no in range(len(self.subprocesses[subprocess_no].subprocesses)):
-                    self.GWP_results += process_requirements_to_GWP(self.subprocesses[subprocess_no].
-                                                                    subprocesses[sub_subprocess_no].requirements)
-                # TODO: Add check here to see if GWP had already been calculated - if so just use that
+                    if self.subprocesses[subprocess_no].subprocesses[sub_subprocess_no].GWP_results is None:
+                        self.GWP_results += process_requirements_to_GWP(self.subprocesses[subprocess_no].
+                                                                        subprocesses[sub_subprocess_no].requirements)
+                    else:
+                        self.GWP_results += self.subprocesses[subprocess_no].subprocesses[sub_subprocess_no].GWP_results
+
+                    # Check that no deeper nested subprocesses exist
+                    if self.subprocesses[subprocess_no].subprocesses[sub_subprocess_no].subprocesses != ():
+                        raise Warning("Deeper nested subprocesses may exist and have not been considered.")
+
         # Calculate total GWP
         GWP_lists = []
         for GWP_obj in self.GWP_results:
             GWP_lists.append(GWP_obj.values)
-        self.GWP_total = [sum(x) for x in zip(*GWP_lists)]
+        self.GWP_total = list(np.array([sum(x) for x in zip(*GWP_lists)]).flatten())
         self.GWP_mean = float(np.mean(self.GWP_total))
 
     def calculate_TEA(self, consider_nested=True):
         pass
 
-    def plot_results(self, plot_GWP=False, plot_TEA=False, plot_type_GWP=None, plot_type_TEA=None):
+    def plot_GWP(self, bins=40, stacked=True, show_total=True, short_labels=False):
         """
-        Need options to plot either GWP or TEA or both and then specify desired plot types for either.
-        Can also ommit this as I already have plotting functions elsewhere...
-
-        types - sankey diagram, histograms, MC results, average distributions,etc.
+        Plot histogram of the process' and its subprocess' GWP.
 
         Parameters
         ----------
-        plot_GWP
-        plot_TEA
-        plot_type
-
+        bins: int
+            Number of bins for histogram.
+        stacked: bool
+            Show interfering bars as stacked or overlapping.
+        show_total: bool
+            Show total GWP of process in addition to subprocesses.
+        short_labels: bool
+            Determines whether shorthand labels or full labels should be used.
         Returns
         -------
-
+        matplotlib.pyplot.axes
+            Matplotlib axis object.
         """
+
+        # Get required parameters
+        subprocess_names = []
+        subprocess_short_labels = []
+        subprocess_GWPs = []
+        for count in range(len(self.GWP_results)):
+            subprocess_names.append(self.GWP_results[count].name)
+            subprocess_short_labels.append(self.GWP_results[count].short_label)
+            subprocess_GWPs.append(self.GWP_results[count].values)
+
+        # Convert to right format
+        subprocess_GWPs = np.transpose(np.array(subprocess_GWPs))
+
+        # Get marker coordinates to show "Total"
+        marker_x = None
+        marker_y = None
+        marker_threshold = None
+        if show_total:
+            GWP_total = np.array(self.GWP_total)
+            marker_x = np.array(plt.hist(GWP_total, bins=bins, alpha=0, histtype='bar')[1][0:-1])
+            marker_y = np.array(plt.hist(GWP_total, bins=bins, alpha=0, histtype='bar')[0])
+            # set threshold below which markers are not displayed
+            marker_threshold = settings.background.iterations_MC * 0.01
+            plt.clf()  # to prevent interference with actual plot
+
+        # Plot
+        sns.set_theme()
+        fig, ax = plt.subplots()
+        if not short_labels:
+            ax.hist(subprocess_GWPs, bins=bins, histtype='bar', stacked=stacked, alpha=1, label=subprocess_names)
+        else:
+            ax.hist(subprocess_GWPs, bins=bins, histtype='bar', stacked=stacked, alpha=1,
+                    label=subprocess_short_labels)
+
+        # Plot total whilst excluding zeros or very low values for plotting
+        if show_total:
+            ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold], label="Total",
+                       marker="x", color="black", alpha=0.8)
+
+        # Set legend, title, and labels
+        ax.legend()
+        ax.set_title(self.name)
+        ax.set_xlabel(settings.labels.LCA_output_plotting_string)
+        ax.set_ylabel("Monte Carlo Iterations")
+
+        # Display plot
+        plt.tight_layout()
+        plt.show()
+
+    def plot_TEA(self):
         pass
+
+    def plot_results(self, show_GWP=True, show_TEA=True):
+        if show_GWP:
+            self.plot_GWP()
+        if show_TEA:
+            self.plot_TEA()

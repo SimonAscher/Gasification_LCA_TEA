@@ -1,74 +1,69 @@
-# Get process models
 import numpy as np
 
-from processes.pretreatment import drying_GWP_MC, milling_GWP_MC, pelleting_GWP_MC, shredding_GWP_MC
-from processes.CHP import CHP_GWP_MC
-from processes.gasification import gasification_GWP_MC
-from processes.syngas_combustion import syngas_combustion_GWP_MC
-from processes.biochar_soil_application import biochar_soil_GWP_MC
-from processes.carbon_capture import carbon_capture_GWP_MC
-from functions.LCA import process_GWP_MC_to_df, combine_GWP_dfs, absorb_process_df
-from functions.LCA import plot_average_GWP_byprocess, plot_global_GWP, plot_single_process_GWP,\
-    plot_global_GWP_byprocess
+from processes.CHP import CombinedHeatPower
+from processes.gasification import Gasification
+from processes.syngas_combustion import SyngasCombustion
+from processes.biochar_soil_application import BiocharSoilApplication
+from processes.carbon_capture import CarbonCapture
+from processes.pretreatment import FeedstockDrying, FeedstockPelleting, FeedstockMilling, FeedstockBaleShredding
+from configs.result_objects import Results
+from configs.process_objects import Process
 from functions.LCA import electricity_GWP, thermal_energy_GWP
 
+# Create processes
 
-# Set up dataframe to store results
-# Get individual dataframes
-df_1 = process_GWP_MC_to_df(CHP_GWP_MC())
-df_2 = process_GWP_MC_to_df(drying_GWP_MC())
-df_2_5 = process_GWP_MC_to_df(shredding_GWP_MC())
-df_3 = process_GWP_MC_to_df(milling_GWP_MC())
-df_4 = process_GWP_MC_to_df(pelleting_GWP_MC())
-df_5 = process_GWP_MC_to_df(gasification_GWP_MC())
-df_6 = process_GWP_MC_to_df(syngas_combustion_GWP_MC())
-df_7 = process_GWP_MC_to_df(biochar_soil_GWP_MC())
-df_8 = process_GWP_MC_to_df(carbon_capture_GWP_MC())
+# CHP
+CHP_new = CombinedHeatPower()
+CHP_new.add_subprocess(SyngasCombustion())  # add subprocess
 
-# Combine some dataframes
-df_2_3 = absorb_process_df(master_df=df_2, absorbed_df=df_3, update_master_process_subprocess_names=True,
-                           new_process_name="Pretreatment")
-df_2_3_4 = absorb_process_df(master_df=df_2_3, absorbed_df=df_4)
-df_pretreatment = absorb_process_df(master_df=df_2_3_4, absorbed_df=df_2_5)
+# Gasification
+gasification_new = Gasification()
 
-# Get overall dataframe
-summary_df = combine_GWP_dfs((df_1, df_pretreatment, df_5, df_6, df_7, df_8))
+# Biochar
+biochar_new = BiocharSoilApplication()
 
-# Create plots
-global_plot = plot_global_GWP(summary_df)
-avg_plot = plot_average_GWP_byprocess(summary_df, short_labels=True)
-individual_plot = plot_single_process_GWP(summary_df, process_name="CHP")
-individual_plot2 = plot_single_process_GWP(summary_df, process_name="Gasification", show_total=False)
-individual_plot3 = plot_single_process_GWP(summary_df, process_name="Carbon Capture", show_total=True)
-individual_plot4 = plot_single_process_GWP(summary_df, process_name="Pretreatment", show_total=True)
+# Carbon Capture
+carbon_capture_new = CarbonCapture()
 
-global_byprocess_plot = plot_global_GWP_byprocess(summary_df)
+# Pretreatment
+pretreatment_new = Process(name="Pretreatment", short_label="Pre.", instantiate_with_default_reqs=False)
+pretreatment_new.add_subprocess(FeedstockDrying())
+pretreatment_new.add_subprocess(FeedstockPelleting())
+pretreatment_new.add_subprocess(FeedstockMilling())
+pretreatment_new.add_subprocess(FeedstockBaleShredding())
+
+# Plot individual processes
+CHP_new.plot_GWP()
+pretreatment_new.plot_GWP()
+
+# Results object
+example_results = Results(processes=(CHP_new, gasification_new, biochar_new, carbon_capture_new, pretreatment_new))
+example_results.calculate_total_GWP()
+
+# # Plot results
+# example_results.plot_global_GWP()
+# example_results.plot_average_GWP_byprocess()
+# example_results.plot_global_GWP_byprocess()
+example_results.save_report(r"C:\Users\2270577A\OneDrive - University of Glasgow\Desktop\LCA_report")
 
 
 #%% Compare my results to Yi Fang's
 # Compare results
-CHP_mean_GWP = []
-CHP_mean_GWP_ele = []
-CHP_mean_GWP_heat = []
+CHP_mean_GWP = CHP_new.GWP_mean
+CHP_mean_GWP_ele = np.mean(CHP_new.requirements[0].electricity[0].values)
+CHP_mean_GWP_heat = np.mean(CHP_new.requirements[0].heat[0].values)
 
-CHP_results = CHP_GWP_MC()
-for _, count in enumerate(np.arange(len(CHP_results.simulation_results))):
-    CHP_mean_GWP.append(CHP_results.simulation_results[count].GWP)
-    CHP_mean_GWP_ele.append(CHP_results.simulation_results[count].subprocess_GWP[0])
-    CHP_mean_GWP_heat.append(CHP_results.simulation_results[count].subprocess_GWP[1])
-
-
-print("Overall system GWP mean:", np.mean(summary_df.loc["GWP"]["Total"]))
-print("CHP mean:", np.mean(CHP_mean_GWP))
-print("CHP mean electricity:", np.mean(CHP_mean_GWP_ele))
-print("CHP mean heat:", np.mean(CHP_mean_GWP_heat))
+print("Overall system GWP mean:", example_results.GWP_mean, "kg CO2 eq.")
+print("CHP GWP mean:", CHP_mean_GWP, "kg CO2 eq.")
+print("CHP mean electricity:", CHP_mean_GWP_ele, "kWh")
+print("CHP mean heat:", CHP_mean_GWP_heat, "kWh")
 print("GWP of 800 kWh electricity:", electricity_GWP(800))
-print("GWP of 1,350 kWh heat:", thermal_energy_GWP(1350))
+print("GWP of 1,300 kWh heat:", thermal_energy_GWP(1300))
 
 """
 800 kWh electricity (0.8 MWh) produced per FU
-1350 kWh heat (1.35 MWh) produced per FU
-Current GWP with carbon capture: -2200 kg CO2eq/FU
+1300 kWh heat (1.3 MWh) produced per FU
+Current GWP with carbon capture: -1600 kg CO2eq/FU
 
-so for 1 MWh of electricity: -1760 kg CO2eq/MWh el.
+so for 1 MWh of electricity: -2,000 kg CO2eq/MWh el.
 """

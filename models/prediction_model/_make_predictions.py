@@ -12,8 +12,8 @@ def make_predictions(models_dict=None, data=None, output_selector="all"):
     ----------
     models_dict: dict
         Dictionary of trained models.
-    data: list
-        Input data used to make predictions on.
+    data: list[list]
+        Input data used to make predictions on. Note how list has to be placed in another list.
     output_selector: list[str]
         Variable used to select outputs. By default, predictions are made for all outputs.
 

@@ -1,71 +1,76 @@
 import numpy as np
+import warnings
+
+from dataclasses import dataclass
 from config import settings
+from configs.process_objects import Process
+from configs.requirement_objects import Requirements, BiogenicGWP, FossilGWP
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.general.utility import scale_gas_fractions
 from processes.syngas_combustion.utils import syngas_combustion_CO2_eq
-from configs import process_GWP_output, process_GWP_output_MC
 
 
-def syngas_combustion_GWP_MC(ML_predictions=None):
-    """
-    Calculates the GWP of syngas combustion.
-    Note: Currently no function to calculate the GWP of an individual simulation exists for this process.
+@dataclass()
+class SyngasCombustion(Process):
+    name: str = "Syngas combustion"
+    short_label: str = "Syn"
 
-    Parameters
-    ----------
-    ML_predictions: dict
-        Dictionary of all predicted model outputs as distributions.
+    def instantiate_default_requirements(self):
+        self.calculate_requirements()
 
-    Returns
-    -------
-    list
-        List the length of MC iterations with GWP values.
-    """
-    # Get defaults
-    if ML_predictions is None:
-        ML_predictions = get_all_prediction_distributions()
+    def calculate_requirements(self, ML_predictions=None):
+        """
+        Calculate the requirements and impacts of syngas combustion.
 
-    # Extract gas_yield for later use
-    gas_yield = ML_predictions["Gas yield [Nm3/kg wb]"]
+        Parameters
+        ----------
+        ML_predictions: dict
+            Dictionary of all predicted model outputs as distributions.
+        """
 
-    # Create dictionary of gas species only
-    gas_fractions = ML_predictions.copy()
+        # Get defaults
+        if ML_predictions is None:
+            ML_predictions = get_all_prediction_distributions()
 
-    # Drop unrequired variables if they exist in dictionary:
-    if "LHV [MJ/Nm3]" in gas_fractions:
-        gas_fractions.pop("LHV [MJ/Nm3]")
-    if "Gas yield [Nm3/kg wb]" in gas_fractions:
-        gas_fractions.pop("Gas yield [Nm3/kg wb]")
-    if "Tar [g/Nm3]" in gas_fractions:
-        gas_fractions.pop("Tar [g/Nm3]")
-    if "Char yield [g/kg wb]" in gas_fractions:
-        gas_fractions.pop("Char yield [g/kg wb]")
+        # Extract gas_yield for later use
+        gas_yield = ML_predictions["Gas yield [Nm3/kg wb]"]
 
-    # Scale gas fractions, so that they all sum up to 1. Turn from percentages to decimals.
-    scaled_gas_fractions = scale_gas_fractions(gas_fractions, gas_fractions_format="percentages")
+        # Create dictionary of gas species only
+        gas_fractions = ML_predictions.copy()
 
-    # Employ GWP calculation function
-    GWP_syngas_combustion_inc_biogenic = syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield)  # [kg CO2eq./FU]
+        # Drop unrequired variables if they exist in dictionary:
+        if "LHV [MJ/Nm3]" in gas_fractions:
+            gas_fractions.pop("LHV [MJ/Nm3]")
+        if "Gas yield [Nm3/kg wb]" in gas_fractions:
+            gas_fractions.pop("Gas yield [Nm3/kg wb]")
+        if "Tar [g/Nm3]" in gas_fractions:
+            gas_fractions.pop("Tar [g/Nm3]")
+        if "Char yield [g/kg wb]" in gas_fractions:
+            gas_fractions.pop("Char yield [g/kg wb]")
 
-    # Calculate non biogenic emissions
-    biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock_category]
-    GWP_syngas_combustion_exc_biogenic = list(np.array(GWP_syngas_combustion_inc_biogenic) * (1 - biogenic_fraction))
+        # Scale gas fractions, so that they all sum up to 1. Turn from percentages to decimals.
+        scaled_gas_fractions = scale_gas_fractions(gas_fractions, gas_fractions_format="percentages")
 
-    # Calculate emissions from biogenic sources
-    GWP_syngas_combustion_from_biogenic = list(np.array(GWP_syngas_combustion_inc_biogenic) * biogenic_fraction)
+        # Calculate CO2 emission from combustion
+        total_CO2 = syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield)  # [kg CO2eq./FU]
 
-    # Initialise MC output object
-    name_process = "Syngas combustion"
-    MC_outputs = process_GWP_output_MC(process_name=name_process)
+        # Get background data on the feedstock
+        try:
+            biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock_category]
+        except:  # BoxKeyError
+            raise Warning("No default biogenic fraction available for this feedstock type - 100% biogenic assumed.")
+            biogenic_fraction = 1
 
-    # Store values in default MC output object
-    for count, entry in enumerate(GWP_syngas_combustion_exc_biogenic):
-        GWP_object = process_GWP_output(process_name=name_process, GWP=entry,
-                                        GWP_from_biogenic=GWP_syngas_combustion_from_biogenic[count])
-        GWP_object.add_subprocess(name=name_process, GWP=entry)
-        MC_outputs.add_GWP_object(GWP_object)
+        # Calculate biogenic and fossil emissions
+        biogenic_CO2 = list(np.array(total_CO2) * biogenic_fraction)
+        fossil_CO2 = list(np.array(total_CO2) * (1 - biogenic_fraction))
 
-    # Add abbreviation of subprocess
-    MC_outputs.subprocess_abbreviations = ("Syn. comb.", )
+        # Initialise Requirements object and add requirements
+        syngas_combustion_requirements = Requirements(name="Syngas combustion")
+        syngas_combustion_requirements.add_requirement(BiogenicGWP(values=biogenic_CO2,
+                                                                   name="Biogenic CO2 emission from syngas combustion"))
+        syngas_combustion_requirements.add_requirement(FossilGWP(values=fossil_CO2,
+                                                                 name="Fossil CO2 emissions from syngas combustion"))
 
-    return MC_outputs
+        # Add requirements to object
+        self.add_requirements(syngas_combustion_requirements)

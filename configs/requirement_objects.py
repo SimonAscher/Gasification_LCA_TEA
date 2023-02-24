@@ -1,3 +1,5 @@
+import numpy as np
+
 from dataclasses import dataclass
 from config import settings
 
@@ -35,6 +37,8 @@ class _Requirement:
         if self.short_label is None:
             self.short_label = self.name  # set short_label to name if not given.
 
+        if len(self.values) == 1 and settings.background.iterations_MC != 1:
+            self.values = list(np.array(self.values).flatten())  # flatten if required
 
 # Define requirement child classes
 # Energy Use
@@ -64,6 +68,13 @@ class FossilGWP(_Requirement):
     # Update defaults
     name: str = "Fossil CO2 eq."
     units: str = "kg CO2eq."
+    negative_emissions: bool = False
+
+    def __post_init__(self):
+        if self.negative_emissions is True:
+            if all(x >= 0 for x in self.values):  # check if values given as positives
+                self.values = [-x for x in self.values]  # turn into negatives
+                raise Warning("Negative emission values were given as positives - turned into negatives.")
 
 
 @dataclass(kw_only=True)
@@ -83,6 +94,8 @@ class BiogenicGWP(_Requirement):
     biogenic_fraction: float
         Determines how biogenic emissions are supposed to be treated:
         0 - completely biogenic (i.e. no net GWP) | 1 - equivalent to fossil fuels
+    negative_emissions: bool
+        Ensures values are given as negative and always sets biogenic_fraction to 1.
     """
 
     # Update defaults
@@ -91,6 +104,15 @@ class BiogenicGWP(_Requirement):
 
     # Add new parameters
     biogenic_fraction: float = settings.background.biogenic_carbon_equivalency
+    negative_emissions: bool = False
+
+    def __post_init__(self):
+        if self.negative_emissions is True:
+            self.biogenic_fraction = 1  # to ensure benefit is accounted for.
+
+            if all(x >= 0 for x in self.values):  # check if values given as positives
+                self.values = [-x for x in self.values]  # turn into negatives
+                raise Warning("Negative emission values were given as positives - turned into negatives.")
 
 
 # Economics - costs and benefits
@@ -122,6 +144,7 @@ class Oxygen(_Requirement):
 class Steam(_Requirement):
     # Update defaults
     name: str = "Steam"
+    short_label: str = "Steam"
     units: str = "kg"
     source: str = "natural gas"  # i.e. heat used
 

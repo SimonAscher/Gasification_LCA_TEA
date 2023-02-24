@@ -1,60 +1,57 @@
 import numpy as np
 
+from dataclasses import dataclass
 from config import settings
-from configs import process_GWP_output, process_GWP_output_MC
-from processes.pretreatment.utils import electricity_pelleting
-from functions.LCA import electricity_GWP
+from configs.process_objects import Process
+from configs.requirement_objects import Requirements, Electricity
 from functions.general.utility.toml_handling import update_user_inputs_toml
+from processes.pretreatment.utils import electricity_pelleting
 
 
-def pelleting_GWP_MC(particle_size=None, MC_iterations=settings.background.iterations_MC):
-    """
-    Calculate the GWP of feedstock pelleting for all Monte Carlo runs.
-    Note: Ensure that milling function is run first to update particle size post milling.
+@dataclass()
+class FeedstockPelleting(Process):
+    name: str = "Feedstock Pelleting"
+    short_label: str = "Pel"
 
-    Parameters
-    ----------
-    particle_size: float
-        Defines the particle size in mm. Uses post milling particle size if applicable.
+    def instantiate_default_requirements(self):
+        self.calculate_requirements()
 
-    MC_iterations: int
-        Number of Monte Carlo iterations.
+    def calculate_requirements(self, particle_size=None, MC_iterations=settings.background.iterations_MC):
+        """
+        Calculate the requirements for feedstock pelleting.
+        Note: Ensure that milling function is run first to update particle size post milling.
 
-    Returns
-    -------
+        Parameters
+        ----------
+        particle_size: float
+            Defines the particle size in mm. Uses post milling particle size if applicable.
 
-    """
-    # Get defaults
-    if particle_size is None:
-        try:
-            particle_size = settings.user_inputs["particle size after milling"]
-        except:
-            particle_size = settings.user_inputs["particle size"]
+        MC_iterations: int
+            Number of Monte Carlo iterations.
+        """
 
-    # Initialise MC output object
-    MC_outputs = process_GWP_output_MC(process_name="Pelleting")
+        # Get defaults
+        if particle_size is None:
+            try:
+                particle_size = settings.user_inputs["particle size after milling"]
+            except:
+                particle_size = settings.user_inputs["particle size"]
 
-    # Do analysis
-    for _, count in enumerate(np.arange(MC_iterations)):
-        # Initialise GWP_object
-        GWP_object = process_GWP_output(process_name="Pelleting")
+        # Initialise storage list
+        electricity_requirement_pelleting = []
 
-        # Calculate GWP
-        electricity_requirement_pelleting = electricity_pelleting(particle_size=particle_size)
-        elect_GWP = electricity_GWP(electricity_requirement_pelleting)
+        # Get electricity requirements for pelleting
+        for _, count in enumerate(np.arange(MC_iterations)):
+            electricity_requirement_pelleting.append(electricity_pelleting(particle_size=particle_size))
 
-        # Add to GWP object
-        GWP_object.add_subprocess(name="Electricity", GWP=elect_GWP)
-        GWP_object.calculate_GWP_from_subprocesses()
+        # Update toml document with average particle size after milling
+        particle_size_post_pelleting_mm = 6.35  # [mm] source: "10.13031/aea.30.9719"
+        update_user_inputs_toml("particle size after pelleting", float(particle_size_post_pelleting_mm))
 
-        # Add to MC outputs object
-        MC_outputs.add_GWP_object(GWP_object)
+        # Initialise Requirements object and add requirements
+        feedstock_pelleting_requirements = Requirements(name=self.name)
+        feedstock_pelleting_requirements.add_requirement(Electricity(values=electricity_requirement_pelleting,
+                                                                     name="Electricity use for feedstock pelleting"))
 
-    # add abbreviations of subprocess'
-    MC_outputs.subprocess_abbreviations = ("Elect.",)
-
-    # Update toml document with average particle size after milling
-    particle_size_post_pelleting_mm = 6.35  # [mm] source: "10.13031/aea.30.9719"
-    update_user_inputs_toml("particle size after pelleting", float(particle_size_post_pelleting_mm))
-
-    return MC_outputs
+        # Add requirements to object
+        self.add_requirements(feedstock_pelleting_requirements)

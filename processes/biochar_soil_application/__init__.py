@@ -1,2 +1,1 @@
-from .process import biochar_soil_GWP_MC
-from .object_oriented_process import BiocharSoilApplication
+from .process import BiocharSoilApplication

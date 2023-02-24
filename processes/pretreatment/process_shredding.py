@@ -1,44 +1,41 @@
 import numpy as np
 
+from dataclasses import dataclass
 from config import settings
-from configs import process_GWP_output, process_GWP_output_MC
-from functions.LCA import electricity_GWP
+from configs.process_objects import Process
+from configs.requirement_objects import Requirements, Electricity
 from processes.pretreatment.utils import electricity_shredding
 
 
-def shredding_GWP_MC(MC_iterations=settings.background.iterations_MC):
-    """
-    Calculate the GWP of feedstock bale shredding for all Monte Carlo runs.
+@dataclass()
+class FeedstockBaleShredding(Process):
+    name: str = "Feedstock bale shredding"
+    short_label: str = "Shred"
 
-    Parameters
-    ----------
-    MC_iterations: int
-         Number of Monte Carlo iterations.
+    def instantiate_default_requirements(self):
+        self.calculate_requirements()
 
-    Returns
-    -------
-    """
+    def calculate_requirements(self, MC_iterations=settings.background.iterations_MC):
+        """
+        Calculate the requirements for feedstock bale shredding.
 
-    # Initialise MC output object
-    MC_outputs = process_GWP_output_MC(process_name="Shredding")
+        Parameters
+        ----------
+        MC_iterations: int
+             Number of Monte Carlo iterations.
+        """
 
-    # Do analysis
-    for _, count in enumerate(np.arange(MC_iterations)):
-        # Initialise GWP_object
-        GWP_object = process_GWP_output(process_name="Shredding")
+        # Initialise storage list
+        electricity_requirement_shredding = []
 
-        # Calculate GWP
-        electricity_requirement_shredding = electricity_shredding()
-        elect_GWP = electricity_GWP(electricity_requirement_shredding)
+        # Calculate electricity requirements
+        for _, count in enumerate(np.arange(MC_iterations)):
+            electricity_requirement_shredding.append(electricity_shredding())
 
-        # Add to GWP object
-        GWP_object.add_subprocess(name="Electricity", GWP=elect_GWP)
-        GWP_object.calculate_GWP_from_subprocesses()
+        # Initialise Requirements object and add requirements
+        feedstock_shredding_requirements = Requirements(name=self.name)
+        feedstock_shredding_requirements.add_requirement(
+            Electricity(values=electricity_requirement_shredding, name="Electricity use for feedstock bale shredding"))
 
-        # Add to MC outputs object
-        MC_outputs.add_GWP_object(GWP_object)
-
-    # Add abbreviations of subprocess'
-    MC_outputs.subprocess_abbreviations = ("Elect.",)
-
-    return MC_outputs
+        # Add requirements to object
+        self.add_requirements(feedstock_shredding_requirements)

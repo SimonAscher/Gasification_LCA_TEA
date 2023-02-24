@@ -1,19 +1,14 @@
 # %% Import shared packages
 import numpy as np
-
-from functions.LCA import process_GWP_MC_to_df
-
-# %% Milling and pelleting
-from processes.pretreatment import milling_GWP_MC, pelleting_GWP_MC
-
-milling_GWP = process_GWP_MC_to_df(milling_GWP_MC())
-pelleting_GWP = process_GWP_MC_to_df(pelleting_GWP_MC())
-
-print("Mean GWP milling:", np.mean(milling_GWP.loc["GWP"]["Milling"]))
-# %% Drying
-from processes.pretreatment import drying_GWP, drying_GWP_MC
+from processes.pretreatment import FeedstockMilling, FeedstockPelleting
+from processes.pretreatment import FeedstockDrying, FeedstockBaleShredding
 from processes.pretreatment.utils import energy_drying
+# %% Milling and pelleting
+milling_GWP = FeedstockMilling()
+pelleting_GWP = FeedstockPelleting()
+print("Mean GWP milling:", milling_GWP.GWP_mean, "kg CO2 eq./FU")
 
+# %% Drying
 mass = 1000  # [kg]
 moist_ar = 20  # moisture content as a fraction of feedstock on an as received basis
 moist_post = 12  # desired final moisture content as a fraction
@@ -30,12 +25,21 @@ energy_drying_output = energy_drying(dryer_type='Direct fired dryer',
                                      output_unit='kWh', syngas_as_fuel=False, show_values=False)
 
 energy_drying_output_belt_dryer = energy_drying(dryer_type='Direct fired dryer',
-                                     specific_heat_reference_temp='40 degC', electricity_reference='Huber Belt dryer',
-                                     output_unit='kWh', syngas_as_fuel=False, show_values=False)
+                                                specific_heat_reference_temp='40 degC',
+                                                electricity_reference='Huber Belt dryer',
+                                                output_unit='kWh', syngas_as_fuel=False, show_values=False)
 
-GWP_drying_example_1 = drying_GWP(energy_drying_output_default)
-GWP_drying_example_2 = drying_GWP(energy_drying_output)
-GWP_drying_example_3 = drying_GWP(energy_drying_output_belt_dryer)
+GWP_drying_example_1 = FeedstockDrying(instantiate_with_default_reqs=False)
+GWP_drying_example_1.calculate_requirements(energy_drying_dict=energy_drying_output_default)
+GWP_drying_example_1.calculate_GWP()
 
-# Monte Carlo
-drying_GWP = process_GWP_MC_to_df(drying_GWP_MC())
+GWP_drying_example_2 = FeedstockDrying(instantiate_with_default_reqs=False)
+GWP_drying_example_2.calculate_requirements(energy_drying_dict=energy_drying_output)
+GWP_drying_example_2.calculate_GWP()
+
+GWP_drying_example_3 = FeedstockDrying(instantiate_with_default_reqs=False)
+GWP_drying_example_3.calculate_requirements(energy_drying_dict=energy_drying_output_belt_dryer)
+GWP_drying_example_3.calculate_GWP()
+
+# Feedstock bale shredding
+GWP_shredding = FeedstockBaleShredding()

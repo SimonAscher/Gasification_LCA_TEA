@@ -120,7 +120,6 @@ oxygen = 0.0913  # [kg CO2eq./kg O2] Ref: GaBi model "oxygen seperation"
 # Ref: See preliminary analysis done in C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\analysis\preliminary\biogenic_fraction_of_feedstocks.ipynb
 "herbaceous biomass" = 0.9833
 "woody biomass" = 0.9878
-
 "plastics" = 0
 "municipal solid waste" = 0
 
