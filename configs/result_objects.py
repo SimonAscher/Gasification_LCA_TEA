@@ -11,6 +11,8 @@ from typing import Type
 from human_id import generate_id
 from configs.process_objects import Process
 from matplotlib.backends.backend_pdf import PdfPages
+from functions.LCA import electricity_GWP, thermal_energy_GWP
+from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
 
 
 @dataclass
@@ -49,6 +51,64 @@ class Results:
 
         # Calculate overall sum
         self.GWP_mean = float(np.mean(self.GWP_total))
+
+    def calculate_electricity_heat_output(self):
+        electricity_arrays = []
+        heat_arrays = []
+
+        def extract_heat_electricity_from_requirement(requirement_obj, electricity_storage_array, heat_storage_array):
+            for requirement_instance in requirement_obj.electricity:  # electricity requirements
+                if requirement_instance.generated:
+                    values = [-x for x in requirement_instance.values]
+                    electricity_storage_array.append(values)
+                else:
+                    electricity_storage_array.append(requirement_instance.values)
+
+            for requirement_instance in requirement_obj.oxygen:  # oxygen requirements - also result in electricity
+                ele_oxygen = []
+                for oxygen_req_value in requirement_instance.values:
+                    ele_oxygen.append(electricity_GWP(amount=oxygen_rng_elect_req(mass_oxygen=oxygen_req_value)))
+                electricity_storage_array.append(ele_oxygen)
+
+            for requirement_instance in requirement_obj.heat:  # heat requirements
+                if requirement_instance.generated:
+                    values = [-x for x in requirement_instance.values]
+                    heat_storage_array.append(values)
+                else:
+                    heat_storage_array.append(requirement_instance.values)
+
+            for requirement_instance in requirement_obj.steam:  # steam requirements - also result in heat
+                heat_steam = []
+                for steam_req_value in requirement_instance.values:
+                    heat_steam.append(thermal_energy_GWP(amount=steam_rng_heat_req(mass_steam=steam_req_value)))
+                heat_storage_array.append(heat_steam)
+
+            return electricity_storage_array, heat_storage_array
+
+        for process in self.processes:  # iterate through processes
+            for requirement in process.requirements:  # iterate through requirements of each process.
+                electricity_arrays, heat_arrays = extract_heat_electricity_from_requirement(requirement,
+                                                                                            electricity_arrays,
+                                                                                            heat_arrays)
+            for subprocess in process.subprocesses:
+                for sub_requirement in subprocess.requirements:
+                    electricity_arrays, heat_arrays = extract_heat_electricity_from_requirement(sub_requirement,
+                                                                                                electricity_arrays,
+                                                                                                heat_arrays)
+
+                    for sub_sub_requirement in subprocess.subprocesses:
+                        electricity_arrays, heat_arrays = extract_heat_electricity_from_requirement(sub_sub_requirement,
+                                                                                                    electricity_arrays,
+                                                                                                    heat_arrays)
+
+        # Calculate net output
+        electricity_output_distribution = list(np.sum(np.array(electricity_arrays), axis=0) * -1)
+        heat_output_distribution = list(np.sum(np.array(heat_arrays), axis=0) * -1)
+
+        self.electricity_output = {"Mean:": np.mean(electricity_output_distribution),
+                                   "Distribution:": electricity_output_distribution}
+        self.heat_output = {"Mean:": np.mean(heat_output_distribution),
+                            "Distribution:": heat_output_distribution}
 
     def calculate_total_TEA(self):
         pass
