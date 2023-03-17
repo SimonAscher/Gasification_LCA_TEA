@@ -7,6 +7,8 @@ from config import settings
 from functions.general.utility import ultimate_comp_daf_to_wb
 from functions.general import calculate_LHV_HHV_feedstock
 from functions.general.utility import MJ_to_kWh
+from processes.CHP import CombinedHeatPower
+from functions.MonteCarloSimulation import get_distribution_draws
 
 
 def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"],
@@ -119,10 +121,10 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
     return mass_agent_output
 
 
-def load_gasification_aux_demands_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
-                                               r"\gasification_aux_demands_results"):
+def load_gasification_aux_electricity_demands_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
+                                                                  r"\gasification_aux_demands_results"):
     """
-    Load pickled data done in analysis on biochar properties (e.g. carbon fraction and carbon stability)
+    Load pickled data done in analysis on gasification and gas cleaning auxiliary electricity demands.
     Analysis done in: analysis/preliminary/gas_cleaning_and_aux_demands/gas_cleaning_and_aux_demands.ipynb.
 
     Parameters
@@ -142,10 +144,33 @@ def load_gasification_aux_demands_data(full_file_path=r"C:\Users\2270577A\Pychar
     return loaded_data
 
 
-def demands_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
-                             H=settings.user_inputs["hydrogen content"],
-                             S=settings.user_inputs["sulphur content"],
-                             moisture=settings.user_inputs["desired moisture"]):
+def load_gasification_aux_heat_demands_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
+                                                           r"\gasification_aux_heat_demands_results"):
+    """
+    Load pickled data done in analysis on gasification and gas cleaning auxiliary heat demands.
+    Analysis done in: analysis/preliminary/gas_cleaning_and_aux_demands/heat_requirements.ipynb.
+
+    Parameters
+    ----------
+    full_file_path: str
+    "r" string specifying the file path to pickle object.
+
+    Returns
+    -------
+    dict
+        Loaded data on requirements for gas cleaning and auxiliary gasification demands.
+    """
+    # Load pickled data
+    loaded_data = pickle.load(open(full_file_path, "rb"))
+    # TODO: Change call to file path to dynamic call (could try something like sys.path[-1])
+
+    return loaded_data
+
+
+def demands_ele_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
+                                 H=settings.user_inputs["hydrogen content"],
+                                 S=settings.user_inputs["sulphur content"],
+                                 moisture=settings.user_inputs["desired moisture"]):
     """
     Calculates electricity requirements for auxiliary gasification operations and syngas cleaning.
 
@@ -155,10 +180,8 @@ def demands_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
         Carbon content of feedstock [% daf].
     H: float
         Hydrogen content of feedstock [% daf].
-
     S: float
         Sulphur content of feedstock [% daf].
-
     moisture: float
         Moisture content of feedstock [% wb].
 
@@ -169,7 +192,6 @@ def demands_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
     """
 
     # Get feedstock LHV
-
     # Get data in right format
     feedstock_data_index = "feedstock data"
     feedstock_df = pd.DataFrame(index=[feedstock_data_index], columns=settings.labels.input_data)
@@ -185,9 +207,9 @@ def demands_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
     total_feedstock_energy = MJ_to_kWh(value=(feedstock_mass * feedstock_LHV))
 
     # Get data on requirements for auxiliary and gas cleaning
-    aux_requirements_data = load_gasification_aux_demands_data()
+    aux_requirements_data = load_gasification_aux_electricity_demands_data()
 
-    # Draw sample from triangular distribution.
+    # Draw sample from triangular_dist_maker distribution.
     aux_fraction = np.random.default_rng().triangular(left=aux_requirements_data.lower,
                                                       mode=aux_requirements_data.mode,
                                                       right=aux_requirements_data.upper)
@@ -195,3 +217,19 @@ def demands_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
     aux_energy = aux_fraction * total_feedstock_energy
 
     return aux_energy
+
+
+def demands_heat_auxiliary_gasification(CHP_results_object=None, MC_iterations=settings.background.iterations_MC):
+
+    if CHP_results_object is None:
+        CHP_results_object = CombinedHeatPower()
+
+    heat_production = CHP_results_object.requirements[0].heat[0].values
+
+    aux_heat_reqs_data = load_gasification_aux_heat_demands_data()
+
+    dist_draws = get_distribution_draws(distribution_maker=aux_heat_reqs_data, length_array=MC_iterations)
+
+    aux_heat_demands = list(np.array(heat_production) * dist_draws)
+
+    return aux_heat_demands

@@ -2,11 +2,11 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from configs import triangular, gaussian
+from configs import triangular_dist_maker, gaussian_dist_maker
 from configs.process_objects import Process
 from configs.requirement_objects import Requirements, BiogenicGWP, FossilGWP
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
-from functions.MonteCarloAnalysis import to_MC_array, make_dist
+from functions.MonteCarloSimulation import to_fixed_MC_array, get_distribution_draws
 from processes.biochar_soil_application.utils import load_biochar_properties_data
 
 
@@ -99,23 +99,23 @@ class BiocharSoilApplication(Process):
                                                                         high=carbon_fraction_max,
                                                                         size=settings.background.iterations_MC)
             else:
-                carbon_fraction_array = make_dist(gaussian(mean=carbon_fraction_mean, std=carbon_fraction_std))
+                carbon_fraction_array = get_distribution_draws(
+                    gaussian_dist_maker(mean=carbon_fraction_mean, std=carbon_fraction_std))
 
         else:  # Fixed value scenario
-            carbon_fraction_array = to_MC_array(carbon_fraction)
+            carbon_fraction_array = to_fixed_MC_array(carbon_fraction)
 
         # Get Monte Carlo arrays of recalcitrant and labile carbon fractions
         if stability is None:  # Use default distribution
             # Get data
             recalcitrant_carbon_data = biochar_properties_data["Biochar recalcitrant carbon fraction"]
 
-            recalcitrant_carbon_array = make_dist(
-                triangular(lower=recalcitrant_carbon_data.lower,
-                           mode=recalcitrant_carbon_data.mode,
-                           upper=recalcitrant_carbon_data.upper))
+            recalcitrant_carbon_array = get_distribution_draws(triangular_dist_maker(lower=recalcitrant_carbon_data.lower,
+                                                                                     mode=recalcitrant_carbon_data.mode,
+                                                                                     upper=recalcitrant_carbon_data.upper))
 
         else:  # Fixed value scenario
-            recalcitrant_carbon_array = to_MC_array(stability)
+            recalcitrant_carbon_array = to_fixed_MC_array(stability)
 
         # Calculate labile carbon
         labile_carbon_array = 1 - recalcitrant_carbon_array

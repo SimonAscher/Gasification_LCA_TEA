@@ -72,6 +72,46 @@ class GlobalWarmingPotential:
         self.mean = np.mean(self.values)
 
 
+@dataclass
+class CostBenefit:
+    """
+    Costs or benefits of a process.
+
+    Attributes
+    ----------
+    requirement : InitVar[Type[_Requirement]]
+        A "_Requirement" child object which is to be converted to its cost or benefit.
+    """
+    # TODO: Update type hint, so it properly shows children of _Requirement class.
+
+    # Update defaults
+    requirement: InitVar[Type[_Requirement]]
+    per_FU: bool = None
+
+    def __post_init__(self, requirement):
+        # Take values from requirement object
+        self.values = []
+        self.name = requirement.name
+        self.short_label = requirement.short_label
+        self.description = requirement.description
+        self.source = requirement.source
+        self.units = settings.user_inputs.currency
+        self.requirement_type = str(type(requirement))  # to remember the source
+
+        # Calculate GWP and store as object attribute
+        if isinstance(requirement, Electricity):
+            for value in requirement.values:
+                self.values.append(electricity_GWP(amount=value, source=requirement.source, units=requirement.units))
+            if requirement.generated:  # i.e. leading to displacement of energy
+                self.values = list(np.array(self.values) * -1)
+
+        elif isinstance(requirement, Heat):
+            for value in requirement.values:
+                self.values.append(thermal_energy_GWP(amount=value, source=requirement.source, units=requirement.units))
+            if requirement.generated:  # i.e. leading to displacement of energy
+                self.values = list(np.array(self.values) * -1)
+
+
 # Dataclass to store process requirements
 @dataclass
 class Process:

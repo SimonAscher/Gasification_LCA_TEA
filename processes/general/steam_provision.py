@@ -58,9 +58,9 @@ def steam_rng_heat_req(mass_steam):
 
     # Get boiler efficiency
     boiler_efficiency_data = load_boiler_efficiency_data()
-    lower_efficiency = boiler_efficiency_data['triangular distribution values'].lower
-    mode_efficiency = boiler_efficiency_data['triangular distribution values'].mode
-    upper_efficiency = boiler_efficiency_data['triangular distribution values'].upper
+    lower_efficiency = boiler_efficiency_data['triangular distribution object'].lower
+    mode_efficiency = boiler_efficiency_data['triangular distribution object'].mode
+    upper_efficiency = boiler_efficiency_data['triangular distribution object'].upper
 
     # Apply boiler efficiency
 

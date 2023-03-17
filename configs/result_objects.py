@@ -25,6 +25,8 @@ class Results:
     # Define defaults which are to be populated later
     GWP_total: list[float] = None
     GWP_mean: float = None
+    electricity_results = None
+    heat_results = None
 
     def __post_init__(self):
         self.ID: str = generate_id()
@@ -142,6 +144,10 @@ class Results:
                        "Component distributions": heat_components,
                        "Component means": np.mean(heat_components, axis=1),
                        "Component names": heat_names}
+
+        # Store results in object
+        self.electricity_results = electricity_output
+        self.heat_results = heat_output
 
         return electricity_output, heat_output
 

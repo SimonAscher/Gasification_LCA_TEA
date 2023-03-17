@@ -1,16 +1,16 @@
 # %% Test subfunctions
 import time
 from functions.general.predictions_to_distributions.utils import get_correct_sigma
-from functions.MonteCarloAnalysis import make_dist
+from functions.MonteCarloSimulation import get_distribution_draws
 
 prediction = 3.8
 output_label = "C2Hn [vol.% db]"
 correct_sigma = get_correct_sigma(prediction, output_label)
 print("Correct sigma:", correct_sigma)
 
-from configs import gaussian
+from configs import gaussian_dist_maker
 
-a = make_dist(gaussian(prediction, correct_sigma))
+a = get_distribution_draws(gaussian_dist_maker(prediction, correct_sigma))
 
 print("Distribution with separate functions:", a)
 

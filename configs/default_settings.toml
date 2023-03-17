@@ -15,7 +15,7 @@ biogenic_carbon_equivalency = 0.0
 
 [default.general]
 # List of countries supported within the model
-countries = ["UK", "Germany", "USA", "World"]
+countries = ["UK", "EU", "Germany", "USA", "World"]
 
 # Broad feedstock categories supported in analysis and ML prediction model
 feedstock_categories = ["plastics", "municipal solid waste", "herbaceous biomass", "woody biomass", "sewage sludge", "other"]
@@ -227,16 +227,36 @@ source = "https://doi.org/10.4186/ej.2014.18.2.67"
 # Economic data
 [default.data.economic]
 
-currencies = ["GBP", "USD", "EURO"]  # Currencies supported by the model
+# TODO: Update if necessary
+currencies = ["GBP", "USD", "EUR"]  # Currencies supported by the model
+system_lifecycle = 20  # Life cycle of system [years]
+reference_date = [2023, 1, 1]  # Reference date in year, month, day format.
+
+[default.data.economic.interest_rate.year_2023]
+GBP = 0.04
+EUR = 0.03
+USD = 0.045
+
+# Also allow for call with countries
+UK = 0.04
+EU = 0.03
+Germany = 0.03
+USA = 0.045
 
 [default.data.economic.conversion_rates]  # Currency conversion rates
 
-[default.data.economic.conversion_rates.most_recent]
-GBP_to_USD = 1.22501
-GBP_to_EURO = 1.12070
-USD_to_EURO = 0.91485
-date = "03.02.2023"
+[default.data.economic.conversion_rates.year_2022]  # Annual averages
+USD_TO_GBP = 0.8003
+EUR_TO_GBP = 0.8489
+source = "https://www.gov.uk/government/publications/exchange-rates-for-customs-and-vat-yearly"
 
+
+[default.data.economic.electricity_wholesale_prices.most_recent.UK]  # Electricity wholesale prices
+lower = 0.100
+mode = 0.16127  # as of 23rd of January 2023 https://www.ofgem.gov.uk/cy/energy-data-and-research/data-portal/wholesale-market-indicators
+upper = 0.200
+units = "GBP/kWh"
+distribution_type = "triangular"
 
 [default.data.economic.CEPCI]  # Chemical Enginnering Plant Cost Index (CEPCI) values
 2001 = 394.3

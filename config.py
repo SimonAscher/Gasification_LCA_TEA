@@ -1,5 +1,5 @@
 # Import Dynaconf
-from dynaconf import Dynaconf  # , Validator
+from dynaconf import Dynaconf
 
 # Create settings instance
 settings = Dynaconf(

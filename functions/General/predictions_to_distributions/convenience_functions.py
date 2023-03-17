@@ -1,7 +1,7 @@
 from functions.general.predictions_to_distributions.utils import get_correct_sigma
-from functions.MonteCarloAnalysis import make_dist
+from functions.MonteCarloSimulation import get_distribution_draws
 from config import settings
-from configs import gaussian
+from configs import gaussian_dist_maker
 from models.prediction_model import get_models, make_predictions
 from functions.general.utility import fetch_ML_inputs
 
@@ -26,7 +26,7 @@ def pred_to_dist(prediction, output_label):
     # Get correct error value
     sigma = get_correct_sigma(prediction, output_label)
     # Get distribution
-    distribution = make_dist(gaussian(prediction, sigma))
+    distribution = get_distribution_draws(gaussian_dist_maker(prediction, sigma))
 
     return distribution
 
@@ -52,7 +52,6 @@ def get_all_prediction_distributions(predictions=None, data=None):
 
     if data is None:
         data = [fetch_ML_inputs()]
-
 
     output_labels = settings.labels.output_data  # get labels
     distributions = {}  # initialise distributions dictionary

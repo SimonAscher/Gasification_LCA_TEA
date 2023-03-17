@@ -3,7 +3,7 @@ from configs.process_objects import Process
 from configs.requirement_objects import Requirements, Electricity, Heat
 from functions.general.utility import kJ_to_kWh
 from processes.pretreatment.utils import energy_drying
-from functions.MonteCarloAnalysis import to_MC_array
+from functions.MonteCarloSimulation import to_fixed_MC_array
 
 
 @dataclass()
@@ -36,11 +36,11 @@ class FeedstockDrying(Process):
 
         # Initialise Requirements object and add requirements
         feedstock_drying_requirements = Requirements(name=self.name)
-        feedstock_drying_requirements.add_requirement(Heat(values=list(to_MC_array(energy_drying_dict["heat"])),
+        feedstock_drying_requirements.add_requirement(Heat(values=list(to_fixed_MC_array(energy_drying_dict["heat"])),
                                                            name="Feedstock drying heat requirement",
                                                            source=energy_drying_dict["heat source"]))
-        feedstock_drying_requirements.add_requirement(Electricity(values=list(to_MC_array(energy_drying_dict
-                                                                                          ["electricity"])),
+        feedstock_drying_requirements.add_requirement(Electricity(values=list(to_fixed_MC_array(energy_drying_dict
+                                                                                                ["electricity"])),
                                                                   name="Feedstock drying electricity requirement"))
 
         # Add requirements to object
