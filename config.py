@@ -5,8 +5,8 @@ from dynaconf import Dynaconf
 settings = Dynaconf(
     settings_files=[  # Paths to toml files
         "configs/default_settings.toml",  # a file for default settings
-        # "configs/generic_user_inputs.toml",  # generic user inputs
-        "configs/user_inputs.toml",  # a file for user inputs
+        "configs/user_inputs_default.toml",  # default user inputs
+        # "configs/user_inputs.toml",  # overwrite default user inputs
         "configs/.secrets.toml"  # a file for sensitive data (gitignored)
     ],
 

@@ -110,7 +110,7 @@ class CostBenefit:
                 self.values.append(thermal_energy_GWP(amount=value, source=requirement.source, units=requirement.units))
             if requirement.generated:  # i.e. leading to displacement of energy
                 self.values = list(np.array(self.values) * -1)
-
+        # TODO: Finish this function.
 
 # Dataclass to store process requirements
 @dataclass

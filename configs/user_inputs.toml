@@ -2,22 +2,22 @@
 iterations_MC = 1000
 country = "UK"
 currency = "GBP"
-feedstock_category = "woody biomass"
-feedstock_name = "blank"
-"particle size" = 1
-"carbon content" = 50.0
-"hydrogen content" = 10.0
-"nitrogen content" = 1.0
-"sulphur content" = 2.0
-"oxygen content" = 37.0
-"as received moisture" = 15.0
-"desired moisture" = 12.0
-"ash content" = 12.0
-temperature = 700.0
+feedstock_category = "plastics"
+feedstock_name = ""
+"particle size" = 0.0
+"carbon content" = 0.0
+"hydrogen content" = 0.0
+"nitrogen content" = 0.0
+"sulphur content" = 0.0
+"oxygen content" = 100.0
+"as received moisture" = 0.0
+"desired moisture" = 0.0
+"ash content" = 0.0
+temperature = 0.0
 ER = 0.3
 "operation mode" = "Continuous"
 "operation scale" = "Lab"
-"gasifying agent" = "Steam"
+"gasifying agent" = "Air"
 catalyst = false
 "reactor type" = "Fixed"
 "bed material" = "N/A"
@@ -27,5 +27,12 @@ electricity_reference = "GaBi (mean)"
 drying_output_unit = "kWh"
 "particle size after milling" = 16.54834875526616
 "particle size after pelleting" = 6.35
-electricity_price = {dist_type="triangular_dist_maker", dist_values={lower=0.100, mode=0.16127, upper=0.200}}
 heat_price = "None"
+
+[default.user_inputs.electricity_price]
+dist_type = "triangular_dist_maker"
+
+[default.user_inputs.electricity_price.dist_values]
+lower = 0.1
+mode = 0.16127
+upper = 0.2

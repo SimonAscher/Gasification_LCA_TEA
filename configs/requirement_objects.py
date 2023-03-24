@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 
 from dataclasses import dataclass
@@ -112,7 +113,7 @@ class BiogenicGWP(_Requirement):
 
             if all(x >= 0 for x in self.values):  # check if values given as positives
                 self.values = [-x for x in self.values]  # turn into negatives
-                raise Warning("Negative emission values were given as positives - turned into negatives.")
+                warnings.warn("Negative emission values were given as positives - turned into negatives.")
 
 
 # Economics - costs and benefits

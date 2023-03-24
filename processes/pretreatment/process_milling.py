@@ -24,7 +24,7 @@ class FeedstockMilling(Process):
         Parameters
         ----------
         screensize: float
-            Defines which screensize should be used for the mill.
+            Defines which screensize should be used for the mill [mm].
 
         MC_iterations: int
             Number of Monte Carlo iterations.

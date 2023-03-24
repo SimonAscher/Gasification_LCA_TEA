@@ -205,7 +205,7 @@ def electricity_milling(screensize=3.2, feedstock_type=settings.user_inputs.feed
     Parameters
     ----------
     screensize: float
-        Defines which size mill screen should be used in process.
+        Defines which size mill screen should be used in process [mm].
     feedstock_type: str
         Specifies the type of feedstock
     show_warnings: bool
