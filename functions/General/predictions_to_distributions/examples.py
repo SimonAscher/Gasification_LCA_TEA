@@ -8,7 +8,7 @@ output_label = "C2Hn [vol.% db]"
 correct_sigma = get_correct_sigma(prediction, output_label)
 print("Correct sigma:", correct_sigma)
 
-from configs import gaussian_dist_maker
+from objects import gaussian_dist_maker
 
 a = get_distribution_draws(gaussian_dist_maker(prediction, correct_sigma))
 

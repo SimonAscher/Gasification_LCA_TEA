@@ -1,0 +1,4 @@
+[electricity_dist_maker]
+lower = 0.015
+mode = 0.03
+upper = 0.05

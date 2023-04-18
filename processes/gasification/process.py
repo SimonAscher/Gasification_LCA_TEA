@@ -1,6 +1,6 @@
 from config import settings
-from configs.process_objects import Process
-from configs.requirement_objects import Requirements, Electricity, Heat, Oxygen, Steam
+from objects import Process
+from objects import Requirements, Electricity, Heat, Oxygen, Steam
 from dataclasses import dataclass
 from processes.gasification.utils import mass_agent, demands_ele_aux_gas_cleaning, demands_heat_auxiliary_gasification
 from functions.MonteCarloSimulation import to_fixed_MC_array
@@ -16,7 +16,7 @@ class Gasification(Process):
         self.calculate_requirements()
 
     def calculate_requirements(self, agent_type=None, agent_mass=None, FU=settings.general["FU"],
-                               MC_iterations=settings.background.iterations_MC):
+                               MC_iterations=settings.user_inputs.general.MC_iterations):
         """
         Calculates all requirements for the gasification process.
 
@@ -34,7 +34,7 @@ class Gasification(Process):
 
         # Define defaults
         if agent_type is None:
-            agent_type = settings.user_inputs["gasifying agent"]
+            agent_type = settings.user_inputs.process_conditions.gasifying_agent
 
         if agent_mass is None:
             agent_mass = mass_agent(agent_type=agent_type)

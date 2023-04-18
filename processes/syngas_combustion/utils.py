@@ -1,7 +1,34 @@
 import numpy as np
+
 from config import settings
 
-# Sub-function to calculate GWP of syngas combustion
+
+# Define helper functions
+def get_molar_masses():
+    """ Get molar mass data from settings."""
+    return settings.data.molar_masses
+
+
+def get_conversion_ratios_to_CO2():
+    """
+    Get conversion ratios from CO, CH4, C2H4 to CO2.
+
+    Returns
+    -------
+    dict
+
+    """
+    # Get molar masses
+    mm = get_molar_masses()
+
+    # Calculate conversion ratios to CO2
+    CO_conv_ratio = (2 * mm["CO2"]) / (2 * mm["CO"])  # 2 CO + O2 -> 2 CO2
+    CH4_conv_ratio = (mm["CO2"]) / mm["CH4"]  # CH4 + 2O2 -> CO2 + 2 H2O
+    C2H4_conv_ratio = (2 * mm["CO2"]) / mm["C2H4"]  # C2H4 + 3 O2 -> 2 CO2 + 2 H2O
+
+    return {"CO": CO_conv_ratio, "CH4": CH4_conv_ratio, "C2H4": C2H4_conv_ratio}
+
+
 def syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield, FU=settings.general["FU"]):
     """
     Sub-function used to calculate the GWP from syngas combustion.
@@ -13,6 +40,8 @@ def syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield, FU=settings.genera
         Scaled gas fraction in decimals.
     gas_yield: list
         Gas yields associated with each iteration.
+    FU: int
+        Functional unit.
 
     Returns
     -------
@@ -26,24 +55,22 @@ def syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yield, FU=settings.genera
     # Set up empty list to store calculated GWPs
     GWP = []
 
-    # Get gas molar masses
-    mm = settings.data.molar_masses
+    # Get gas conversion ratios
+    conversion_ratios = get_conversion_ratios_to_CO2()
+    CO_conv_ratio = conversion_ratios["CO"]
+    CH4_conv_ratio = conversion_ratios["CH4"]
+    C2H4_conv_ratio = conversion_ratios["C2H4"]
 
-    # TODO: CHECK ALL THESE EQUATIONS AND MAKE SURE THEY ARE BALANCED AND THE CORRESPONDING RATIOS ARE CORRECT - WRITE TESTS
-    # Calculate conversion ratios to CO2
-    CO_conv_ratio = (2 * mm["CO2"]) / (2 * mm["CO"])  # 2 CO + O2 -> 2 CO2
-    CH4_conv_ratio = (mm["CO2"]) / mm["CH4"]  # CH4 + 2O2 -> CO2 + 2 H2O
-    C2H4_conv_ratio = (2 * mm["CO2"]) / mm["C2H4"]  # C2H4 + 3 O2 -> 2 CO2 + 2 H2O
+    # Get gas densities
+    densities = settings.data.densities
 
     # Calculate GWPs for each MC iteration
     for iterations in np.arange(len(scaled_gas_fractions["N2 [vol.% db]"])):
-        calculated_GWP = (scaled_gas_fractions["CO2 [vol.% db]"][iterations] +
-                          scaled_gas_fractions["CO [vol.% db]"][iterations] * CO_conv_ratio +
-                          scaled_gas_fractions["CH4 [vol.% db]"][iterations] * CH4_conv_ratio +
-                          scaled_gas_fractions["C2Hn [vol.% db]"][iterations] * C2H4_conv_ratio
-                          ) * gas_yield[iterations] * settings.data.densities["CO2"] * FU
+        calculated_GWP = (scaled_gas_fractions["CO2 [vol.% db]"][iterations] * densities["CO2"] +
+                          scaled_gas_fractions["CO [vol.% db]"][iterations] * densities["CO"] * CO_conv_ratio +
+                          scaled_gas_fractions["CH4 [vol.% db]"][iterations] * densities["CH4"] * CH4_conv_ratio +
+                          scaled_gas_fractions["C2Hn [vol.% db]"][iterations] * densities["C2H4"] * C2H4_conv_ratio
+                          ) * gas_yield[iterations] * FU
         GWP.append(calculated_GWP)  # add GWP to storage list
-        # TODO: Add case where only 1 set of predictions is given instead of distributions - just in case this is
-        #  needed.
 
     return GWP

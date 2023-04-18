@@ -1,4 +1,4 @@
-# Simple tested functions to convert between different units
+# Simple functions to convert between different units
 
 # Energy units
 

@@ -32,7 +32,7 @@ from dynaconf import LazySettings
 # st.write(f"Contents of settings: {settings.as_dict()}")  # shows empty
 # st.write(settings)
 # st.write(f"Contents of settings: {settings.default.background.iteration_MC}")
-# st.write(f"Contents of settings: {settings.background.iteration_MC}")
+# st.write(f"Contents of settings: {settings.user_inputs.general.MC_iterations}")
 
 
 

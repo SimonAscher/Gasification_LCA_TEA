@@ -1,10 +1,10 @@
 import numpy as np
 
 from config import settings
-from configs import triangular_dist_maker, gaussian_dist_maker, fixed_dist_maker, range_dist_maker
+from objects import triangular_dist_maker, gaussian_dist_maker, fixed_dist_maker, range_dist_maker
 
 
-def to_fixed_MC_array(value, no_iterations=settings.background.iterations_MC):
+def to_fixed_MC_array(value, no_iterations=settings.user_inputs.general.MC_iterations):
     """
     Convenience function to turn any value into a repeating array the length of Monte Carlo iterations.
 
@@ -25,7 +25,7 @@ def to_fixed_MC_array(value, no_iterations=settings.background.iterations_MC):
     return mc_array
 
 
-def get_distribution_draws(distribution_maker, length_array: int = settings.background.iterations_MC,
+def get_distribution_draws(distribution_maker, length_array=settings.user_inputs.general.MC_iterations,
                            random_state: int = settings.background.random_seed):
     """
     Function to get draws from a given distribution type (e.g. gaussian, triangular, fixed).
@@ -33,7 +33,7 @@ def get_distribution_draws(distribution_maker, length_array: int = settings.back
     Parameters
     ----------
     distribution_maker: triangular_dist_maker | gaussian_dist_maker | fixed_dist_maker | range_dist_maker
-        Named tuple defining the variables of the distribution. Defined in configs/default_objects.py.
+        Named tuple defining the variables of the distribution. Defined in objects/generic_objects.py.
         Contains variables (e.g. mean, std, lower, upper, mode) defining the given distribution.
     length_array: int
         Length of created array. Default value is the number of Monte Carlo iterations loaded from settings.

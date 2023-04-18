@@ -2,8 +2,8 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from configs.process_objects import Process
-from configs.requirement_objects import Requirements, Electricity
+from objects import Process
+from objects import Requirements, Electricity
 from processes.pretreatment.utils import electricity_shredding
 
 
@@ -15,7 +15,7 @@ class FeedstockBaleShredding(Process):
     def instantiate_default_requirements(self):
         self.calculate_requirements()
 
-    def calculate_requirements(self, MC_iterations=settings.background.iterations_MC):
+    def calculate_requirements(self, MC_iterations=settings.user_inputs.general.MC_iterations):
         """
         Calculate the requirements for feedstock bale shredding.
 

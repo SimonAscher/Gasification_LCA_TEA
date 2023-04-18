@@ -1,7 +1,7 @@
 from functions.general.predictions_to_distributions.utils import get_correct_sigma
 from functions.MonteCarloSimulation import get_distribution_draws
 from config import settings
-from configs import gaussian_dist_maker
+from objects import gaussian_dist_maker
 from models.prediction_model import get_models, make_predictions
 from functions.general.utility import fetch_ML_inputs
 

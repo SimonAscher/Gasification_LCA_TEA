@@ -1,0 +1,37 @@
+"Difference energy requirement milling - herbaceous and woody biomass" = "22.753231168950638"
+
+["Energy milling model"]
+"Regression function" = [ "-5.165241883564793", "48.42332019681778",]
+RMSE = "4.858182065428869"
+
+["Particle size from milling"]
+"Regression function" = [ "3.333333333333332", "5.083333333333333",]
+RMSE = "3.3819373146171707"
+
+["Pelleting model"]
+"Regression function" = [ "3.625146057819802", "48.404376096760956",]
+RMSE = "13.538351800197665"
+
+["Energy milling model".Labels]
+x_label = "Screen size [mm]"
+y_label = "Energy consumption milling [kWh/tonne]"
+
+["Energy milling model".X_limits]
+min = 2.4
+max = 6.5
+
+["Particle size from milling".Labels]
+x_label = "Screen size [mm]"
+y_label = "Particle size [mm]"
+
+["Particle size from milling".X_limits]
+min = 3.2
+max = 6.5
+
+["Pelleting model".Labels]
+x_label = "Particle size [mm]"
+y_label = "Energy consumption pelleting [kWh/tonne]"
+
+["Pelleting model".X_limits]
+min = 0.52
+max = 31.0

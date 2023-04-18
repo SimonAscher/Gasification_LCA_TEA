@@ -2,10 +2,10 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from configs.process_objects import Process
-from configs.requirement_objects import Requirements, Electricity
-from functions.general.utility.toml_handling import update_user_inputs_toml
+from objects import Process
+from objects import Requirements, Electricity
 from processes.pretreatment.utils import electricity_pelleting
+from dynaconf.loaders.toml_loader import write
 
 
 @dataclass()
@@ -16,7 +16,7 @@ class FeedstockPelleting(Process):
     def instantiate_default_requirements(self):
         self.calculate_requirements()
 
-    def calculate_requirements(self, particle_size=None, MC_iterations=settings.background.iterations_MC):
+    def calculate_requirements(self, particle_size=None, MC_iterations=settings.user_inputs.general.MC_iterations):
         """
         Calculate the requirements for feedstock pelleting.
         Note: Ensure that milling function is run first to update particle size post milling.
@@ -33,9 +33,9 @@ class FeedstockPelleting(Process):
         # Get defaults
         if particle_size is None:
             try:
-                particle_size = settings.user_inputs["particle size after milling"]
+                particle_size = settings.user_inputs.feedstock.particle_size_post_milling
             except:
-                particle_size = settings.user_inputs["particle size"]
+                particle_size = settings.user_inputs.feedstock.particle_size_ar
 
         # Initialise storage list
         electricity_requirement_pelleting = []
@@ -46,7 +46,13 @@ class FeedstockPelleting(Process):
 
         # Update toml document with average particle size after milling
         particle_size_post_pelleting_mm = 6.35  # [mm] source: "10.13031/aea.30.9719"
-        update_user_inputs_toml("particle size after pelleting", float(particle_size_post_pelleting_mm))
+        user_inputs_file_path = settings.settings_module[-2]
+        write(user_inputs_file_path,
+              {"default":
+                   {"user_inputs":
+                        {"feedstock":
+                             {"particle_size_post_pelleting": float(particle_size_post_pelleting_mm)}}}},
+              merge=True)
 
         # Initialise Requirements object and add requirements
         feedstock_pelleting_requirements = Requirements(name=self.name)

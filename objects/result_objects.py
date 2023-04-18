@@ -9,7 +9,7 @@ from config import settings
 from dataclasses import dataclass
 from typing import Type
 from human_id import generate_id
-from configs.process_objects import Process
+from objects.process_objects import Process
 from matplotlib.backends.backend_pdf import PdfPages
 from functions.LCA import electricity_GWP, thermal_energy_GWP
 from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
@@ -234,7 +234,7 @@ class Results:
             marker_x = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[1][0:-1])
             marker_y = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[0])
             plt.clf()  # to prevent interference with actual plot
-            marker_threshold = settings.background.iterations_MC * 0.01  # threshold below which markers are not displayed
+            marker_threshold = settings.user_inputs.general.MC_iterations * 0.01  # threshold below which markers are not displayed
 
             # Plot histograms and total
             sns.set_theme()  # Use seaborn style
@@ -457,7 +457,7 @@ class Results:
         marker_x = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[1][0:-1])
         marker_y = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[0])
         plt.clf()  # to prevent interference with actual plot
-        marker_threshold = settings.background.iterations_MC * 0.01  # threshold below which markers are not displayed
+        marker_threshold = settings.user_inputs.general.MC_iterations * 0.01  # threshold below which markers are not displayed
 
         # Plot histograms and total
         sns.set_theme()  # Use seaborn style

@@ -1,15 +1,21 @@
 from config import settings
 
 
-def ultimate_comp_daf_to_wb(C=settings.user_inputs["carbon content"], H=settings.user_inputs["hydrogen content"],
-                            N=settings.user_inputs["nitrogen content"], S=settings.user_inputs["sulphur content"],
-                            O=settings.user_inputs["oxygen content"], moisture=settings.user_inputs["desired moisture"],
-                            ash=settings.user_inputs["ash content"]):
+def ultimate_comp_daf_to_wb(C=settings.user_inputs.feedstock.carbon, H=settings.user_inputs.feedstock.hydrogen,
+                            N=settings.user_inputs.feedstock.nitrogen, S=settings.user_inputs.feedstock.sulphur,
+                            O=settings.user_inputs.feedstock.oxygen, moisture=None,
+                            ash=settings.user_inputs.feedstock.ash):
     """
     Converts ultimate composition of a material from % daf (dry ash free)basis to % wb (wet basis).
     By default, takes feedstock data given by user.
 
     """
+    # Get defaults
+    if moisture is None:
+        try:
+            moisture = settings.user_inputs.feedstock.moisture_post_drying
+        except:
+            moisture = settings.user_inputs.feedstock.moisture_ar
 
     sum_percentages = C + H + N + S + O + moisture + ash
     C_scaled = C * (100 / sum_percentages)

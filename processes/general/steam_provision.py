@@ -3,11 +3,10 @@ import pickle
 import numpy as np
 
 from config import settings
-from functions.general.utility import kJ_to_kWh
+from functions.general.utility import kJ_to_kWh, get_project_root
 
 
-def load_boiler_efficiency_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
-                                                 r"\boiler_efficiency_results"):
+def load_boiler_efficiency_data(full_file_path=None):
     """
     Load pickled data done in analysis on boiler efficiency for steam production.
     Analysis done in: analysis/preliminary/boiler_efficiency/boiler_efficiency.ipynb.
@@ -22,10 +21,12 @@ def load_boiler_efficiency_data(full_file_path=r"C:\Users\2270577A\PycharmProjec
     dict
         Loaded boiler efficiency data
     """
+    if full_file_path is None:
+        project_root = get_project_root()
+        full_file_path = str(project_root) + r"\data\boiler_efficiency_results"
 
     # Load pickled data
     loaded_data = pickle.load(open(full_file_path, "rb"))
-    # TODO: Change call to file path to dynamic call - could try something like sys.path[-1]
 
     return loaded_data
 

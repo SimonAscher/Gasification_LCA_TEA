@@ -117,11 +117,11 @@ oxygen = 0.0913  # [kg CO2eq./kg O2] Ref: GaBi model "oxygen seperation"
 
 [default.data.biogenic_fractions]
 # Fraction of feedstock emissions considered biogenic
-# Ref: See preliminary analysis done in C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\analysis\preliminary\biogenic_fraction_of_feedstocks.ipynb
+# Ref: See preliminary analysis done in \analysis\preliminary\biogenic_fraction_of_feedstocks.ipynb
 "herbaceous biomass" = 0.9833
 "woody biomass" = 0.9878
+"municipal solid waste" = 0.65
 "plastics" = 0
-"municipal solid waste" = 0
 
 
 [default.data.feedstock_drying]
@@ -192,7 +192,7 @@ make = "Whispergen WhisperTech"
 source = "https://doi.org/10.1016/j.wasman.2017.03.028"
 
 [default.data.conversion_efficiencies.CHP.micro_gas_turbine]
-# CHP conversion efficiencies as decimals. Solid oxide fuel cell.
+# CHP conversion efficiencies as decimals. Micro gas turbine .
 electrical = 0.26
 heat = 0.52
 parasitic = 0.10

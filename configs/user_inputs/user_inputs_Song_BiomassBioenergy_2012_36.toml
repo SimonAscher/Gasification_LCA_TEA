@@ -1,0 +1,59 @@
+[default.user_inputs.general]
+MC_iterations = 1000
+country = "UK"
+currency = "GBP"
+
+[default.user_inputs.feedstock]
+category = "woody biomass"
+name = "Pine wood (Song, Biomass Bioenergy 2012, 36, 258-267)"
+particle_size_ar = 1.5
+carbon = 46.29
+hydrogen = 6.48
+nitrogen = 1.04
+sulphur = 0.12
+oxygen = 46.07000000000001
+moisture_ar = 15.0
+moisture_post_drying = 11.89
+ash = 1.56
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 820.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Lab"
+catalyst = "No"
+gasifying_agent = "Steam"
+reactor_type = "Fluidised bed"
+bed_material = "Silica"
+
+[default.user_inputs.economic]
+electricity_price_choice = "default"
+
+[default.user_inputs.economic.electricity_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = false
+
+[default.user_inputs.processes.drying]
+included = true
+moisture_post_drying = 11.89
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = true
+method = "VPSA post combustion"
+
+[default.user_inputs.processes.CHP]
+type = "User defined"
+electrical = 22.0
+heat = 11.0
+parasitic = 11.0
+size_kW = 1111.0

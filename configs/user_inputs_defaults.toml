@@ -1,0 +1,29 @@
+[default.user_inputs.general]
+
+[default.user_inputs.feedstock]
+
+[default.user_inputs.process_conditions]
+
+[default.user_inputs.economic]
+
+[default.user_inputs.economic.electricity_price_parameters]
+
+[default.user_inputs.processes.milling]
+
+[default.user_inputs.processes.drying]
+dryer_type = "Direct fired dryer"
+specific_heat_reference_temp = "40 degC"
+electricity_reference = "GaBi (mean)"
+output_unit = "kWh"
+
+[default.user_inputs.processes.pelleting]
+
+[default.user_inputs.processes.bale_shredding]
+
+[default.user_inputs.processes.biochar]
+
+[default.user_inputs.processes.carbon_capture]
+method = "VPSA post combustion"
+
+[default.user_inputs.processes.CHP]
+type = "Jenbacher Type 6 gas engine (1600 kW) (default)"

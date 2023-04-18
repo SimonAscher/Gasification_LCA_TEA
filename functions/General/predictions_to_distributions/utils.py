@@ -1,5 +1,7 @@
 import pickle
 
+from functions.general.utility import get_project_root
+
 
 def get_correct_sigma(prediction, output_label):
     """
@@ -19,7 +21,9 @@ def get_correct_sigma(prediction, output_label):
     """
 
     # Load dataframe containing errors
-    with open(r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data\prediction_boundaries_and_errors_df", "rb") as f:
+    root_path = get_project_root()
+    file_path = str(root_path) + r"\data\prediction_boundaries_and_errors_df"
+    with open(file_path, "rb") as f:
         boundaries_errors_df = pickle.load(f)
 
     # Get boundaries and errors (sigmas)

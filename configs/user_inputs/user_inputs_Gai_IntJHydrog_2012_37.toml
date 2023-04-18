@@ -1,0 +1,54 @@
+[default.user_inputs.general]
+MC_iterations = 1000
+country = "UK"
+currency = "GBP"
+
+[default.user_inputs.feedstock]
+category = "herbaceous biomass"
+name = "Corn straw (Gai, Int. J. Hydrog 2012, 37, 4935-4944)"
+particle_size_ar = 3.75
+carbon = 43.83
+hydrogen = 5.95
+nitrogen = 0.97
+sulphur = 0.12
+oxygen = 45.01
+moisture_ar = 18.0
+moisture_post_drying = 6.17
+ash = 5.93
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 900.0
+ER = 0.18
+operation_mode = "Continuous"
+operation_scale = "Lab"
+catalyst = "No"
+gasifying_agent = "Steam"
+reactor_type = "Fixed bed"
+bed_material = "N/A"
+
+[default.user_inputs.economic]
+electricity_price_choice = "default"
+
+[default.user_inputs.economic.electricity_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = false
+
+[default.user_inputs.processes.drying]
+included = true
+moisture_post_drying = 6.17
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = true
+method = "VPSA post combustion"
+
+[default.user_inputs.processes.CHP]

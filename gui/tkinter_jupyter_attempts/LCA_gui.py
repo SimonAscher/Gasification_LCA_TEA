@@ -1,10 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as tkk
 
-from configs import fixed_dist_maker, range_dist_maker, triangular_dist_maker, gaussian_dist_maker
-from functions.general.utility import update_user_inputs_toml
-
-
 root = tk.Tk()
 root.geometry("300x500")
 

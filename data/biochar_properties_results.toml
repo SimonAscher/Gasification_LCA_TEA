@@ -1,0 +1,53 @@
+[Biochar_recalcitrant_carbon_fraction_distribution]
+lower = 0.8
+mode = 0.9
+upper = 0.97
+
+[Biochar_carbon_fractions_df."animal manure"]
+mean = 0.09
+"95%" = 0.53
+lower = 0.0423
+upper = 0.1377
+std = 0.024336734693877548
+
+[Biochar_carbon_fractions_df.wood]
+mean = 0.52
+"95%" = 0.52
+lower = 0.2496
+upper = 0.7904
+std = 0.13795918367346938
+
+[Biochar_carbon_fractions_df."herbaceous biomass"]
+mean = 0.28
+"95%" = 0.5
+lower = 0.14
+upper = 0.42000000000000004
+std = 0.07142857142857144
+
+[Biochar_carbon_fractions_df."rice husk and rice straw"]
+mean = 0.13
+"95%" = 0.5
+lower = 0.065
+upper = 0.195
+std = 0.03316326530612245
+
+[Biochar_carbon_fractions_df."nut shells, pits, and stones"]
+mean = 0.4
+"95%" = 0.52
+lower = 0.192
+upper = 0.6080000000000001
+std = 0.10612244897959186
+
+[Biochar_carbon_fractions_df."biosolids (paper sludge, sewage sludge)"]
+mean = 0.07
+"95%" = 0.5
+lower = 0.035
+upper = 0.10500000000000001
+std = 0.01785714285714286
+
+[Biochar_carbon_fractions_df.general]
+mean = 0.5770083333333335
+"95%" = nan
+lower = nan
+upper = nan
+std = 0.16894895411698235

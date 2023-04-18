@@ -1,0 +1,54 @@
+[default.user_inputs.general]
+MC_iterations = 1000
+country = "UK"
+currency = "GBP"
+
+[default.user_inputs.feedstock]
+particle_size_post_pelleting = 6.35
+particle_size_post_milling = 15.57024870525535
+category = "municipal solid waste"
+name = "MSW (Wang, Int. J. Hydrog 2012, 37, 6503-6510)"
+particle_size_ar = 5.0
+carbon = 53.31
+hydrogen = 6.91
+nitrogen = 0.84
+sulphur = 0.52
+oxygen = 38.419999999999995
+moisture_ar = 9.34
+ash = 7.12
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 799.99
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Lab"
+catalyst = "Yes"
+gasifying_agent = "Steam"
+reactor_type = "Fixed bed"
+bed_material = "N/A"
+
+[default.user_inputs.economic]
+electricity_price_choice = "default"
+
+[default.user_inputs.economic.electricity_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = false
+
+[default.user_inputs.processes.drying]
+included = false
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = true
+method = "VPSA post combustion"
+
+[default.user_inputs.processes.CHP]

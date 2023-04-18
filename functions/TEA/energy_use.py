@@ -1,5 +1,5 @@
 from config import settings
-from configs import triangular_dist_maker, gaussian_dist_maker, fixed_dist_maker, range_dist_maker
+from objects import triangular_dist_maker
 from functions.general.utility import kJ_to_kWh, MJ_to_kWh
 from functions.MonteCarloSimulation import get_distribution_draws
 from functions.general.utility import user_input_to_dist_maker

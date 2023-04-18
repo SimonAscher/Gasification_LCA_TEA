@@ -1,3 +1,8 @@
+import pickle
+
+from config import settings
+from functions.general.utility import get_project_root
+
 # Function that fetches models
 def get_models():
     """
@@ -10,24 +15,17 @@ def get_models():
     """
 
     # %% Load dataframe with models stored
-    # Get directory path
-    import os
-    # Specify filename
-    # filename = "GBR_performance_summary"
-    #TODO: Change call to file path to dynamic call
 
-    # Show full filepath
-    full_file_path = r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data\GBR_performance_summary"
-    # print("Full path to file:", full_file_path)
+    # Get file path to GBR data
+    project_root = get_project_root()
+    full_file_path = str(project_root) + r"\data\GBR_performance_summary"
 
     # Load performance summary object
-    import pickle
     perf_summary = pickle.load(open(full_file_path, "rb"))
 
     # %% Extract models for all outputs
 
     # Get column labels of performance summary object
-    from config import settings
     column_labels = settings.labels.output_data
 
     models_dict = {}  # initialise dictionary to store loaded models in

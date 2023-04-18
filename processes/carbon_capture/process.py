@@ -2,8 +2,8 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from configs.process_objects import Process
-from configs.requirement_objects import Requirements, BiogenicGWP, FossilGWP, Electricity, Heat
+from objects import Process
+from objects import Requirements, BiogenicGWP, FossilGWP, Electricity, Heat
 from processes.carbon_capture.utils import carbon_capture_VPSA_post_comb, carbon_capture_amine_post_comb
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from processes.syngas_combustion.process import SyngasCombustion
@@ -18,7 +18,7 @@ class CarbonCapture(Process):
         self.calculate_requirements()
 
     def calculate_requirements(self, ML_predictions=None, syngas_combustion_object=None,
-                               cc_method="VPSA post combustion", MC_iterations=settings.background.iterations_MC):
+                               cc_method=None, MC_iterations=settings.user_inputs.general.MC_iterations):
         """
         Calculate the requirements and impacts of carbon capture and storage (CCS) process.
 
@@ -39,6 +39,8 @@ class CarbonCapture(Process):
             ML_predictions = get_all_prediction_distributions()
         if syngas_combustion_object is None:
             syngas_combustion_object = SyngasCombustion()
+        if cc_method is None:
+            cc_method = "VPSA post combustion"
 
         # Initialise MC output object
         if cc_method == "VPSA pre combustion":

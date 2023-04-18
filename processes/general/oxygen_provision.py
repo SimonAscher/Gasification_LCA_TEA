@@ -2,11 +2,10 @@ import pickle
 
 import numpy as np
 
-from config import settings
+from functions.general.utility import get_project_root
 
 
-def load_air_separation_unit_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
-                                                 r"\air_separation_unit_results"):
+def load_air_separation_unit_data(full_file_path=None):
     """
     Load pickled data done in analysis on air separation unit electricity demands.
     Analysis done in: analysis/preliminary/air_separation_unit/air_separation_unit_comparison.ipynb.
@@ -21,10 +20,12 @@ def load_air_separation_unit_data(full_file_path=r"C:\Users\2270577A\PycharmProj
     dict
         Loaded air separation unit data
     """
+    if full_file_path is None:
+        project_root = get_project_root()
+        full_file_path = str(project_root) + r"\data\air_separation_unit_results"
 
     # Load pickled data
     loaded_data = pickle.load(open(full_file_path, "rb"))
-    # TODO: Change call to file path to dynamic call - could try something like sys.path[-1]
 
     return loaded_data
 

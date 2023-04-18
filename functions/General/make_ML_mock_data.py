@@ -4,12 +4,13 @@ import math
 import pandas as pd
 
 from config import settings
-
+from functions.general.utility import get_project_root
 
 # Define helper functions
-def load_source_data(
-        data_source=r'C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data'
-                    r'\20220810_Dataset_Gasification_Ascher_predictors.csv'):
+def load_source_data(data_source=None):
+    if data_source is None:
+        project_root = get_project_root()
+        data_source = str(project_root) + r"\data\20220810_Dataset_Gasification_Ascher_predictors.csv"
     return pd.read_csv(data_source)
 
 

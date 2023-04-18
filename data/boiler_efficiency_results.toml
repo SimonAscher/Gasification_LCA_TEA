@@ -1,0 +1,7 @@
+references = [ "10.1002/ep.13161", "10.1016/j.energy.2020.117221", "10.1016/b978-0-12-804389-9.00003-4",]
+fuel_type = "natural gas"
+
+[triangular_distribution]
+lower = 0.7608
+mode = 0.9
+upper = 0.95

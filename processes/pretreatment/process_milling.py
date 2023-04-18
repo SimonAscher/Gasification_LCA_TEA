@@ -3,10 +3,10 @@ import warnings
 
 from dataclasses import dataclass
 from config import settings
-from configs.process_objects import Process
-from configs.requirement_objects import Requirements, Electricity
+from objects import Process
+from objects import Requirements, Electricity
 from processes.pretreatment.utils import electricity_milling
-from functions.general.utility.toml_handling import update_user_inputs_toml
+from dynaconf.loaders.toml_loader import write
 
 
 @dataclass()
@@ -17,7 +17,7 @@ class FeedstockMilling(Process):
     def instantiate_default_requirements(self):
         self.calculate_requirements()
 
-    def calculate_requirements(self, screensize=3.2, MC_iterations=settings.background.iterations_MC):
+    def calculate_requirements(self, screensize=3.2, MC_iterations=settings.user_inputs.general.MC_iterations):
         """
         Calculate the requirements for feedstock milling.
 
@@ -41,10 +41,16 @@ class FeedstockMilling(Process):
 
         # Update toml document with average particle size after milling
         average_particle_size = np.mean(particle_sizes)
-        if average_particle_size > settings.user_inputs["particle size"]:
+        if float(average_particle_size) > settings.user_inputs.feedstock.particle_size_ar:
             warnings.warn("Milling likely obsolete as particle size already very fine.")
         else:
-            update_user_inputs_toml("particle size after milling", float(average_particle_size))
+            user_inputs_file_path = settings.settings_module[-2]
+            write(user_inputs_file_path,
+                  {"default":
+                       {"user_inputs":
+                            {"feedstock":
+                                 {"particle_size_post_milling": float(average_particle_size)}}}},
+                  merge=True)
 
         # Initialise Requirements object and add requirements
         feedstock_drying_requirements = Requirements(name=self.name)

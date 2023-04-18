@@ -38,7 +38,7 @@ class _Requirement:
         if self.short_label is None:
             self.short_label = self.name  # set short_label to name if not given.
 
-        if len(self.values) == 1 and settings.background.iterations_MC != 1:
+        if len(self.values) == 1 and settings.user_inputs.general.MC_iterations != 1:
             self.values = list(np.array(self.values).flatten())  # flatten if required
 
 # Define requirement child classes

@@ -3,16 +3,16 @@ import warnings
 import random
 import numpy as np
 from config import settings
-from functions.general.utility import kJ_to_kWh
+from functions.general.utility import kJ_to_kWh, get_project_root
 
 
-def energy_drying(mass_feedstock=settings.general.FU,
-                  moisture_ar=settings.user_inputs["as received moisture"],
-                  moisture_post_drying=settings.user_inputs["desired moisture"],
-                  dryer_type=settings.user_inputs.dryer_type,
-                  specific_heat_reference_temp=settings.user_inputs.specific_heat_reference_temp,
-                  electricity_reference=settings.user_inputs.electricity_reference,
-                  output_unit=settings.user_inputs.drying_output_unit,
+def energy_drying(mass_feedstock=None,
+                  moisture_ar=None,
+                  moisture_post_drying=None,
+                  dryer_type=None,
+                  specific_heat_reference_temp=None,
+                  electricity_reference=None,
+                  output_unit=None,
                   syngas_as_fuel=False,
                   show_values=False
                   ):
@@ -48,6 +48,22 @@ def energy_drying(mass_feedstock=settings.general.FU,
         Dictionary of energy requirements in the form of heat and electricity including their sources and the units.
         Note: Heat requirement given as amount of raw heat source required (e.g. XYZ kWh of natural gas)
     """
+    # Get defaults
+    if mass_feedstock is None:
+        mass_feedstock = settings.general.FU
+    if moisture_ar is None:
+        moisture_ar = settings.user_inputs.feedstock.moisture_ar
+    if moisture_post_drying is None:
+        moisture_post_drying = settings.user_inputs.feedstock.moisture_post_drying
+    if dryer_type is None:
+        dryer_type = settings.user_inputs.processes.drying.dryer_type
+    if specific_heat_reference_temp is None:
+        specific_heat_reference_temp = settings.user_inputs.processes.drying.specific_heat_reference_temp
+    if electricity_reference is None:
+        electricity_reference = settings.user_inputs.processes.drying.electricity_reference
+    if output_unit is None:
+        output_unit = settings.user_inputs.processes.drying.output_unit
+
     # Get data and reference values from settings
     # Assumed room temperature and temperature of drying process
     temp_drying_process = settings.data.feedstock_drying.temp_drying_process  # in deg C
@@ -172,13 +188,12 @@ def energy_drying(mass_feedstock=settings.general.FU,
 
 
 # Define models for milling and pelleting process based on analysis in:
-# analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption_v1.ipynb
+# analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption.ipynb
 
-def load_milling_pelleting_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
-                                               r"\milling_pelleting_results"):
+def load_milling_pelleting_data(full_file_path=None):
     """
     Load pickled data done in analysis on milling and pelleting energy demands.
-    Analysis done in: analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption_v1.ipynb.
+    Analysis done in: analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption.ipynb.
 
     Parameters
     ----------
@@ -190,17 +205,20 @@ def load_milling_pelleting_data(full_file_path=r"C:\Users\2270577A\PycharmProjec
     dict
         Loaded data on milling and pelleting energy demands etc.
     """
+    if full_file_path is None:
+        project_root = get_project_root()
+        full_file_path = str(project_root) + r"\data\milling_pelleting_results"
+
     # Load pickled data
     loaded_data = pickle.load(open(full_file_path, "rb"))
-    # TODO: Change call to file path to dynamic call (could try something like sys.path[-1])
 
     return loaded_data
 
 
-def electricity_milling(screensize=3.2, feedstock_type=settings.user_inputs.feedstock_category, show_warnings=True):
+def electricity_milling(screensize=3.2, feedstock_type=settings.user_inputs.feedstock.category, show_warnings=True):
     """
     Calculates the electricity requirements for milling 1 tonne of feedstock.
-    Analysis and data: analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption_v1.ipynb.
+    Analysis and data: analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption.ipynb.
 
     Parameters
     ----------
@@ -250,7 +268,7 @@ def electricity_milling(screensize=3.2, feedstock_type=settings.user_inputs.feed
 def electricity_pelleting(particle_size=None, show_warnings=True):
     """
     Calculates the electricity requirements for pelleting 1 tonne of feedstock.
-    Analysis and data: analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption_v1.ipynb.
+    Analysis and data: analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption.ipynb.
 
     Parameters
     ----------
@@ -268,9 +286,9 @@ def electricity_pelleting(particle_size=None, show_warnings=True):
     # Get defaults
     if particle_size is None:
         try:
-            particle_size = settings.user_inputs["particle size after milling"]
+            particle_size = settings.user_inputs.feedstock.particle_size_post_milling
         except:
-            particle_size = settings.user_inputs["particle size"]
+            particle_size = settings.user_inputs.feedstock.particle_size_ar
 
     # Run checks
     if particle_size > 31 and show_warnings:

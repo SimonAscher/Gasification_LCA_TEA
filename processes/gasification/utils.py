@@ -4,20 +4,20 @@ import pandas as pd
 import numpy as np
 
 from config import settings
-from functions.general.utility import ultimate_comp_daf_to_wb
+from functions.general.utility import ultimate_comp_daf_to_wb, get_project_root
 from functions.general import calculate_LHV_HHV_feedstock
 from functions.general.utility import MJ_to_kWh
 from processes.CHP import CombinedHeatPower
 from functions.MonteCarloSimulation import get_distribution_draws
 
 
-def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"],
-                                         H=settings.user_inputs["hydrogen content"],
-                                         N=settings.user_inputs["nitrogen content"],
-                                         S=settings.user_inputs["sulphur content"],
-                                         O=settings.user_inputs["oxygen content"],
-                                         moisture=settings.user_inputs["desired moisture"],
-                                         ash=settings.user_inputs["ash content"]):
+def oxygen_for_stoichiometric_combustion(C=settings.user_inputs.feedstock.carbon,
+                                         H=settings.user_inputs.feedstock.hydrogen,
+                                         N=settings.user_inputs.feedstock.nitrogen,
+                                         S=settings.user_inputs.feedstock.sulphur,
+                                         O=settings.user_inputs.feedstock.oxygen,
+                                         moisture=None,
+                                         ash=settings.user_inputs.feedstock.ash):
     """
     Calculates the oxygen required for the complete combustion of a given feedstock.
     By default, takes feedstock data given by user.
@@ -27,6 +27,13 @@ def oxygen_for_stoichiometric_combustion(C=settings.user_inputs["carbon content"
     float
         Required oxygen for stoichiometric combustion [kg oxygen / kg of feedstock wb]
     """
+    # Get defaults
+    if moisture is None:
+        try:
+            moisture = settings.user_inputs.feedstock.moisture_post_drying
+        except:
+            moisture = settings.user_inputs.feedstock.moisture_ar
+
     # Get ultimate composition as wet basis
     ultimate_comp_wb = ultimate_comp_daf_to_wb(C, H, N, S, O, moisture, ash)
 
@@ -60,9 +67,9 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
     """
     # Get defaults
     if agent_type is None:
-        agent_type = settings.user_inputs["gasifying agent"]
+        agent_type = settings.user_inputs.process_conditions.gasifying_agent
     if ER is None:
-        ER = settings.user_inputs["ER"]
+        ER = settings.user_inputs.process_conditions.ER
 
     # Get oxygen requirement for stoichiometric combustion in kg oxygen per kg wb feedstock
     max_oxygen = oxygen_for_stoichiometric_combustion()
@@ -121,8 +128,7 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
     return mass_agent_output
 
 
-def load_gasification_aux_electricity_demands_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
-                                                                  r"\gasification_aux_demands_results"):
+def load_gasification_aux_electricity_demands_data(full_file_path=None):
     """
     Load pickled data done in analysis on gasification and gas cleaning auxiliary electricity demands.
     Analysis done in: analysis/preliminary/gas_cleaning_and_aux_demands/gas_cleaning_and_aux_demands.ipynb.
@@ -137,15 +143,17 @@ def load_gasification_aux_electricity_demands_data(full_file_path=r"C:\Users\227
     dict
         Loaded data on requirements for gas cleaning and auxiliary gasification demands.
     """
+    if full_file_path is None:
+        project_root = get_project_root()
+        full_file_path = str(project_root) + r"\data\gasification_aux_demands_results"
+
     # Load pickled data
     loaded_data = pickle.load(open(full_file_path, "rb"))
-    # TODO: Change call to file path to dynamic call (could try something like sys.path[-1])
 
     return loaded_data
 
 
-def load_gasification_aux_heat_demands_data(full_file_path=r"C:\Users\2270577A\PycharmProjects\PhD_LCA_TEA\data"
-                                                           r"\gasification_aux_heat_demands_results"):
+def load_gasification_aux_heat_demands_data(full_file_path=None):
     """
     Load pickled data done in analysis on gasification and gas cleaning auxiliary heat demands.
     Analysis done in: analysis/preliminary/gas_cleaning_and_aux_demands/heat_requirements.ipynb.
@@ -160,17 +168,20 @@ def load_gasification_aux_heat_demands_data(full_file_path=r"C:\Users\2270577A\P
     dict
         Loaded data on requirements for gas cleaning and auxiliary gasification demands.
     """
+    if full_file_path is None:
+        project_root = get_project_root()
+        full_file_path = str(project_root) + r"\data\gasification_aux_heat_demands_results"
+
     # Load pickled data
     loaded_data = pickle.load(open(full_file_path, "rb"))
-    # TODO: Change call to file path to dynamic call (could try something like sys.path[-1])
 
     return loaded_data
 
 
-def demands_ele_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
-                                 H=settings.user_inputs["hydrogen content"],
-                                 S=settings.user_inputs["sulphur content"],
-                                 moisture=settings.user_inputs["desired moisture"]):
+def demands_ele_aux_gas_cleaning(C=settings.user_inputs.feedstock.carbon,
+                                 H=settings.user_inputs.feedstock.hydrogen,
+                                 S=settings.user_inputs.feedstock.sulphur,
+                                 moisture=None):
     """
     Calculates electricity requirements for auxiliary gasification operations and syngas cleaning.
 
@@ -190,6 +201,12 @@ def demands_ele_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
     float
         Electricity requirement for auxiliary gasification demands and gas cleaning.
     """
+    # Get defaults
+    if moisture is None:
+        try:
+            moisture = settings.user_inputs.feedstock.moisture_post_drying
+        except:
+            moisture = settings.user_inputs.feedstock.moisture_ar
 
     # Get feedstock LHV
     # Get data in right format
@@ -219,7 +236,8 @@ def demands_ele_aux_gas_cleaning(C=settings.user_inputs["carbon content"],
     return aux_energy
 
 
-def demands_heat_auxiliary_gasification(CHP_results_object=None, MC_iterations=settings.background.iterations_MC):
+def demands_heat_auxiliary_gasification(CHP_results_object=None,
+                                        MC_iterations=settings.user_inputs.general.MC_iterations):
 
     if CHP_results_object is None:
         CHP_results_object = CombinedHeatPower()

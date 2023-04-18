@@ -2,7 +2,7 @@ from config import settings
 from functions.general.utility import kJ_to_kWh, MJ_to_kWh
 
 
-def thermal_energy_GWP(amount, source=None, units="kWh", country=settings.user_inputs.country, displaced=False):
+def thermal_energy_GWP(amount, source=None, units="kWh", country=None, displaced=False):
     """
     Function which calculates the GWP of thermal energy use.
 
@@ -27,9 +27,12 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=settings.user_i
     if source is None:
         source = "natural gas"
 
+    if country is None:
+        country = settings.user_inputs.general.country
+
     # Get country specific carbon intensity of thermal energy
     if source == "natural gas":
-        carbon_intensity_natural_gas = settings.data.CO2_equivalents.thermal_energy.natural_gas[settings.user_inputs.country]
+        carbon_intensity_natural_gas = settings.data.CO2_equivalents.thermal_energy.natural_gas[country]
     else:
         raise TypeError("Heat source not supported.")
 
@@ -53,7 +56,7 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=settings.user_i
     return GWP
 
 
-def electricity_GWP(amount, source=None, units="kWh", country=settings.user_inputs["country"], displaced=False):
+def electricity_GWP(amount, source=None, units="kWh", country=None, displaced=False):
     """
     Function to determine the GWP of using (or avoiding) a certain amount of grid electricity.
 
@@ -78,6 +81,9 @@ def electricity_GWP(amount, source=None, units="kWh", country=settings.user_inpu
     # Get defaults
     if source is None:
         source = "grid"
+
+    if country is None:
+        country = settings.user_inputs.general.country
 
     # Convert units if not kWh
     if units == "kWh":

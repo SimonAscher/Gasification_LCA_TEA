@@ -5,12 +5,12 @@ from dynaconf import Dynaconf
 settings = Dynaconf(
     settings_files=[  # Paths to toml files
         "configs/default_settings.toml",  # a file for default settings
-        "configs/user_inputs_default.toml",  # default user inputs
-        # "configs/user_inputs.toml",  # overwrite default user inputs
-        "configs/.secrets.toml"  # a file for sensitive data (gitignored)
+        "configs/user_inputs_defaults.toml",  # default user inputs
+        "configs/user_inputs/user_inputs_Gai_IntJHydrog_2012_37.toml",  # user inputs (overwrites defaults)
+        "configs/secrets.toml"  # a file for sensitive data (gitignored)
     ],
-
     environments=True,  # Enable layered environments
+    merge_enabled=True  # Allows for default inputs to be overwritten
 )
 
 # %% Set up validators and defaults

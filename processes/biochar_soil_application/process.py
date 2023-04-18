@@ -2,9 +2,9 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from configs import triangular_dist_maker, gaussian_dist_maker
-from configs.process_objects import Process
-from configs.requirement_objects import Requirements, BiogenicGWP, FossilGWP
+from objects import triangular_dist_maker, gaussian_dist_maker
+from objects import Process
+from objects import Requirements, BiogenicGWP, FossilGWP
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.MonteCarloSimulation import to_fixed_MC_array, get_distribution_draws
 from processes.biochar_soil_application.utils import load_biochar_properties_data
@@ -43,8 +43,8 @@ class BiocharSoilApplication(Process):
         biochar_yield = (np.array(biochar_yield_predictions) / 1000) * settings.general.FU  # [kg/FU]
 
         # Extract user data on feedstock type and name
-        feedstock_name = settings.user_inputs.feedstock_name.lower()
-        feedstock_type = settings.user_inputs.feedstock_category.lower()
+        feedstock_name = settings.user_inputs.feedstock.name.lower()
+        feedstock_type = settings.user_inputs.feedstock.category.lower()
         feedstock_description = feedstock_type + " " + feedstock_name
 
         # Initialise variables used to fetch correct carbon fraction in biochar
@@ -97,7 +97,7 @@ class BiocharSoilApplication(Process):
             if carbon_fraction_else_case:
                 carbon_fraction_array = np.random.default_rng().uniform(low=carbon_fraction_min,
                                                                         high=carbon_fraction_max,
-                                                                        size=settings.background.iterations_MC)
+                                                                        size=settings.user_inputs.general.MC_iterations)
             else:
                 carbon_fraction_array = get_distribution_draws(
                     gaussian_dist_maker(mean=carbon_fraction_mean, std=carbon_fraction_std))
@@ -128,7 +128,7 @@ class BiocharSoilApplication(Process):
 
         # Get background data on biogenic nature of feedstock
         try:
-            biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock_category]
+            biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock.category]
         except:  # BoxKeyError
             biogenic_fraction = 1
             raise Warning("No default biogenic fraction available for this feedstock type - 100% biogenic assumed.")
@@ -147,19 +147,23 @@ class BiocharSoilApplication(Process):
         if biogenic_fraction > 0:
             biochar_requirements.add_requirement(
                 BiogenicGWP(values=list(labile_biogenic_CO2),
-                            name="Emissions due to labile biogenic fraction of biochar"))
+                            name="Emissions due to labile biogenic fraction of biochar",
+                            short_label="Labile biogenic C"))
             biochar_requirements.add_requirement(
                 BiogenicGWP(values=list(recalcitrant_biogenic_CO2),
                             name="Avoided emissions due to recalcitrant biogenic fraction of biochar",
-                            negative_emissions=True))
+                            negative_emissions=True,
+                            short_label="Recalc. biogenic C"))
         if biogenic_fraction < 1:
             biochar_requirements.add_requirement(
                 FossilGWP(values=list(labile_fossil_CO2),
-                          name="Emissions due to labile non-biogenic fraction of biochar"))
+                          name="Emissions due to labile non-biogenic fraction of biochar",
+                          short_label="Labile fossil C"))
             biochar_requirements.add_requirement(
                 FossilGWP(values=list(recalcitrant_fossil_CO2),
                           name="Avoided emissions due to recalcitrant non-biogenic fraction of biochar",
-                          negative_emissions=True))
+                          negative_emissions=True,
+                          short_label="Recalc. fossil C"))
 
 
         # Add requirements to object

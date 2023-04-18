@@ -1,9 +1,7 @@
 from config import settings
 
 
-def get_present_value(value, value_type,
-                      interest_rate=settings.data.economic.interest_rate.year_2023[settings.user_inputs.currency],
-                      discount_period=settings.data.economic.system_lifecycle):
+def get_present_value(value, value_type, interest_rate=None, discount_period=None):
     """
     Convert future value or annual value to present value.
 
@@ -23,6 +21,11 @@ def get_present_value(value, value_type,
     float
         Present value of imputed cost or benefit object
     """
+    if interest_rate is None:
+        interest_rate = settings.data.economic.interest_rate.year_2023[settings.user_inputs.general.currency]
+    if discount_period is None:
+        discount_period = settings.data.economic.system_lifecycle
+
     pv = []
     if value_type == "FV":
         pv = value * (1 / (1 + interest_rate)) ** discount_period

@@ -1,10 +1,11 @@
 import toml
 
-from configs import fixed_dist_maker, range_dist_maker, triangular_dist_maker, gaussian_dist_maker
+from functions.general.utility.path_handling import get_project_root
+from objects import fixed_dist_maker, range_dist_maker, triangular_dist_maker, gaussian_dist_maker
 
-def update_user_inputs_toml(variable_name, variable_value,
-                            absolute_raw_filepath=r"C:\Users\2270577A\PycharmProjects"
-                                                  r"\PhD_LCA_TEA\configs\user_inputs.toml"):
+# NOTE: THESE FUNCTIONS ARE CURRENTLY NOT USED - default paths to files are incorrect too
+
+def update_user_inputs_toml(variable_name, variable_value, relative_filepath=None):
     """
     Function to add a user input to toml file.
 
@@ -14,42 +15,47 @@ def update_user_inputs_toml(variable_name, variable_value,
         Gives the name of the variable which is to be created.
     variable_value:
         Gives the value for the newly created variable.
-    absolute_raw_filepath
-        Absolute raw (i.e. string preceded by r) file path to user inputs toml file.
+    relative_filepath
+        Relative raw (i.e. string preceded by r) file path to user inputs toml file.
     """
+    root_path = get_project_root()
+    if relative_filepath is None:
+        relative_filepath = str(root_path) + r"configs\user_inputs.toml"
+    else:
+        relative_filepath = str(root_path) + relative_filepath
 
     # Load toml
-    data = toml.load(absolute_raw_filepath)
+    data = toml.load(relative_filepath)
 
     # Update value
     data["default"]["user_inputs"][variable_name] = variable_value
 
     # Update toml
-    f = open(absolute_raw_filepath, 'w')
+    f = open(relative_filepath, 'w')
     toml.dump(data, f)
     f.close()
 
-    #TODO: Optional - could extend this to work for any toml file and for any structure
-    # let function select how deep the to be updated variable is
-    # i.e. ["general"]["user_inputs"]["variable_to_be_updated"] (or however many brackets are required)
 
-
-def reset_user_inputs_toml(absolute_raw_filepath=r"C:\Users\2270577A\PycharmProjects"
-                                                 r"\PhD_LCA_TEA\configs\user_inputs.toml"):
+def reset_user_inputs_toml(relative_filepath=None):
     """
     Function to reset toml file and clear all variables.
 
     Parameters
     ----------
-    absolute_raw_filepath
-        Absolute raw (i.e. string preceded by r) file path to user inputs toml file.
+    relative_filepath
+        Relative raw (i.e. string preceded by r) file path to user inputs toml file.
     """
+    root_path = get_project_root()
+    if relative_filepath is None:
+        relative_filepath = str(root_path) + r"configs\user_inputs.toml"
+    else:
+        relative_filepath = str(root_path) + relative_filepath
 
     # Create dictionary to initialise file
     default_data = {'default': {'user_inputs': {}}}
 
     # Update file
-    f = open(absolute_raw_filepath, 'w')
+    f = open(relative_filepath, 'w')
     toml.dump(default_data, f)
     f.close()
 
