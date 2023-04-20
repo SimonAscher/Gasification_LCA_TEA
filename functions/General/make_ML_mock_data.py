@@ -6,6 +6,7 @@ import pandas as pd
 from config import settings
 from functions.general.utility import get_project_root
 
+
 # Define helper functions
 def load_source_data(data_source=None):
     if data_source is None:

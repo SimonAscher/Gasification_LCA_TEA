@@ -1,7 +1,8 @@
 import pickle
 import warnings
-import random
+
 import numpy as np
+
 from config import settings
 from functions.general.utility import kJ_to_kWh, get_project_root
 

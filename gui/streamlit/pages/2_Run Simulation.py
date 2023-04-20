@@ -14,6 +14,3 @@ pretreatment_options = ["Drying", "Milling", "Pelleting", "Bale shredding"]
 pretreatment_options = st.multiselect(label="Pretreatment options", options=pretreatment_options,
                                       help="Please define which pretreatment options are to be used before the "
                                            "feedstock is used for gasification.")
-
-
-

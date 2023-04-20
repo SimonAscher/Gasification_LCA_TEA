@@ -4,26 +4,21 @@ import streamlit as st
 
 from human_id import generate_id
 
-# from config import settings
-# TODO: Integrate with dynaconf and my other personal libraries of the project. Think I would have to turn my own work
-#  into a package first.
-# country_options = settings.general.countries
-# currency_options = settings.data.economic.currencies
+from config import settings
 
 # Data
-country_options = ["UK", "USA", "Germany"]
-currency_options = ["GBP", "USD", "EUR"]
-feedstock_categories_options = ["plastics", "municipal solid waste", "herbaceous biomass", "woody biomass",
-                                "sewage sludge", "other"]
-milling_screen_sizes_mm = [3.20, 4.76, 6.50]
-distribution_options = ["fixed", "range", "triangular", "gaussian"]
-economic_inputs_options = ["default", "user selected", "predefined scenario"]
-numeric_default_option = ["default", "user selected"]
-pretreatment_options = ["Drying", "Milling", "Pelleting", "Bale shredding"]
-carbon_capture_options = ["Vacuum pressure swing adsorption (VPSA) post combustion capture (default)",
-                          "Amine-based post combustion capture"]
-CHP_options = ["Jenbacher Type 6 gas engine (1600 kW) (default)", "Solid oxide fuel cell (SOFC) (1.7 kW)",
-               "Stirling engine (1.2 kW)", "Micro gas turbine (30kW)", "User defined"]
+country_options = settings.general.countries
+currency_options = settings.data.economic.currencies
+feedstock_categories_options = settings.general.feedstock_categories
+milling_screen_sizes_mm = settings.data.milling.screen_sizes
+dryer_type_options = settings.streamlit.dryer_type_options
+distribution_options = settings.background.distribution_options
+economic_inputs_options = settings.streamlit.economic_inputs_options
+numeric_inputs_options = settings.streamlit.numeric_inputs_options
+pretreatment_options = settings.streamlit.pretreatment_options
+carbon_capture_options = settings.streamlit.carbon_capture_options
+CHP_options = settings.streamlit.CHP_options
+
 # Start of streamlit app
 st.title('Simulation Inputs')
 
@@ -78,6 +73,10 @@ feedstock_moisture_post_drying = None
 if drying_included:
     feedstock_moisture_post_drying = st.number_input(label="Desired feedstock moisture post drying [%wb]",
                                                      min_value=0.0, max_value=100.0)
+    drying_additional_options = st.checkbox(label="Display additional drying options", value=False)
+    if drying_additional_options:
+        dryer_type = st.selectbox(label="Dryer type", options=dryer_type_options, index=0,
+                                  help="Select which type of dryer is to be used.")
     st.markdown("""---""")
 feedstock_ash = st.number_input(label="Ash content [%db]", min_value=0.0, max_value=100.0)
 
@@ -218,20 +217,20 @@ biochar_carbon_fraction = None
 biochar_stability = None
 
 if biochar_included:
-    biochar_yield_option = st.radio(label="Biochar yield", options=numeric_default_option)
+    biochar_yield_option = st.radio(label="Biochar yield", options=numeric_inputs_options)
     if biochar_yield_option == "default":
         biochar_yield = None
     else:
         biochar_yield = st.number_input(label="Biochar yield [g/kg wb]")
 
-    biochar_carbon_fraction_option = st.radio(label="Biochar carbon fraction", options=numeric_default_option)
+    biochar_carbon_fraction_option = st.radio(label="Biochar carbon fraction", options=numeric_inputs_options)
     if biochar_carbon_fraction_option == "default":
         biochar_carbon_fraction = None
     else:
         biochar_carbon_fraction = st.number_input(label="Biochar carbon fraction as a decimal")
 
     biochar_stability_option = st.radio(label="Recalcitrant fraction of carbon in biochar",
-                                        options=numeric_default_option)
+                                        options=numeric_inputs_options)
     if biochar_stability_option == "default":
         biochar_stability = None
     else:
@@ -327,7 +326,8 @@ def user_data_to_toml():
                                 "screen_size_mm": milling_screen_size_mm
                                 },
                     "drying": {"included": drying_included,
-                               "moisture_post_drying": feedstock_moisture_post_drying
+                               "moisture_post_drying": feedstock_moisture_post_drying,
+                               "dryer_type": dryer_type
                                },
                     "pelleting": {"included": pelleting_included},
                     "bale_shredding": {"included": bale_shredding_included},
@@ -357,4 +357,3 @@ if st.button(label='Compile Data'):
     toml_data = toml.dumps(data).encode('utf-8')
     # Create a download button that allows the user to download the TOML file
     st.download_button(label='Download Data', data=toml_data, file_name=file_name)
-

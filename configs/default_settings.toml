@@ -7,6 +7,9 @@ random_seed = 42
 # Number of Monte Carlo iterations to be used by the model
 iterations_MC = 1000
 
+# Options for distribution types used in Monte Carlo simulation
+distribution_options = ["fixed", "range", "triangular", "gaussian"]
+
 # Default value how biogenic carbon is to be treated: 0 - completely biogenic (i.e. no net GWP); 1 - equivalent to fossil fuels
 biogenic_carbon_equivalency = 0.0
 # this can be changed later to different approaches ideally - i.e. normal 100 time horizon and biogenic carbon assumed as zero
@@ -141,6 +144,9 @@ room_temperature = 18  # in deg C
 "GaBi (mean)" = 0.0037  # [kWh/kg of biomass input]
 "Huber Belt dryer" = 0.0375  # [kWh/kg of water evaporation]
 
+
+[default.data.milling]
+screen_sizes = [3.20, 4.76, 6.50]  # mm
 
 [default.data.specific_heats]
 # Specific heat capacity of water
@@ -283,3 +289,14 @@ distribution_type = "triangular"
 2022 = "unavailable"
 source = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.191", "10.1016/j.biortech.2020.123076"]
 # TODO add values for 2021 and 2022
+
+
+[default.streamlit]
+economic_inputs_options = ["default", "user selected", "predefined scenario"]  # radio buttons for economic inputs
+numeric_inputs_options = ["default", "user selected"]  # radio buttons for numeric inputs
+pretreatment_options = ["Drying", "Milling", "Pelleting", "Bale shredding"]
+carbon_capture_options = ["Vacuum pressure swing adsorption (VPSA) post combustion capture (default)",
+                          "Amine-based post combustion capture"]
+CHP_options = ["Jenbacher Type 6 gas engine (1600 kW) (default)", "Solid oxide fuel cell (SOFC) (1.7 kW)",
+               "Stirling engine (1.2 kW)", "Micro gas turbine (30kW)", "User defined"]
+dryer_type_options = ["Direct fired dryer", "Indirect-heated convection dryer", "Contact dryer", "Microwave drying"]
