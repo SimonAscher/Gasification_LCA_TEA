@@ -11,7 +11,7 @@ root_path = str(Path(__file__).parent.parent.parent)
 sys.path.append(root_path)
 # Note: Have all module imports after this
 
-#%% Main Program
+#%% Main Program - TESTS
 from processes.syngas_combustion import SyngasCombustion
 
 st.title('General Biomass and Waste Gasification LCA and TEA')

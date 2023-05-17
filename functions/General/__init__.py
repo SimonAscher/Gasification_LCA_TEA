@@ -3,3 +3,4 @@ from .gasification_parameter_estimation import calculate_syngas_LHV, calculate_c
     calculate_carbon_conversion_efficiency
 from .feedstock_parameter_estimation import calculate_LHV_HHV_feedstock
 from .error_measures import MAPE
+from .system_size_conversion import convert_system_size

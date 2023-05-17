@@ -5,6 +5,7 @@ from objects import fixed_dist_maker, range_dist_maker, triangular_dist_maker, g
 
 # NOTE: THESE FUNCTIONS ARE CURRENTLY NOT USED - default paths to files are incorrect too
 
+
 def update_user_inputs_toml(variable_name, variable_value, relative_filepath=None):
     """
     Function to add a user input to toml file.
