@@ -52,3 +52,4 @@ included = true
 method = "VPSA post combustion"
 
 [default.user_inputs.processes.CHP]
+type = "Jenbacher Type 6 gas engine (1600 kW) (default)"

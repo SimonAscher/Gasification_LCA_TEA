@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from config import settings
+from dynaconf.utils.boxing import DynaBox
 from dataclasses import dataclass, InitVar
 from typing import Type
 from objects.requirement_objects import _Requirement, Requirements
@@ -112,30 +113,38 @@ class CostBenefit:
                 self.values = list(np.array(self.values) * -1)
         # TODO: Finish this function.
 
+
 # Dataclass to store process requirements
 @dataclass
 class Process:
     """
-    Process instance. Contains all process requirements and information.
+    Contains all process requirements and information.
 
     Attributes
     ----------
-    name : str
+    name: str
         The name of the process.
-    short_label : str
+    short_label: str
         A shorthand notation of the process - used for plotting etc.
-    information : str
+    information: str
         Additional information can be added here.
-    subprocesses : tuple[Type["Process"]]
+    subprocesses: tuple[Type["Process"]]
         Subprocesses of the process.
     requirements: tuple[Requirements]
         Requirements of this process
+    plot_style: str | DynaBox
+        Style to be used for plotting - str loads predefined style from settings (e.g. "digital" or "poster").
+        Alternatively DynaBox object can be given directly.
     instantiate_with_default_reqs: bool
         Determines whether the process should fetch its default requirements and calculate its GWP and TEA results from
         that.
+
     Methods
     -------
     add_subprocess(subprocess)
+
+    TODO: Update Docstring.
+
     """
 
     # General parameters
@@ -144,6 +153,7 @@ class Process:
     information: str = None
     subprocesses: tuple[Type["Process"]] = ()  # Wrap name in string to forward declare
     requirements: tuple[Requirements] = ()
+    plot_style: str | DynaBox = "digital"  # default style for plots
 
     # InitVars
     instantiate_with_default_reqs: bool = True
@@ -162,6 +172,9 @@ class Process:
             self.instantiate_default_requirements()
             self.calculate_GWP()
             self.calculate_TEA()
+
+        if type(self.plot_style) != DynaBox:
+            self.plot_style = settings.plotting[self.plot_style]  # update plot style
 
     def add_subprocess(self, subprocess, update_results=True):
         """
@@ -286,6 +299,25 @@ class Process:
     def calculate_TEA(self, consider_nested=True):
         pass
 
+    def update_plot_style(self, style=None, style_box=None):
+        """
+        Updates the plot style to be used - which effects figure size, font size, dpi, etc.
+        Use either style or style_box.
+        Parameters
+        ----------
+        style: str
+            Style identifier corresponding to style defined in settings.plotting.
+        style_box: DynaBox
+            User defined box with relevant plotting parameters.
+        """
+        if style is not None:
+            self.plot_style = settings.plotting[style]
+        elif style_box is not None:
+            self.plot_style = style_box
+        else:
+            raise ValueError("Either use default style via 'style' parameter or supply style_box. Do not use both.")
+
+
     def plot_GWP(self, bins=40, stacked=True, show_total=True, short_labels=False):
         """
         Plot histogram of the process' and its subprocess' GWP.
@@ -332,7 +364,7 @@ class Process:
 
         # Plot
         sns.set_theme()
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
         if not short_labels:
             ax.hist(subprocess_GWPs, bins=bins, histtype='bar', stacked=stacked, alpha=1, label=subprocess_names)
         else:
@@ -342,13 +374,14 @@ class Process:
         # Plot total whilst excluding zeros or very low values for plotting
         if show_total:
             ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold], label="Total",
-                       marker="x", color="black", alpha=0.8)
+                       marker="x", s=self.plot_style.marker_size, color="black", alpha=0.8)
 
         # Set legend, title, and labels
-        ax.legend()
-        ax.set_title(self.name)
-        ax.set_xlabel(settings.labels.LCA_output_plotting_string)
-        ax.set_ylabel("Monte Carlo Iterations")
+        ax.legend(fontsize=self.plot_style.legend_fontsize_small)
+        ax.set_title(self.name, fontsize=self.plot_style.title_fontsize)
+        ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string, fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.labels_fontsize)
 
         # Display plot
         plt.tight_layout()

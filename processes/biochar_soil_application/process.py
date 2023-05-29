@@ -148,22 +148,22 @@ class BiocharSoilApplication(Process):
             biochar_requirements.add_requirement(
                 BiogenicGWP(values=list(labile_biogenic_CO2),
                             name="Emissions due to labile biogenic fraction of biochar",
-                            short_label="Labile biogenic C"))
+                            short_label="Labile $C_{b}$"))
             biochar_requirements.add_requirement(
                 BiogenicGWP(values=list(recalcitrant_biogenic_CO2),
                             name="Avoided emissions due to recalcitrant biogenic fraction of biochar",
                             negative_emissions=True,
-                            short_label="Recalc. biogenic C"))
+                            short_label="Recalc. $C_{b}$"))
         if biogenic_fraction < 1:
             biochar_requirements.add_requirement(
                 FossilGWP(values=list(labile_fossil_CO2),
                           name="Emissions due to labile non-biogenic fraction of biochar",
-                          short_label="Labile fossil C"))
+                          short_label="Labile $C_{f}$"))
             biochar_requirements.add_requirement(
                 FossilGWP(values=list(recalcitrant_fossil_CO2),
                           name="Avoided emissions due to recalcitrant non-biogenic fraction of biochar",
                           negative_emissions=True,
-                          short_label="Recalc. fossil C"))
+                          short_label="Recalc. $C_{f}$"))
 
 
         # Add requirements to object

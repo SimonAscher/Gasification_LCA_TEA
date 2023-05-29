@@ -11,7 +11,7 @@ settings = Dynaconf(
     settings_files=[  # Paths to toml files
         str(root_path) + r"\configs\default_settings.toml",  # a file for default settings
         str(root_path) + r"\configs\user_inputs_defaults.toml",  # default user inputs
-        str(root_path) + r"\configs\user_inputs\user_inputs_Gai_IntJHydrog_2012_37.toml",  # user inputs (overwrites defaults)
+        str(root_path) + r"\configs\user_inputs\user_inputs_Song_BiomassBioenergy_2012_36.toml",  # user inputs (overwrites defaults)
         str(root_path) + r"\configs\secrets.toml"  # a file for sensitive data (gitignored)
     ],
     environments=True,  # Enable layered environments

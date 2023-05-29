@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from config import settings
 from processes.CHP import CombinedHeatPower
@@ -35,7 +36,7 @@ if settings.user_inputs.processes.drying.included or settings.user_inputs.proces
     processes = processes + (process_pretreatment,)
 
 # Gasification
-process_gasification = Gasification()
+process_gasification = Gasification(short_label="Gasif.")
 processes = processes + (process_gasification,)
 
 # CHP
@@ -55,27 +56,26 @@ if settings.user_inputs.processes.carbon_capture.included:
 
 # Biochar
 if settings.user_inputs.processes.biochar.included:
-    process_biochar = BiocharSoilApplication()
+    process_biochar = BiocharSoilApplication(short_label="Biochar.")
     processes = processes + (process_biochar,)
 
 # Plot individual processes
+process_CHP.update_plot_style(style="poster")
 process_CHP.plot_GWP()
 try:
+    process_pretreatment.update_plot_style(style="poster")
     process_pretreatment.plot_GWP()
 except:
     pass
 
 # Results object
-example_results = Results(processes=processes)
+example_results = Results(processes=processes, plot_style="poster")
 example_results.calculate_total_GWP()
 example_results.calculate_electricity_heat_output()
 
 # # Plot results
-# example_results.plot_global_GWP()
-# example_results.plot_average_GWP_byprocess()
-# example_results.plot_global_GWP_byprocess()
-example_results.plot_energy_generation()
-example_results.save_report(r"C:\Users\2270577A\OneDrive - University of Glasgow\Desktop\LCA_report")
+example_results.save_report(storage_path=r"C:\Users\2270577A\OneDrive - University of Glasgow\Desktop\LCA_report",
+                            save_figures=True)
 
 
 #%% Compare my results to Yi Fang's

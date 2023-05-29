@@ -43,6 +43,31 @@ output_units = ["[vol.% db]", '[vol.% db]', '[vol.% db]', '[vol.% db]', '[vol.% 
 LCA_output_plotting_string = "[$kgCO_{2 eq.}FU^{-1}$]"
 
 
+[default.plotting]
+
+[default.plotting.digital]
+fig_size = [6.4, 4.8]
+fig_dpi = 100
+title_fontsize = 18
+legend_fontsize_small = 12
+legend_fontsize_large = 14
+labels_fontsize = 14
+ticks_fontsize = 12
+marker_size = 50
+legend_location = "upper right"
+
+[default.plotting.poster]
+fig_size = [12, 8]
+fig_dpi = 100
+title_fontsize = 32
+legend_fontsize_small = 26
+legend_fontsize_large = 30
+labels_fontsize = 32
+ticks_fontsize = 26
+marker_size = 200
+legend_location = "upper right"
+
+
 [default.unit_conversions]
 mmBtu_to_MJ = 1055.06  # One million British thermal units to MJ
 

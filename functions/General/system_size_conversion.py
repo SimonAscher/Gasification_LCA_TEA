@@ -67,11 +67,12 @@ def convert_system_size(value, input_units, output_units, additional_outputs=Fal
         prediction = float(regressor.predict(np.array(value).reshape(-1, 1)))
 
     # Raise warnings if data far outside of size used for training
-    if input_units == "tonnes/hour" and value > (2 * feedstock_mass_data.max()):
+    boundary_threshold_multiplier = 1.5
+    if input_units == "tonnes/hour" and value > (boundary_threshold_multiplier * feedstock_mass_data.max()):
         warn("Input significantly outside range of training data.")
-    if input_units == "kWh/hour" and value > (2 * feedstock_energy_data.max()):
+    if input_units == "kWh/hour" and value > (boundary_threshold_multiplier * feedstock_energy_data.max()):
         warn("Input significantly outside range of training data.")
-    if input_units == "MWel" and value > (2 * power_data.max()):
+    if input_units == "MWel" and value > (boundary_threshold_multiplier * power_data.max()):
         warn("Input significantly outside range of training data.")
 
     if value < 0:

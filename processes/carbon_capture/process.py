@@ -93,9 +93,9 @@ class CarbonCapture(Process):
             # Add requirements to requirement object
             CCS_requirements.add_requirement(BiogenicGWP
                                              (values=captured_CO2_biogenic, name="Captured biogenic CO2",
-                                              short_label="CO2 biogenic", negative_emissions=True))
+                                              short_label="$CO_{2}$ biogenic", negative_emissions=True))
             CCS_requirements.add_requirement(FossilGWP(values=captured_CO2_fossil, name="Captured fossil CO2",
-                                                       short_label="CO2 fossil"))
+                                                       short_label="$CO_{2}$ fossil"))
             CCS_requirements.add_requirement(Electricity(values=electricity_req,
                                                          name="Electricity use for carbon capture"))
             CCS_requirements.add_requirement(Heat(values=heat_req, name="Heat use for carbon capture"))

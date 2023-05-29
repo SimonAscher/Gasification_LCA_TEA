@@ -1,11 +1,15 @@
 import datetime
 import math
+import os
+import pathlib
+import shutil
 
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from config import settings
+from dynaconf.utils.boxing import DynaBox
 from dataclasses import dataclass
 from typing import Type
 from human_id import generate_id
@@ -17,20 +21,61 @@ from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
 
 @dataclass
 class Results:
+    """
+    Combines a number of processes and calculates their life cycle assessment (LCA) and
+    techno-economic analysis (TEA) results.
+
+    Attributes
+    ----------
+    name: str
+        Name given to the results.
+    processes: tuple[Type[Process]]
+        Tuple of process objects making up the results.
+    information: str
+        Additional information can be added here.
+    plot_style: str | DynaBox
+        Style to be used for plotting - str loads predefined style from settings (e.g. "digital" or "poster").
+        Alternatively DynaBox object can be given directly.
+    GWP_total: list[float]
+        GWP Monte Carlo results - populated later.
+    GWP_mean: float
+        Average GWP - populated later.
+    electricity_results: dict
+        Electricity generation and use results - populated later.
+    heat_results: dict
+        Heat/thermal energy generation and use results - populated later.
+    ID: str
+        Unique identifier given to this set of results. Created when object is instantiated. Automatically added.
+    date_time: str
+        Date and time when results were instantiated. Automatically added.
+
+    Methods
+    -------
+    add_process(process):
+        Allows for the addition of a process after the results objects has been initialised.
+
+    calculate_total_GWP():
+        Calculates the overall global warming potential (GWP) of the system.
+
+    TODO: Add other methods and make sure they display properly.
+    """
     name: str = None
     processes: tuple[Type[Process]] = ()
     # TODO: Update type hint, so it properly shows children of _Requirement class.
     information: str = None
+    plot_style: str | DynaBox = "digital"  # default style for plots
 
     # Define defaults which are to be populated later
     GWP_total: list[float] = None
     GWP_mean: float = None
-    electricity_results = None
-    heat_results = None
+    electricity_results: dict = None
+    heat_results: dict = None
 
     def __post_init__(self):
         self.ID: str = generate_id()
         self.date_time: str = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        if type(self.plot_style) != DynaBox:
+            self.plot_style = settings.plotting[self.plot_style]  # update plot style
 
     def add_process(self, process):
         """
@@ -151,6 +196,24 @@ class Results:
 
         return electricity_output, heat_output
 
+    def update_plot_style(self, style=None, style_box=None):
+        """
+        Updates the plot style to be used - which effects figure size, font size, dpi, etc.
+        Use either style or style_box.
+        Parameters
+        ----------
+        style: str
+            Style identifier corresponding to style defined in settings.plotting.
+        style_box: DynaBox
+            User defined box with relevant plotting parameters.
+        """
+        if style is not None:
+            self.plot_style = settings.plotting[style]
+        elif style_box is not None:
+            self.plot_style = style_box
+        else:
+            raise ValueError("Either use default style via 'style' parameter or supply style_box. Do not use both.")
+
     def plot_energy_generation(self, plot_global=True, plot_electricity=True, plot_heat=True, bins_global=None,
                                bins_electricity=None, bins_heat=None, show_total=True):
         """
@@ -190,16 +253,16 @@ class Results:
                 bins_global = 10
 
             sns.set_theme()
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
             ax.hist(electricity_data["Total MC distribution"], bins_global, alpha=0.8)
             ax.hist(heat_data["Total MC distribution"], bins_global, alpha=0.8)
 
             # Set title and labels
-            ax.legend(["Electricity", "Heat"])
-            ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]")
-            ax.set_ylabel("Monte Carlo Iterations")
-
-            # Display plot
+            ax.legend(["Electricity", "Heat"], fontsize=self.plot_style.legend_fontsize_large,
+                      loc=self.plot_style.legend_location)
+            ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]", fontsize=self.plot_style.labels_fontsize)
+            ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+            ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
             plt.tight_layout()
             plt.show()
 
@@ -238,26 +301,29 @@ class Results:
 
             # Plot histograms and total
             sns.set_theme()  # Use seaborn style
-            fig, ax = plt.subplots()
-
+            fig_inner, ax_inner = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
             # Plot histograms
-            ax.hist(GWP_exc_total, bins=bin_vector, histtype='bar', stacked=True, label=process_names[0:-1])
+            ax_inner.hist(GWP_exc_total, bins=bin_vector, histtype='bar', stacked=True, label=process_names[0:-1])
 
             if display_total:  # Plot total whilst excluding zeros or very low values for plotting
-                ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
-                           label=process_names[-1],
-                           marker="x", color="black", alpha=0.8)
+                ax_inner.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
+                                 label=process_names[-1],
+                                 marker="x",
+                                 s=self.plot_style.marker_size,
+                                 color="black",
+                                 alpha=0.8)
 
             # Set legend and labels
-            ax.legend()
-            ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]")
-            ax.set_ylabel("Monte Carlo Iterations")
+            ax_inner.legend(fontsize=self.plot_style.legend_fontsize_small, loc=self.plot_style.legend_location)
+            ax_inner.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]", fontsize=self.plot_style.labels_fontsize)
+            ax_inner.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+            ax_inner.tick_params(labelsize=self.plot_style.ticks_fontsize)
 
             # Display plot
             plt.tight_layout()
             plt.show()
 
-            return fig, ax
+            return fig_inner, ax_inner
 
         # Employ helper function to plot electricity and heat
         if plot_electricity:
@@ -286,12 +352,13 @@ class Results:
 
         """
         sns.set_theme()
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
         ax.hist(self.GWP_total, bins=bins)
 
         # Set title and labels
-        ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string)
-        ax.set_ylabel("Monte Carlo Iterations")
+        ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string, fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
 
         # Display plot
         plt.tight_layout()
@@ -322,17 +389,22 @@ class Results:
         bar_width = 0.5
 
         # Get process names and shorthands for names
-        names = []
-        short_names = []
-        for process in self.processes:
-            names.append(process.name)
-            short_names.append(process.short_label)
-
-        x_array = names
+        if short_labels:
+            short_names = []
+            for process in self.processes:
+                short_names.append(process.short_label)
+            x_array = short_names
+        else:
+            names = []
+            for process in self.processes:
+                names.append(process.name)
+            x_array = names
         x_array.append("Total")  # Last element on axis
 
         # Initialise figure
-        fig, ax = plt.subplots()
+        # fig_size = (self.plot_style.fig_size[0], 0.8 * self.plot_style.fig_size[0])  # to allow for more labels space
+        fig_size = tuple(self.plot_style.fig_size)
+        fig, ax = plt.subplots(figsize=fig_size, dpi=self.plot_style.fig_dpi)
 
         # Plotting logic
         for process_count, process in enumerate(self.processes):
@@ -388,7 +460,7 @@ class Results:
                                  y=y_position,
                                  s=subprocess_label,
                                  color="black",
-                                 fontsize=12,
+                                 fontsize=self.plot_style.legend_fontsize_small,
                                  horizontalalignment='center'
                                  )
         # Add final bar showing total/overall GWP
@@ -397,12 +469,13 @@ class Results:
         ax.bar(x_array, y_array, bar_width, label="Total")
 
         # Set labels
-        ax.set_ylabel("GWP " + settings.labels.LCA_output_plotting_string)
-        plt.xticks(rotation=45)
+        ax.set_ylabel("GWP " + settings.labels.LCA_output_plotting_string, fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(axis="x", labelsize=self.plot_style.labels_fontsize, rotation=45)
+        ax.tick_params(axis="y", labelsize=self.plot_style.ticks_fontsize)
 
         # Display legend
         if legend_loc == "box":
-            ax.legend()
+            ax.legend(fontsize=self.plot_style.legend_fontsize_small)
 
         # Display plot
         plt.tight_layout()
@@ -461,7 +534,7 @@ class Results:
 
         # Plot histograms and total
         sns.set_theme()  # Use seaborn style
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
 
         # Plot histograms
         ax.hist(GWP_exc_total, bins=bin_vector, histtype='bar', stacked=True, label=process_names[0:-1])
@@ -469,12 +542,16 @@ class Results:
         if show_total:  # Plot total whilst excluding zeros or very low values for plotting
             ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
                        label=process_names[-1],
-                       marker="x", color="black", alpha=0.8)
+                       marker="x",
+                       s=self.plot_style.marker_size,
+                       color="black",
+                       alpha=0.8)
 
         # Set legend and labels
-        ax.legend()
-        ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string)
-        ax.set_ylabel("Monte Carlo Iterations")
+        ax.legend(fontsize=self.plot_style.legend_fontsize_small)
+        ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string, fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.labels_fontsize)
 
         # Display plot
         plt.tight_layout()
@@ -511,7 +588,7 @@ class Results:
         if show_energy_generation:
             self.plot_energy_generation()
 
-    def save_report(self, storage_path):
+    def save_report(self, storage_path, save_figures=False):
         """
         Saves all figure as a pdf report.
 
@@ -519,27 +596,47 @@ class Results:
         ----------
         storage_path: str
             Raw string indicating where the file should be stored.
+        save_figures: bool
+            If true also saves figures as separate files.
 
         Returns
         -------
 
         """
+        # Get figure objects
         fig1, ax1 = self.plot_global_GWP()
         fig2, ax2 = self.plot_global_GWP_byprocess()
         fig3, ax3 = self.plot_average_GWP_byprocess()
         fig_ax_4 = self.plot_energy_generation()
-
         # fig5, ax5 = self.plot_TEA()
 
-        filename = r"\report_" + self.ID + ".pdf"
-        full_path = storage_path + filename
-        file = PdfPages(full_path)
+        # Create results directory if it does not exist already
+        results_dir = os.path.join(storage_path, self.ID)
+        if not os.path.isdir(results_dir):  # Create directory if it does not exist already
+            os.makedirs(results_dir)
+        filename = "report_" + self.ID + ".pdf"
+        report_path = os.path.join(results_dir, filename)
+
+        # Save figures to pdf
+        file = PdfPages(report_path)
         file.savefig(fig1)
         file.savefig(fig2)
         file.savefig(fig3)
         file.savefig(fig_ax_4[0][0])
         file.savefig(fig_ax_4[1][0])
         file.savefig(fig_ax_4[2][0])
-
         # file.savefig(fig5)
         file.close()
+
+        # Save toml user input file with pdf report
+        user_inputs_path = settings.settings_module[2]
+        shutil.copy(user_inputs_path, os.path.join(results_dir, pathlib.PurePath(user_inputs_path).name))
+
+        # Save figure files to directory
+        if save_figures:
+            fig1.savefig(os.path.join(results_dir, "global_GWP.png"))
+            fig2.savefig(os.path.join(results_dir, "global_GWP_byprocess.png"))
+            fig3.savefig(os.path.join(results_dir, "average_GWP_byprocess.png"))
+            fig_ax_4[0][0].savefig(os.path.join(results_dir, "energy_global.png"))
+            fig_ax_4[1][0].savefig(os.path.join(results_dir, "energy_electricity.png"))
+            fig_ax_4[2][0].savefig(os.path.join(results_dir, "energy_heat.png"))

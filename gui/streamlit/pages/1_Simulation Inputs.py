@@ -262,9 +262,11 @@ if CHP_display_additional_inputs:
     CHP_parasitic_energy_demand = None
     CHP_size_kW = None
     if CHP_unit == "User defined":
-        CHP_electrical_efficiency = st.number_input(label="Electrical efficiency as a decimal")
-        CHP_thermal_efficiency = st.number_input(label="Thermal efficiency as a decimal")
-        CHP_parasitic_energy_demand = st.number_input(label="Parasitic energy demand as a decimal")
+        CHP_electrical_efficiency = st.number_input(label="Electrical efficiency as a decimal",
+                                                    min_value=0, max_value=1)
+        CHP_thermal_efficiency = st.number_input(label="Thermal efficiency as a decimal", min_value=0, max_value=1)
+        CHP_parasitic_energy_demand = st.number_input(label="Parasitic energy demand as a decimal",
+                                                      min_value=0, max_value=1)
         CHP_size_kW = st.number_input(label="CHP plant size [kW]")
 
     CHP_dict = {"type": CHP_unit,
