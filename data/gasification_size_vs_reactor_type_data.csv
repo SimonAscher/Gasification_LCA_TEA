@@ -1,0 +1,36 @@
+﻿Reactor Type,Scale [kW or descriptive],Scale [kW],Scale [descriptive],Reference,Note
+fluidised bed,pilot,,pilot,"Arena, Fuel 2014, 117, 528-536",from original ML data set
+fluidised bed,500,501,pilot,"Arena, Waste Management 2010, 30, 1212-1219",from original ML data set
+fluidised bed,pilot,,pilot,"Lahijani, Bioresource Technology 2011, 102, 2068-2076",from original ML data set
+fluidised bed,lab,,lab,"Lv, Bioresource Technology 2004, 95, 95-101",from original ML data set
+fluidised bed,lab,,lab,"de Andres, Fuel Processing Technology 2011, 92, 433-440",from original ML data set
+fluidised bed,100,101,pilot,"Kaewluan, Fuel Processing Technology 2011, 92, 671-677",from original ML data set
+fixed bed,lab,,lab,"Sarker, Energy Conversion and Management, 2015, 103, 801-813",from original ML data set
+fluidised bed,pilot,,pilot,"Sarker, Energy Conversion and Management, 2015, 91, 451-458",from original ML data set
+fluidised bed,127,128,pilot,"Mansaray, Biomass and Bioenergy 1999, 17, 315-332",from original ML data set
+fluidised bed,lab,,lab,"Loha, J Renew and Sust Energy 2013, 5, 043111",from original ML data set
+fluidised bed,lab,,lab,"Baratieri, Waste Biomass Valor 2010, 1, 283-291",from original ML data set
+fixed bed,lab,,lab,"Luo, Energy 2012, 44, 391-395",from original ML data set
+fluidised bed,pilot,,pilot,"Khan, Energy Convers. Manag. 2014, 87, 1224-1230",from original ML data set
+fixed bed,lab,,lab,"Wang, Int. J. Hydrog 2012, 37, 6503-6510",from original ML data set
+fluidised bed,20,20,lab,"Karatas, Fuel 2018, 214, 285-292",from original ML data set
+fluidised bed,800,800,pilot,"Huynh, Fuel 2013, 103, 987-996 ",from original ML data set
+other,lab,,lab,"Erkiaga, Chem. Eng. J. 2014, 237, 259-267",from original ML data set
+fixed bed,pilot,,pilot,"Yin, Bioresour. Technol. 2012, 119,15-21",from original ML data set
+fixed bed,lab,,lab,"Gai, Int. J. Hydrog 2012, 37, 4935-4944",from original ML data set
+fluidised bed,pilot,,pilot,"Ruoppolo, Waste Management 2012, 32, 724-732",from original ML data set
+fluidised bed,pilot,,pilot,"Narváez, Ind. Eng. Chem. Res. 1996, 35, 2110-2120",from original ML data set
+fluidised bed,lab,,lab,"Song, Biomass Bioenergy 2012, 36, 258-267",from original ML data set
+fixed bed,350,351,pilot,"Biagini, Bioresource Technology 2016, 201, 156-165",from original ML data set
+fluidised bed,lab,,lab,"Herguido, Ind. Eng. Chem. Res. 1992, 31, 1274-1282",from original ML data set
+fluidised bed,lab,,lab,"Fremaux, Energy Convers. Manag. 2015, 91, 427-432",from original ML data set
+fluidised bed,100,101,pilot,"Zhang, Fuel 2017, 188, 628-637",from original ML data set
+other,pilot,,pilot,"Iovane, BIOMASS BIOENERG 2013, 56, 423-431",from original ML data set
+fluidised bed,1672,1672,industrial,"Paranascu, Energy 2019, 189, 116095",calculated from energy/hour data by using empiral relationship identified as part of this research
+fluidised bed,322,322,pilot,"Skorek-Osikowska, Energy 2014, 67, 328-340",
+fluidised bed,1154,1154,industrial,"Skorek-Osikowska, Energy 2014, 67, 328-340",
+fluidised bed,400,400,pilot,"Arena, Fuel Processing Technology 2015, 131, 69-77",
+fluidised bed,500,500,pilot,"Di Gregorio, Energy 2012, 42, 331-341",
+fluidised bed,419,419,pilot,"Ghiat, Computers & Chemical Engineering, 135, 106758",
+fluidised bed,12380,12380,industrial,"Dinca, Energy 2018, 149, 925-936",
+fixed bed,80,80,lab,"Jayah, Biomass Bioenergy 2003, 459-469",
