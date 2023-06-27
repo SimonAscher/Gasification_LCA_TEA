@@ -96,6 +96,7 @@ CH4 = 16
 C2H4 = 28
 H = 1
 C = 12
+N = 14
 O = 16
 H2O = 18
 units = "g/mol"

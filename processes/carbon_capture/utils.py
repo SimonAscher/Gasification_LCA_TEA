@@ -68,11 +68,11 @@ def carbon_capture_amine_post_comb(units="kWh"):
     recovery_mean = 0.90  # as decimal on a flue gas basis
     recovery_std = recovery_mean * 0.1  # use an estimated std of 10%
 
-    total_consumption_mean = 3.36  # [MJ/kg CO2]
-    total_consumption_std = 0.32  # [MJ/kg CO2]
+    total_consumption_mean = 3.403  # [MJ/kg CO2]
+    total_consumption_std = 0.342  # [MJ/kg CO2]
     total_consumption = np.random.normal(total_consumption_mean, total_consumption_std)
 
-    electricity_fraction = np.random.normal(0.121, 0.037)
+    electricity_fraction = np.random.normal(0.138, 0.064)
     heat_fraction = 1-electricity_fraction
 
     # Calculate outputs

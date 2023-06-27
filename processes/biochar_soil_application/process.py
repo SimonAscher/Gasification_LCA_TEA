@@ -2,12 +2,13 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
+from functions.LCA import get_CO2_equ
 from objects import triangular_dist_maker, gaussian_dist_maker
 from objects import Process
 from objects import Requirements, BiogenicGWP, FossilGWP
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.MonteCarloSimulation import to_fixed_MC_array, get_distribution_draws
-from processes.biochar_soil_application.utils import load_biochar_properties_data
+from processes.biochar_soil_application.utils import load_biochar_properties_data, avoided_N2O_emissions
 
 
 @dataclass()
@@ -133,11 +134,15 @@ class BiocharSoilApplication(Process):
             biogenic_fraction = 1
             raise Warning("No default biogenic fraction available for this feedstock type - 100% biogenic assumed.")
 
-        # Calculate biogenic and fossil emissions
+        # Calculate biogenic and fossil emissions due to carbon in biochar
         recalcitrant_biogenic_CO2 = list(GWP_recalcitrant * biogenic_fraction)
         recalcitrant_fossil_CO2 = list(GWP_recalcitrant * (1-biogenic_fraction))
         labile_biogenic_CO2 = list(GWP_labile * biogenic_fraction)
         labile_fossil_CO2 = list(GWP_labile * (1 - biogenic_fraction))
+
+        # Calculate benefits due to reduced N2O emissions from soil due to biochar application
+        avoided_N20 = list(map(avoided_N2O_emissions, biochar_yield))  # N20/FU
+        avoided_N2O_GWP = [get_CO2_equ(N2O=i) for i in avoided_N20]  # kg CO2 eq./FU
 
         # Requirements related to biochar to soil application
 
@@ -165,6 +170,12 @@ class BiocharSoilApplication(Process):
                           negative_emissions=True,
                           short_label="Recalc. $C_{f}$"))
 
+        # Avoided emissions due to lowered N2O emissions from soil after biochar application
+        biochar_requirements.add_requirement(
+            BiogenicGWP(values=avoided_N2O_GWP,
+                        name="Avoided emissions due to lowered N2O emissions from soil",
+                        negative_emissions=True,
+                        short_label="Avoid. $N_{2}O$"))
 
         # Add requirements to object
         self.add_requirements(biochar_requirements)

@@ -58,6 +58,7 @@ if settings.user_inputs.processes.carbon_capture.included:
 if settings.user_inputs.processes.biochar.included:
     process_biochar = BiocharSoilApplication(short_label="Biochar.")
     processes = processes + (process_biochar,)
+    process_biochar.plot_GWP()
 
 # Plot individual processes
 process_CHP.update_plot_style(style="poster")
