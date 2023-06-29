@@ -9,6 +9,7 @@ from pathlib import Path
 # Add root directory
 root_path = str(Path(__file__).parent.parent.parent)
 sys.path.append(root_path)
+st.write(root_path)
 # Note: Have all module imports after this
 
 #%% Main Program - TESTS
@@ -18,4 +19,5 @@ st.title('General Biomass and Waste Gasification LCA and TEA')
 
 # Test streamlit
 a = SyngasCombustion()
+st.write("Test streamlit: SyngasCombustion sub-model example output")
 st.write(a.GWP_mean)

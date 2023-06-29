@@ -1,3 +1,12 @@
+import sys
+
+from pathlib import Path
+
+# Add root directory
+root_path = str(Path(__file__).parent.parent.parent.parent)
+sys.path.append(root_path)
+# Note: Have all module imports after this
+
 import toml
 
 import streamlit as st
@@ -56,7 +65,9 @@ if milling_included:
                                                "sizes of 16, 21, and 26 mm, respectively.")
     st.markdown("""---""")
 
-st.subheader("Feedstock ultimate composition")
+st.subheader("Feedstock ultimate composition",
+             help="Typical feedstock data may be obtained from the [Phyllis2 database](https://phyllis.nl).")
+st.markdown("")
 feedstock_C = st.number_input(label="Carbon content [%daf]", min_value=0.0, max_value=100.0)
 feedstock_H = st.number_input(label="Hydrogen content [%daf]", min_value=0.0, max_value=100.0)
 feedstock_N = st.number_input(label="Nitrogen content [%daf]", min_value=0.0, max_value=100.0)
@@ -66,7 +77,8 @@ feedstock_O = st.number_input(label="Oxygen content [%daf] (calculated by differ
                               min_value=0.0, max_value=100.0)
 if feedstock_O < 0:
     st.error("Feedstock oxygen is below zero. Check imputed elemental composition.")
-st.subheader("Feedstock proximate composition")
+st.subheader("Feedstock proximate composition",
+             help="Typical feedstock data may be obtained from the [Phyllis2 database](https://phyllis.nl).")
 feedstock_moisture_ar = st.number_input(label="Feedstock moisture [%wb] (as received)", min_value=0.0, max_value=100.0)
 drying_included = st.checkbox(label="Is feedstock drying included as a pretreatment step?", value=False)
 feedstock_moisture_post_drying = None

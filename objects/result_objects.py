@@ -629,7 +629,11 @@ class Results:
         file.close()
 
         # Save toml user input file with pdf report
-        user_inputs_path = settings.settings_module[2]
+        try:
+            user_inputs_path = settings.settings_module[6]  # save file selected by user
+        except:
+            user_inputs_path = settings.settings_module[2]  # save default scenarios file
+
         shutil.copy(user_inputs_path, os.path.join(results_dir, pathlib.PurePath(user_inputs_path).name))
 
         # Save figure files to directory

@@ -5,6 +5,7 @@ import numpy as np
 from config import settings
 from functions.general.utility import get_project_root
 
+
 def load_biochar_properties_data(full_file_path=None):
     """
     Load pickled data done in analysis on biochar properties (e.g. carbon fraction and carbon stability)
@@ -50,6 +51,7 @@ def avoided_N2O_emissions(biochar_yield):
     soil_emissions_1st_quartile = 1.18  # kg N ha^-1 yr^-1
     soil_emissions_3rd_quartile = 2.63  # kg N ha^-1 yr^-1
 
+    # Estimate distribution standard deviation from quartiles
     soil_emissions_std_1 = (soil_emissions_mean - soil_emissions_1st_quartile) / 0.675
     soil_emissions_std_2 = (-soil_emissions_mean + soil_emissions_3rd_quartile) / 0.675
     soil_emissions_std_avg = (soil_emissions_std_1 + soil_emissions_std_2) / 2
