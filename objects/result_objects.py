@@ -44,6 +44,9 @@ class Results:
         Electricity generation and use results - populated later.
     heat_results: dict
         Heat/thermal energy generation and use results - populated later.
+    figures: dict
+        Dictionary of figures illustrating environmental and economic results.
+
     ID: str
         Unique identifier given to this set of results. Created when object is instantiated. Automatically added.
     date_time: str
@@ -70,6 +73,7 @@ class Results:
     GWP_mean: float = None
     electricity_results: dict = None
     heat_results: dict = None
+    figures: dict = None
 
     def __post_init__(self):
         self.ID: str = generate_id()
@@ -214,128 +218,152 @@ class Results:
         else:
             raise ValueError("Either use default style via 'style' parameter or supply style_box. Do not use both.")
 
-    def plot_energy_generation(self, plot_global=True, plot_electricity=True, plot_heat=True, bins_global=None,
-                               bins_electricity=None, bins_heat=None, show_total=True):
+
+    def plot_energy_global(self, bins=10):
         """
-        Creates plots to illustrate the energy generation performance of the system.
+        Create plot to illustrate the global energy generation performance of the system.
 
         Parameters
         ----------
-        plot_global: bool
-            Plots overall energy generation (electricity and heat) of the system.
-        plot_electricity: bool
-            Plots electricity generation and consumption by inidividual subprocesses.
-        plot_heat: bool
-            Plots heat generation and consumption by inidividual subprocesses.
-        bins_global: int
-            Defines how many bins should be used for histograms in global plot.
-        bins_electricity: int
-            Defines how many bins should be used for histograms in electricity plot.
-        bins_heat: int
-            Defines how many bins should be used for histograms in heat plot.
-        show_total: bool
-            Determines whether total should be shown in the electricity and heat plots.
+        bins: int
+            Number of bins to be used for plot.
 
         Returns
         -------
-        list[list[matplotlib.pyplot.figure, matplotlib.pyplot.axes]]
-            List of the resulting matplotlib figure and axes objects.
+
         """
         # Get required data
-        electricity_data, heat_data = self.calculate_electricity_heat_output()
+        electricity_data, heat_data = self.electricity_results, self.heat_results
 
-        fig_and_ax = []  # to store created objects
+        sns.set_theme()
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
+        ax.hist(electricity_data["Total MC distribution"], bins, alpha=0.8)
+        ax.hist(heat_data["Total MC distribution"], bins, alpha=0.8)
 
-        # Plot global results
-        if plot_global:
-            # Get defaults
-            if bins_global is None:
-                bins_global = 10
+        # Set title and labels
+        ax.legend(["Electricity", "Heat"], fontsize=self.plot_style.legend_fontsize_large,
+                  loc=self.plot_style.legend_location)
+        ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]", fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
+        plt.tight_layout()
+        plt.show()
 
-            sns.set_theme()
-            fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
-            ax.hist(electricity_data["Total MC distribution"], bins_global, alpha=0.8)
-            ax.hist(heat_data["Total MC distribution"], bins_global, alpha=0.8)
+        return fig, ax
 
-            # Set title and labels
-            ax.legend(["Electricity", "Heat"], fontsize=self.plot_style.legend_fontsize_large,
-                      loc=self.plot_style.legend_location)
-            ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]", fontsize=self.plot_style.labels_fontsize)
-            ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
-            ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
-            plt.tight_layout()
-            plt.show()
+    def _plot_energy_byprocess(self, energy_data, bins=40, display_total=True):
+        """
+        Helper function to plot electricity and heat generation/consumption results by process.
 
-            # Store
-            fig_and_ax.append([fig, ax])
+        Parameters
+        ----------
+        bins: int
+            Number of bins to be used for plot.
+        display_total: bool
+            Show total production/consumption.
 
-        # Define helper function to plot contributions
-        def plot_energy_byprocess(energy_data, bin_no=None, display_total=True):
+        Returns
+        -------
 
-            # Get defaults
-            if bin_no is None:
-                bin_no = 40
+        """
+        # Extract required values
+        process_names = energy_data["Component names"]
+        GWP_matrix = list(energy_data["Component distributions"])
 
-            # Extract required values
-            process_names = energy_data["Component names"]
-            GWP_matrix = list(energy_data["Component distributions"])
+        # Add total and prepare plotting format
+        process_names.append("Total")
+        GWP_matrix.append(energy_data["Total MC distribution"])
+        GWP_matrix = np.transpose(np.array(GWP_matrix))  # convert to right format
+        GWP_exc_total = GWP_matrix[:, 0:-1]  # get list without the total
+        GWP_total = GWP_matrix[:, -1]  # get list of total GWP
 
-            # Add total and prepare plotting format
-            process_names.append("Total")
-            GWP_matrix.append(energy_data["Total MC distribution"])
-            GWP_matrix = np.transpose(np.array(GWP_matrix))  # convert to right format
-            GWP_exc_total = GWP_matrix[:, 0:-1]  # get list without the total
-            GWP_total = GWP_matrix[:, -1]  # get list of total GWP
+        # Turn bin number into a bin vector which can be used to plot histograms and total
+        bin_width = round((np.max(GWP_matrix) - np.min(GWP_matrix)) / bins)
+        min_value = math.floor(np.min(GWP_matrix))
+        max_value = math.ceil(np.max(GWP_matrix))
+        bin_vector = range(min_value, max_value + bin_width, bin_width)
 
-            # Turn bin number into a bin vector which can be used to plot histograms and total
-            bin_width = round((np.max(GWP_matrix) - np.min(GWP_matrix)) / bin_no)
-            min_value = math.floor(np.min(GWP_matrix))
-            max_value = math.ceil(np.max(GWP_matrix))
-            bin_vector = range(min_value, max_value + bin_width, bin_width)
+        # Get total marker coordinates
+        marker_x = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[1][0:-1])
+        marker_y = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[0])
+        plt.clf()  # to prevent interference with actual plot
+        marker_threshold = settings.user_inputs.general.MC_iterations * 0.01  # threshold below which markers are not displayed
 
-            # Get total marker coordinates
-            marker_x = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[1][0:-1])
-            marker_y = np.array(plt.hist(GWP_total, bins=bin_vector, alpha=0, histtype='bar')[0])
-            plt.clf()  # to prevent interference with actual plot
-            marker_threshold = settings.user_inputs.general.MC_iterations * 0.01  # threshold below which markers are not displayed
+        # Plot histograms and total
+        sns.set_theme()  # Use seaborn style
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
+        # Plot histograms
+        ax.hist(GWP_exc_total, bins=bin_vector, histtype='bar', stacked=True, label=process_names[0:-1])
 
-            # Plot histograms and total
-            sns.set_theme()  # Use seaborn style
-            fig_inner, ax_inner = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
-            # Plot histograms
-            ax_inner.hist(GWP_exc_total, bins=bin_vector, histtype='bar', stacked=True, label=process_names[0:-1])
+        if display_total:  # Plot total whilst excluding zeros or very low values for plotting
+            ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
+                       label=process_names[-1],
+                       marker="x",
+                       s=self.plot_style.marker_size,
+                       color="black",
+                       alpha=0.8)
 
-            if display_total:  # Plot total whilst excluding zeros or very low values for plotting
-                ax_inner.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
-                                 label=process_names[-1],
-                                 marker="x",
-                                 s=self.plot_style.marker_size,
-                                 color="black",
-                                 alpha=0.8)
+        # Set legend and labels
+        ax.legend(fontsize=self.plot_style.legend_fontsize_small, loc=self.plot_style.legend_location)
+        ax.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]", fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
 
-            # Set legend and labels
-            ax_inner.legend(fontsize=self.plot_style.legend_fontsize_small, loc=self.plot_style.legend_location)
-            ax_inner.set_xlabel(r"Output Energy [$kWh\ FU^{-1}$]", fontsize=self.plot_style.labels_fontsize)
-            ax_inner.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
-            ax_inner.tick_params(labelsize=self.plot_style.ticks_fontsize)
+        # Display plot
+        plt.tight_layout()
+        plt.show()
 
-            # Display plot
-            plt.tight_layout()
-            plt.show()
+        return fig, ax
 
-            return fig_inner, ax_inner
+    def plot_energy_electricity(self, bins=None, show_total=True):
+        """
+        Plot electricity generation/consumption of system.
 
-        # Employ helper function to plot electricity and heat
-        if plot_electricity:
-            fig_el, ax_el = plot_energy_byprocess(energy_data=electricity_data, bin_no=bins_electricity,
-                                                  display_total=show_total)
-            fig_and_ax.append([fig_el, ax_el])
+        Parameters
+        ----------
+        bins: int
+            Number of bins to be used for plot.
+        show_total: bool
+            Show total production/consumption.
 
-        if plot_heat:
-            fig_heat, ax_heat = plot_energy_byprocess(energy_data=heat_data, bin_no=bins_heat, display_total=show_total)
-            fig_and_ax.append([fig_heat, ax_heat])
+        Returns
+        -------
 
-        return fig_and_ax
+        """
+        # Get defaults
+        if bins is None:
+            bins = 40
+
+        data = self.electricity_results
+
+        fig, ax = self._plot_energy_byprocess(energy_data=data, bins=bins, display_total=show_total)
+
+        return fig, ax
+
+    def plot_energy_heat(self, bins=None, show_total=True):
+        """
+        Plot heat generation/consumption of system.
+
+        Parameters
+        ----------
+        bins: int
+            Number of bins to be used for plot.
+        show_total: bool
+            Show total production/consumption.
+
+        Returns
+        -------
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+        """
+        # Get defaults
+        if bins is None:
+            bins = 40
+
+        data = self.heat_results
+
+        fig, ax = self._plot_energy_byprocess(energy_data=data, bins=bins, display_total=show_total)
+
+        return fig, ax
 
     def plot_global_GWP(self, bins=20):
         """
@@ -461,7 +489,7 @@ class Results:
                                  s=subprocess_label,
                                  color="black",
                                  fontsize=self.plot_style.legend_fontsize_small,
-                                 horizontalalignment='center'
+                                 horizontalalignment="center"
                                  )
         # Add final bar showing total/overall GWP
         y_array = np.zeros(len(x_array))  # Initialise y-array
@@ -586,7 +614,33 @@ class Results:
             self.plot_TEA()
 
         if show_energy_generation:
-            self.plot_energy_generation()
+            self.plot_energy_global()
+            self.plot_energy_electricity()
+            self.plot_energy_heat()
+
+    def store_figures(self):
+        """
+        Store figures in results object.
+
+        Returns
+        -------
+
+        """
+        # Get figure objects
+        fig1, _ = self.plot_global_GWP()
+        fig2, _ = self.plot_global_GWP_byprocess()
+        fig3, _ = self.plot_average_GWP_byprocess()
+        fig4, _ = self.plot_energy_global()
+        fig5, _ = self.plot_energy_electricity()
+        fig6, _ = self.plot_energy_heat()
+
+        self.figures = {"global_GWP": fig1,
+                        "global_GWP_byprocess": fig2,
+                        "average_GWP_byprocess": fig3,
+                        "energy_global": fig4,
+                        "energy_electricity": fig5,
+                        "energy_heat": fig6
+                        }
 
     def save_report(self, storage_path, save_figures=False):
         """
@@ -607,7 +661,9 @@ class Results:
         fig1, ax1 = self.plot_global_GWP()
         fig2, ax2 = self.plot_global_GWP_byprocess()
         fig3, ax3 = self.plot_average_GWP_byprocess()
-        fig_ax_4 = self.plot_energy_generation()
+        fig4, _ = self.plot_energy_global()
+        fig5, _ = self.plot_energy_electricity()
+        fig6, _ = self.plot_energy_heat()
         # fig5, ax5 = self.plot_TEA()
 
         # Create results directory if it does not exist already
@@ -622,10 +678,9 @@ class Results:
         file.savefig(fig1)
         file.savefig(fig2)
         file.savefig(fig3)
-        file.savefig(fig_ax_4[0][0])
-        file.savefig(fig_ax_4[1][0])
-        file.savefig(fig_ax_4[2][0])
-        # file.savefig(fig5)
+        file.savefig(fig4)
+        file.savefig(fig5)
+        file.savefig(fig6)
         file.close()
 
         # Save toml user input file with pdf report
@@ -641,6 +696,6 @@ class Results:
             fig1.savefig(os.path.join(results_dir, "global_GWP.png"))
             fig2.savefig(os.path.join(results_dir, "global_GWP_byprocess.png"))
             fig3.savefig(os.path.join(results_dir, "average_GWP_byprocess.png"))
-            fig_ax_4[0][0].savefig(os.path.join(results_dir, "energy_global.png"))
-            fig_ax_4[1][0].savefig(os.path.join(results_dir, "energy_electricity.png"))
-            fig_ax_4[2][0].savefig(os.path.join(results_dir, "energy_heat.png"))
+            fig4.savefig(os.path.join(results_dir, "energy_global.png"))
+            fig5.savefig(os.path.join(results_dir, "energy_electricity.png"))
+            fig6.savefig(os.path.join(results_dir, "energy_heat.png"))

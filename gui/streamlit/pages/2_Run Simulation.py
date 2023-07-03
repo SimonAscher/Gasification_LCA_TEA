@@ -68,17 +68,22 @@ if uploaded_file is not None:  # Continue with script once a file has been uploa
         # Continue rest of script here
 
         with st.spinner(text="Running environmental and economic simulation. This may take ~60 seconds."):
-            run_LCA()
+            results = run_LCA()
         st.success("Simulation complete.")
-
-
-
-
-
-
-
-
-
-
         # Delete temporary user input file again
+
+        st.pyplot(results.figures["average_GWP_byprocess"])
+        st.pyplot(results.figures["global_GWP"])
+
+
         os.remove(uploaded_user_inputs_path)
+
+
+
+
+
+
+
+
+
+

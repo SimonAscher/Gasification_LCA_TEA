@@ -70,33 +70,13 @@ def run_LCA():
         pass
 
     # Results object
-    example_results = Results(processes=processes, plot_style="poster")
+    example_results = Results(processes=processes, plot_style="digital")
     example_results.calculate_total_GWP()
     example_results.calculate_electricity_heat_output()
 
     # # Plot results
     example_results.save_report(storage_path=r"C:\Users\2270577A\OneDrive - University of Glasgow\Desktop\LCA_report",
                                 save_figures=True)
+    example_results.save_streamlit_report()
 
-
-    #%% Compare my results to Yi Fang's
-    # Compare results
-    CHP_mean_GWP = process_CHP.GWP_mean
-    CHP_mean_GWP_ele = np.mean(process_CHP.requirements[0].electricity[0].values)
-    CHP_mean_GWP_heat = np.mean(process_CHP.requirements[0].heat[0].values)
-
-    print("Overall system GWP mean:", example_results.GWP_mean, "kg CO2 eq.")
-    print("CHP GWP mean:", CHP_mean_GWP, "kg CO2 eq.")
-    print("CHP mean electricity:", CHP_mean_GWP_ele, "kWh")
-    print("CHP mean heat:", CHP_mean_GWP_heat, "kWh")
-    print("GWP of 800 kWh electricity:", electricity_GWP(800))
-    print("GWP of 1,300 kWh heat:", thermal_energy_GWP(1300))
-
-    """
-    800 kWh electricity (0.8 MWh) produced per FU
-    1300 kWh heat (1.3 MWh) produced per FU
-    Current GWP with carbon capture: -1600 kg CO2eq/FU
-    
-    so for 1 MWh of electricity: -2,000 kg CO2eq/MWh el.
-    """
-
+    return example_results
