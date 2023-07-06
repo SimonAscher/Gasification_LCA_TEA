@@ -4,7 +4,7 @@ from functions.general.utility import kJ_to_kWh, MJ_to_kWh
 
 def thermal_energy_GWP(amount, source=None, units="kWh", country=None, displaced=False):
     """
-    Function which calculates the GWP of thermal energy use.
+    Function which calculates the GWP of heat/thermal energy use.
 
     Parameters
     ----------
@@ -23,16 +23,16 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=None, displaced
     float
         GWP value in kg CO2eq.
     """
-    # Load defaults
+    # Get defaults
     if source is None:
-        source = "natural gas"
+        source = settings.user_inputs.reference_energy_sources.heat
 
     if country is None:
         country = settings.user_inputs.general.country
 
     # Get country specific carbon intensity of thermal energy
     if source == "natural gas":
-        carbon_intensity_natural_gas = settings.data.CO2_equivalents.thermal_energy.natural_gas[country]
+        carbon_intensity = settings.data.CO2_equivalents.thermal_energy.natural_gas[country]
     else:
         raise TypeError("Heat source not supported.")
 
@@ -46,8 +46,13 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=None, displaced
     else:
         raise TypeError("Other units currently not supported.")
 
+    # Check if updated carbon intensity value is provided in sensitivity analysis
+    if "heat" in settings.sensitivity_analysis.energy_impacts and \
+            settings.sensitivity_analysis.energy_impacts.heat != "None":
+        carbon_intensity = settings.sensitivity_analysis.energy_impacts.heat
+
     # Calculate GWP value
-    GWP = carbon_intensity_natural_gas * amount
+    GWP = carbon_intensity * amount
 
     # Check if energy used or displaced
     if displaced:
@@ -77,10 +82,9 @@ def electricity_GWP(amount, source=None, units="kWh", country=None, displaced=Fa
     float
         GWP value in kg CO2eq.
     """
-
     # Get defaults
     if source is None:
-        source = "grid"
+        source = settings.user_inputs.reference_energy_sources.electricity
 
     if country is None:
         country = settings.user_inputs.general.country
@@ -95,12 +99,19 @@ def electricity_GWP(amount, source=None, units="kWh", country=None, displaced=Fa
     else:
         raise TypeError("Other units currently not supported.")
 
-    # Calculate GWP value
+    # Get country specific carbon intensity of electricity
     if source == "grid":
-        electricity_intensity = settings.data.CO2_equivalents.electricity[country]
-        GWP = electricity_intensity * amount
+        carbon_intensity = settings.data.CO2_equivalents.electricity[country]
     else:
         raise TypeError("Electricity source not supported.")
+
+    # Check if updated carbon intensity value is provided in sensitivity analysis
+    if "electricity" in settings.sensitivity_analysis.energy_impacts and \
+            settings.sensitivity_analysis.energy_impacts.electricity != "None":
+        carbon_intensity = settings.sensitivity_analysis.energy_impacts.electricity
+
+    # Calculate GWP value
+    GWP = carbon_intensity * amount
 
     # Check if energy used or displaced
     if displaced:

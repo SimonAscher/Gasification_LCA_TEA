@@ -1,0 +1,3 @@
+[default.sensitivity_analysis.energy_impacts]
+electricity = "None"
+heat = "None"

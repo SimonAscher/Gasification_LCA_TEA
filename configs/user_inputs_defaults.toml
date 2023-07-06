@@ -1,5 +1,9 @@
 [default.user_inputs.general]
 
+[default.user_inputs.reference_energy_sources]
+electricity = "grid"
+heat = "natural gas"
+
 [default.user_inputs.feedstock]
 
 [default.user_inputs.process_conditions]

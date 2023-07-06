@@ -4,15 +4,16 @@ from dynaconf import Dynaconf
 from pathlib import Path
 
 # Get root path
-root_path = Path(__file__).parent
+root_path = str(Path(__file__).parent)
 
 # Create settings instance
 settings = Dynaconf(
     settings_files=[  # Paths to toml files
-        str(root_path) + r"\configs\default_settings.toml",  # a file for default settings
-        str(root_path) + r"\configs\user_inputs_defaults.toml",  # default user inputs
-        str(root_path) + r"\configs\user_inputs\predefined\user_inputs_Gai_IntJHydrog_2012_37.toml",  # user inputs (overwrites defaults)
-        str(root_path) + r"\configs\secrets.toml"  # a file for sensitive data (gitignored)
+        root_path + r"\configs\default_settings.toml",  # a file for default settings
+        root_path + r"\configs\user_inputs_defaults.toml",  # default user inputs
+        root_path + r"\configs\user_inputs\predefined\user_inputs_Gai_IntJHydrog_2012_37.toml",  # user inputs (overwrites defaults)
+        root_path + r"\configs\sensitivity_analysis_defaults.toml",  # default sensitivity analysis choices
+        root_path + r"\configs\secrets.toml"  # a file for sensitive data (gitignored)
     ],
     environments=True,  # Enable layered environments
     merge_enabled=True  # Allows for default inputs to be overwritten

@@ -248,6 +248,7 @@ class Results:
         ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
         plt.tight_layout()
         plt.show()
+        plt.close(fig)
 
         return fig, ax
 
@@ -312,6 +313,7 @@ class Results:
         # Display plot
         plt.tight_layout()
         plt.show()
+        plt.close(fig)
 
         return fig, ax
 
@@ -391,6 +393,7 @@ class Results:
         # Display plot
         plt.tight_layout()
         plt.show()
+        plt.close(fig)
 
         return fig, ax
 
@@ -508,6 +511,7 @@ class Results:
         # Display plot
         plt.tight_layout()
         plt.show()
+        plt.close(fig)
 
         return fig, ax
 
@@ -584,6 +588,7 @@ class Results:
         # Display plot
         plt.tight_layout()
         plt.show()
+        plt.close(fig)
 
         return fig, ax
 
@@ -620,7 +625,7 @@ class Results:
 
     def store_figures(self):
         """
-        Store figures in results object.
+        Store all figures in results object.
 
         Returns
         -------
@@ -658,9 +663,9 @@ class Results:
 
         """
         # Get figure objects
-        fig1, ax1 = self.plot_global_GWP()
-        fig2, ax2 = self.plot_global_GWP_byprocess()
-        fig3, ax3 = self.plot_average_GWP_byprocess()
+        fig1, _ = self.plot_global_GWP()
+        fig2, _ = self.plot_global_GWP_byprocess()
+        fig3, _ = self.plot_average_GWP_byprocess()
         fig4, _ = self.plot_energy_global()
         fig5, _ = self.plot_energy_electricity()
         fig6, _ = self.plot_energy_heat()
@@ -683,13 +688,15 @@ class Results:
         file.savefig(fig6)
         file.close()
 
-        # Save toml user input file with pdf report
-        try:
-            user_inputs_path = settings.settings_module[6]  # save file selected by user
-        except:
-            user_inputs_path = settings.settings_module[2]  # save default scenarios file
-
-        shutil.copy(user_inputs_path, os.path.join(results_dir, pathlib.PurePath(user_inputs_path).name))
+        # TODO: Implement this method again - could just extract [user_inputs] and [sensitivity_analysis] sections from
+        #  settings object.
+        # # Save toml user input file with pdf report
+        # try:
+        #     user_inputs_path = settings.settings_module[7]  # save file selected by user
+        # except:
+        #     user_inputs_path = settings.settings_module[2]  # save default scenarios file
+        #
+        # shutil.copy(user_inputs_path, os.path.join(results_dir, pathlib.PurePath(user_inputs_path).name))
 
         # Save figure files to directory
         if save_figures:

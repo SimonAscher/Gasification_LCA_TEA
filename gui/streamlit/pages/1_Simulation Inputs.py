@@ -2,6 +2,7 @@ import sys
 
 from pathlib import Path
 
+
 # Add root directory
 root_path = str(Path(__file__).parent.parent.parent.parent)
 sys.path.append(root_path)
@@ -14,8 +15,9 @@ import streamlit as st
 from human_id import generate_id
 
 from config import settings
+from functions.gui import display_correct_user_distribution_inputs
 
-# Data
+# Background data
 country_options = settings.general.countries
 currency_options = settings.data.economic.currencies
 feedstock_categories_options = settings.general.feedstock_categories
@@ -81,7 +83,10 @@ st.subheader("Feedstock proximate composition",
              help="Typical feedstock data may be obtained from the [Phyllis2 database](https://phyllis.nl).")
 feedstock_moisture_ar = st.number_input(label="Feedstock moisture [%wb] (as received)", min_value=0.0, max_value=100.0)
 drying_included = st.checkbox(label="Is feedstock drying included as a pretreatment step?", value=False)
+
+# Set defaults
 feedstock_moisture_post_drying = None
+dryer_type = None
 if drying_included:
     feedstock_moisture_post_drying = st.number_input(label="Desired feedstock moisture post drying [%wb]",
                                                      min_value=0.0, max_value=100.0)
@@ -117,42 +122,6 @@ if reactor_type != "Fixed bed":
 
 # %% Techno-economic analysis inputs
 st.header("Techno-economic analysis choices")
-
-
-def display_correct_user_distribution_inputs(choice):
-    """
-    Displays the correct input fields based on the user's selected distribution type.
-    Parameters
-    ----------
-    choice
-
-    Returns
-    -------
-        Given user inputs.
-    """
-    dist_values = None
-    if choice == "fixed":
-        value = st.number_input(label="Constant value")
-        dist_values = {"value": value, "distribution_type": choice}
-
-    elif choice == "range":
-        low = st.number_input(label="Distribution lower bound")
-        high = st.number_input(label="Distribution upper bound")
-        dist_values = {"low": low, "high": high, "distribution_type": choice}
-
-    elif choice == "triangular":
-        lower = st.number_input(label=" Distribution lower bound")
-        mode = st.number_input(label="Distribution mode")
-        upper = st.number_input(label="Distribution upper bound")
-        dist_values = {"lower": lower, "mode": mode, "upper": upper, "distribution_type": choice}
-
-    elif choice == "gaussian":
-        mean = st.number_input(label="Distribution mean")
-        std = st.number_input(label="Distribution standard deviation (σ)")
-        dist_values = {"mean": mean, "std": std, "distribution_type": choice}
-
-    return dist_values
-
 
 electricity_price = st.radio(label="Select the electricity wholesale price [" + currency + "/kWh]",
                              options=economic_inputs_options)

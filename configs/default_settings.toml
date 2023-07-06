@@ -326,3 +326,6 @@ carbon_capture_options = ["Vacuum pressure swing adsorption (VPSA) post combusti
 CHP_options = ["Jenbacher Type 6 gas engine (1600 kW) (default)", "Solid oxide fuel cell (SOFC) (1.7 kW)",
                "Stirling engine (1.2 kW)", "Micro gas turbine (30kW)", "User defined"]
 dryer_type_options = ["Direct fired dryer", "Indirect-heated convection dryer", "Contact dryer", "Microwave drying"]
+sensitivity_analysis_energy_options = ["default", "75 % of current emissions", "50 % of current emissions",
+    "25 % of current emissions", "user defined"]
+sensitivity_analysis_run_options = ['Use .toml file','Use new selection of parameters']
