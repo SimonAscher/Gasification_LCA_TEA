@@ -5,10 +5,12 @@ import seaborn as sns
 from config import settings
 from dynaconf.utils.boxing import DynaBox
 from dataclasses import dataclass, InitVar
-from typing import Type
+from typing import Type, TypeVar
+
 from objects.requirement_objects import _Requirement, Requirements
 from objects.requirement_objects import Heat, Electricity, Steam, Oxygen, FossilGWP, BiogenicGWP
 from functions.LCA import electricity_GWP, thermal_energy_GWP
+from functions.TEA.energy_use import electricity_cost_benefit, heat_cost_benefit
 from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
 
 
@@ -35,7 +37,7 @@ class GlobalWarmingPotential:
         self.short_label = requirement.short_label
         self.description = requirement.description
         self.source = requirement.source
-        self.units = "kg CO2eq./FU"  # Update units
+        self.units = "kg CO2eq." + "/" + settings.general.FU_label  # Update units
         self.requirement_type = str(type(requirement))  # to remember where the GWP is coming from
 
         # Calculate GWP and store as object attribute
@@ -43,13 +45,15 @@ class GlobalWarmingPotential:
             for value in requirement.values:
                 self.values.append(electricity_GWP(amount=value, source=requirement.source, units=requirement.units))
             if requirement.generated:  # i.e. leading to displacement of energy
-                self.values = list(np.array(self.values) * -1)
+                if all(val >= 0 for val in requirement.values):  # Check that values are not already negative.
+                    self.values = list(np.array(self.values) * -1)
 
         elif isinstance(requirement, Heat):
             for value in requirement.values:
                 self.values.append(thermal_energy_GWP(amount=value, source=requirement.source, units=requirement.units))
             if requirement.generated:  # i.e. leading to displacement of energy
-                self.values = list(np.array(self.values) * -1)
+                if all(val >= 0 for val in requirement.values):  # Check that values are not already negative.
+                    self.values = list(np.array(self.values) * -1)
 
         elif isinstance(requirement, FossilGWP):
             self.values = requirement.values
@@ -82,37 +86,64 @@ class CostBenefit:
     ----------
     requirement : InitVar[Type[_Requirement]]
         A "_Requirement" child object which is to be converted to its cost or benefit.
+    per_FU: bool
+        Determines whether the costs/benefits are absolute (False) or per functional unit (True).
     """
-    # TODO: Update type hint, so it properly shows children of _Requirement class.
-
     # Update defaults
     requirement: InitVar[Type[_Requirement]]
     per_FU: bool = None
+    cost: bool = None
+    benefit: bool = None
 
     def __post_init__(self, requirement):
+        # Get right units
+        if self.per_FU:
+            units = settings.user_inputs.general.currency + "/" + settings.general.FU_label
+        else:
+            units = settings.user_inputs.general.currency
+
         # Take values from requirement object
         self.values = []
         self.name = requirement.name
         self.short_label = requirement.short_label
         self.description = requirement.description
         self.source = requirement.source
-        self.units = settings.user_inputs.currency
-        self.requirement_type = str(type(requirement))  # to remember the source
+        self.units = units
+        self.requirement_type = str(type(requirement))
 
         # Calculate GWP and store as object attribute
         if isinstance(requirement, Electricity):
-            for value in requirement.values:
-                self.values.append(electricity_GWP(amount=value, source=requirement.source, units=requirement.units))
-            if requirement.generated:  # i.e. leading to displacement of energy
-                self.values = list(np.array(self.values) * -1)
+            self.values = electricity_cost_benefit(requirement.values)
+            if requirement.generated:  # i.e. leading to sale of electricity
+                if all(val <= 0 for val in requirement.values):  # Check that values are not already positive.
+                    self.values = list(np.array(self.values) * -1)
+                self.cost = False
+                self.benefit = True
+            else:
+                self.cost = True
+                self.benefit = False
 
-        elif isinstance(requirement, Heat):
-            for value in requirement.values:
-                self.values.append(thermal_energy_GWP(amount=value, source=requirement.source, units=requirement.units))
-            if requirement.generated:  # i.e. leading to displacement of energy
-                self.values = list(np.array(self.values) * -1)
+        if isinstance(requirement, Heat):
+            self.values = heat_cost_benefit(requirement.values)
+            if requirement.generated:  # i.e. leading to sale of heat
+                if all(val <= 0 for val in requirement.values):  # Check that values are not already positive.
+                    self.values = list(np.array(self.values) * -1)
+                self.cost = False
+                self.benefit = True
+            else:
+                self.cost = True
+                self.benefit = False
+
         # TODO: Finish this function.
 
+        # Run some checks
+        if self.cost:
+            if self.benefit:
+                raise ValueError("Cannot have object be both a cost and a benefit.")
+
+        if self.benefit:
+            if self.cost:
+                raise ValueError("Cannot have object be both a cost and a benefit.")
 
 # Dataclass to store process requirements
 @dataclass
@@ -395,3 +426,6 @@ class Process:
             self.plot_GWP()
         if show_TEA:
             self.plot_TEA()
+
+
+Process_Parent = TypeVar('Process_Parent', bound=Process)

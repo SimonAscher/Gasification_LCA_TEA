@@ -29,6 +29,7 @@ bed_material = "N/A"
 
 [default.user_inputs.economic]
 electricity_price_choice = "default"
+heat_price_choice = "default"
 
 [default.user_inputs.economic.electricity_price_parameters]
 

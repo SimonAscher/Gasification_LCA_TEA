@@ -25,7 +25,7 @@ feedstock_categories = ["plastics", "municipal solid waste", "herbaceous biomass
 
 # Functional unit (FU) used in LCA
 FU = 1000  # 1 tonne of feedstock
-
+FU_label = "tonne of feedstock input"
 
 [default.labels]
 # Labels for model inputs array
@@ -83,6 +83,7 @@ CO2 = 1.98
 CH4 = 0.656
 C2H4 = 1.18
 O2 = 1.323
+natural_gas = 0.777
 units = "kg/m3"
 
 
@@ -108,6 +109,7 @@ CO = 12.633
 CH4 = 35.883
 H2 = 10.783
 C2H4 = 59.457
+natural_gas = 36.6
 units = "MJ/m3"
 source = " HEATING VALUE OF GASES FROM BIOMASS GASIFICATION Report prepared for: IEA Bioenergy Agreement, Task 20 - Thermal Gasification of Biomass Lars Waldheim, Torbjörn Nilsson TPS Termiska Processer AB May 2001"
 
@@ -118,6 +120,7 @@ CO = 12.633
 CH4 = 39.819
 H2 = 12.745
 C2H4 = 63.414
+natural_gas = 40.6
 units = "MJ/m3"
 source = " HEATING VALUE OF GASES FROM BIOMASS GASIFICATION Report prepared for: IEA Bioenergy Agreement, Task 20 - Thermal Gasification of Biomass Lars Waldheim, Torbjörn Nilsson TPS Termiska Processer AB May 2001"
 
@@ -283,12 +286,30 @@ EUR_TO_GBP = 0.8489
 source = "https://www.gov.uk/government/publications/exchange-rates-for-customs-and-vat-yearly"
 
 
-[default.data.economic.electricity_wholesale_prices.most_recent.UK]  # Electricity wholesale prices
-lower = 0.100
-mode = 0.16127  # as of 23rd of January 2023 https://www.ofgem.gov.uk/cy/energy-data-and-research/data-portal/wholesale-market-indicators
+[default.data.economic.electricity_wholesale_prices.UK]  # Electricity wholesale prices
+lower = 0.080
+mode = 0.110
 upper = 0.200
 units = "GBP/kWh"
 distribution_type = "triangular"
+source = ["https://tradingeconomics.com/united-kingdom/electricity-price",
+    "https://www.ofgem.gov.uk/cy/energy-data-and-research/data-portal/wholesale-market-indicators"]
+
+[default.data.economic.electricity_wholesale_prices.Germany]  # Electricity wholesale prices
+lower = 0.080
+mode = 0.110
+upper = 0.200
+units = "EUR/kWh"
+distribution_type = "triangular"
+source = ["https://tradingeconomics.com/germany/electricity-price"]
+
+[default.data.economic.natural_gas_price.UK]  # Natural gas price
+lower = 0.65
+mode = 1.00
+upper = 1.75
+units = "GBP/thm"
+distribution_type = "triangular"
+source = ["https://tradingeconomics.com/commodity/uk-natural-gas"]
 
 [default.data.economic.CEPCI]  # Chemical Enginnering Plant Cost Index (CEPCI) values
 2001 = 394.3
@@ -318,7 +339,7 @@ source = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.
 
 
 [default.streamlit]
-economic_inputs_options = ["default", "user selected", "predefined scenario"]  # radio buttons for economic inputs
+economic_inputs_options = ["default", "user selected"]  # radio buttons for economic inputs
 numeric_inputs_options = ["default", "user selected"]  # radio buttons for numeric inputs
 pretreatment_options = ["Drying", "Milling", "Pelleting", "Bale shredding"]
 carbon_capture_options = ["Vacuum pressure swing adsorption (VPSA) post combustion capture (default)",

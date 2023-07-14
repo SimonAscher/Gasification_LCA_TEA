@@ -10,7 +10,7 @@ from objects import Results
 from functions.general.utility import get_project_root
 from config import settings
 
-def display_correct_user_distribution_inputs(choice):
+def display_correct_user_distribution_inputs(choice, key):
     """
     Displays the correct input fields based on the user's selected distribution type.
 
@@ -18,6 +18,8 @@ def display_correct_user_distribution_inputs(choice):
     ----------
     choice: str
         Chosen distribution type.
+    key: str
+        Key identifying what the distribution choices are shown for. This avoids DuplicateWidgetID error.
 
     Returns
     -------
@@ -26,23 +28,23 @@ def display_correct_user_distribution_inputs(choice):
     """
     dist_values = None
     if choice == "fixed":
-        value = st.number_input(label="Constant value")
+        value = st.number_input(label="Constant value", key=key + "fixed constant")
         dist_values = {"value": value, "distribution_type": choice}
 
     elif choice == "range":
-        low = st.number_input(label="Distribution lower bound")
-        high = st.number_input(label="Distribution upper bound")
+        low = st.number_input(label="Distribution lower bound", key=key + "range low")
+        high = st.number_input(label="Distribution upper bound", key=key + "range high")
         dist_values = {"low": low, "high": high, "distribution_type": choice}
 
     elif choice == "triangular":
-        lower = st.number_input(label=" Distribution lower bound")
-        mode = st.number_input(label="Distribution mode")
-        upper = st.number_input(label="Distribution upper bound")
+        lower = st.number_input(label=" Distribution lower bound", key=key + "triangular lower")
+        mode = st.number_input(label="Distribution mode", key=key + "triangular mode")
+        upper = st.number_input(label="Distribution upper bound", key=key + "triangular upper")
         dist_values = {"lower": lower, "mode": mode, "upper": upper, "distribution_type": choice}
 
     elif choice == "gaussian":
-        mean = st.number_input(label="Distribution mean")
-        std = st.number_input(label="Distribution standard deviation (σ)")
+        mean = st.number_input(label="Distribution mean", key=key + "gaussian mean")
+        std = st.number_input(label="Distribution standard deviation (σ)", key=key + "gaussian standard deviation")
         dist_values = {"mean": mean, "std": std, "distribution_type": choice}
 
     return dist_values

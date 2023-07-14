@@ -57,8 +57,8 @@ class SyngasCombustion(Process):
         try:
             biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock.category]
         except:  # BoxKeyError
-            raise Warning("No default biogenic fraction available for this feedstock type - 0% biogenic assumed.")
             biogenic_fraction = 0
+            raise Warning("No default biogenic fraction available for this feedstock type - 0% biogenic assumed.")
 
         # Calculate biogenic and fossil emissions
         biogenic_CO2 = list(np.array(total_CO2) * biogenic_fraction)

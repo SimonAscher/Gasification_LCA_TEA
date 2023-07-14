@@ -83,7 +83,7 @@ def get_average_annual_exchange_rate(year, base_currency, converted_currency):
 
 def convert_currency_annual_average(value, year, base_currency, converted_currency):
     """
-    Gets the average annual exchange rate for a given year.
+    Converts a value from an original currency to a new currency for a given year.
 
     Parameters
     ----------

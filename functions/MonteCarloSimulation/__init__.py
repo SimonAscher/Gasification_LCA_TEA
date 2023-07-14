@@ -1,2 +1,2 @@
-from .distribution_creation import to_fixed_MC_array, get_distribution_draws
+from .distribution_creation import to_fixed_MC_array, get_distribution_draws, dist_maker_from_settings
 from ._run_simulation import run_simulation

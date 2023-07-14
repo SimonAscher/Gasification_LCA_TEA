@@ -1,76 +1,103 @@
+import numpy as np
+
 from config import settings
-from objects import triangular_dist_maker
-from functions.general.utility import kJ_to_kWh, MJ_to_kWh
-from functions.MonteCarloSimulation import get_distribution_draws
-from functions.general.utility import user_input_to_dist_maker
-
-def thermal_energy_cost_benefit(amount, source=None, units="kWh", country=settings.user_inputs.country,
-                                displaced=False):
-    pass
+from functions.general.utility import therm_to_kWh
 
 
-def electricity_cost_benefit(amount, source=None, price_distribution=user_input_to_dist_maker(settings.user_inputs.electricity_price), electricity_units="kWh",
-                             country=settings.user_inputs.country, currency = settings.user_inputs.currency,
-                             sold=False):
+# def thermal_energy_cost_benefit(amount, source=None, units="kWh", country=settings.user_inputs.country,
+#                                 displaced=False):
+#     pass
+
+def heat_cost_benefit(heat_array):
     """
-     Function to determine the GWP of using (or avoiding) a certain amount of grid electricity.
+    Applies electricity price to an array of electricity requirements (i.e. generation or consumption).
 
-     Parameters
-     ----------
-     amount: float
-         Defines the amount of electricity used.
-     source: str
-         Defines which source is considered for electricity production.
-    price_distribution: triangular_dist_maker | gaussian_dist_maker | fixed_dist_maker | range_dist_maker
-        Named tuple defining the distribution which is to be used.
-     electricity_units: str
-         Defines units used in analysis - currently only kWh supported.
-     country: str
-         Specifies the reference country or region.
-     used: bool
-         Determines whether energy is sold to the grid or bought from the grid.
-     Returns
-     -------
-     float
-         GWP value in kg CO2eq.
-     """
+    Parameters
+    ----------
+    heat_array: ArrayLike
+        List or array of heat requirements in [kWh] or [kWh/FU].
 
-    # Get defaults
-    if source is None:
-        source = "grid"
+    Returns
+    -------
+    ArrayLike
+        Array of costs (-ve) or benefits (+ve) resulting from the corresponding requirement.
+        Returned as the currency defined in settings.user_inputs.general.currency.
+    """
+    # Make imports here to avoid circular import error
+    from functions.MonteCarloSimulation import get_distribution_draws, dist_maker_from_settings
+
+    # Check how heat price is defined and get corresponding price distribution
+    if settings.user_inputs.economic.heat_price_choice == "default" and settings.user_inputs.reference_energy_sources.heat == "natural gas":
+        price_distribution = dist_maker_from_settings(
+            location=settings.data.economic.natural_gas_price[settings.user_inputs.general.country])
+
+        prices = get_distribution_draws(distribution_maker=price_distribution,
+                                        length_array=len(heat_array))
+        # Convert prices from thm to kWh if necessary
+        if settings.data.economic.natural_gas_price[settings.user_inputs.general.country].units.split("/")[1]:
+            prices = therm_to_kWh(np.array(prices), reverse=True)
+
+        costs_benefits = np.multiply(heat_array, prices)
+        costs_benefits = list(costs_benefits / 0.9)  # scale due to inefficiencies in conversion to heat
+
+        # Check if currencies match up
+        if settings.user_inputs.general.currency != settings.data.economic.natural_gas_price[settings.user_inputs.general.country].units.split("/")[0]:
+            raise ValueError("Heat price is in a different currency to the one supplied by the user.")
+
+    elif settings.user_inputs.economic.heat_price_choice == "user selected":
+        price_distribution = dist_maker_from_settings(
+            location=settings.user_inputs.economic.heat_price_parameters)
+
+        prices = get_distribution_draws(distribution_maker=price_distribution,
+                                        length_array=len(heat_array))
+
+        costs_benefits = list(np.multiply(heat_array, prices))
+
     else:
-        raise TypeError("Electricity source not supported.")
+        raise ValueError("Heat price option not supported.")
 
-    if price_distribution is None:  # Default price distributions based on country
-        if settings.user_inputs.country == "UK":
-            data = settings.data.economic.electricity_wholesale_prices.most_recent.UK
-            price_distribution = triangular_dist_maker(lower=data.lower, mode=data.mode, upper=data.upper)  # "GBP/kWh"
+    return costs_benefits
 
-        elif settings.user_inputs.country == "USA":
-            pass
 
-        else:
-            raise ValueError("Default electricity costs for this country are currently not supported.")
+def electricity_cost_benefit(electricity_array):
+    """
+    Applies electricity price to an array of electricity requirements (i.e. generation or consumption).
 
-        # Check that units are compatible
-        units = settings.data.economic.electricity_wholesale_prices.most_recent[settings.user_inputs.country].units
-        if "kWh" not in units:
-            raise ValueError("Incorrect units supplied. Should be given as kWh.")
+    Parameters
+    ----------
+    electricity_array: ArrayLike
+        List or array of electricity requirements in [kWh] or [kWh/FU].
 
-        if currency not in units:
-            raise ValueError("Incorrect currency supplied.")
+    Returns
+    -------
+    ArrayLike
+        Array of costs (-ve) or benefits (+ve) resulting from the corresponding requirement.
+        Returned as the currency defined in settings.user_inputs.general.currency.
+    """
+    # Make imports here to avoid circular import error
+    from functions.MonteCarloSimulation import get_distribution_draws, dist_maker_from_settings
 
-    # Convert units if not kWh
-    if electricity_units == "kWh":
-        pass
-    elif electricity_units == "kJ":
-        amount = kJ_to_kWh(amount)
-    elif electricity_units == "MJ":
-        amount = MJ_to_kWh(amount)
+    # Check how electricity price is defined and get corresponding price distribution
+    if settings.user_inputs.economic.electricity_price_choice == "default":
+        price_distribution = dist_maker_from_settings(
+            location=settings.data.economic.electricity_wholesale_prices[settings.user_inputs.general.country])
+
+        # Check if currencies match up
+        if settings.user_inputs.general.currency != \
+                settings.data.economic.electricity_wholesale_prices[settings.user_inputs.general.country].units.split(
+                        "/")[0]:
+            raise ValueError("Electricity price is in a different currency to the one supplied by the user.")
+
+    elif settings.user_inputs.economic.electricity_price_choice == "user selected":
+        price_distribution = dist_maker_from_settings(
+            location=settings.user_inputs.economic.electricity_price_parameters)
+
     else:
-        raise TypeError("Other units currently not supported.")
+        raise ValueError("Electricity price option not supported.")
 
-    # Calculate cost/benefit
-    output_cost_benefit = amount * get_distribution_draws(distribution_maker=price_distribution, length_array=1)
+    prices = get_distribution_draws(distribution_maker=price_distribution,
+                                    length_array=len(electricity_array))
 
-    return output_cost_benefit
+    costs_benefits = list(np.multiply(electricity_array, prices))
+
+    return costs_benefits

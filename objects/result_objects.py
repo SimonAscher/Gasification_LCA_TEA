@@ -60,8 +60,8 @@ class Results:
     calculate_total_GWP():
         Calculates the overall global warming potential (GWP) of the system.
 
-    TODO: Add other methods and make sure they display properly.
     """
+    # TODO: Add other methods to docstring.
     name: str = None
     processes: tuple[Type[Process]] = ()
     # TODO: Update type hint, so it properly shows children of _Requirement class.
@@ -217,7 +217,6 @@ class Results:
             self.plot_style = style_box
         else:
             raise ValueError("Either use default style via 'style' parameter or supply style_box. Do not use both.")
-
 
     def plot_energy_global(self, bins=10):
         """
@@ -662,14 +661,16 @@ class Results:
         -------
 
         """
-        # Get figure objects
-        fig1, _ = self.plot_global_GWP()
-        fig2, _ = self.plot_global_GWP_byprocess()
-        fig3, _ = self.plot_average_GWP_byprocess()
-        fig4, _ = self.plot_energy_global()
-        fig5, _ = self.plot_energy_electricity()
-        fig6, _ = self.plot_energy_heat()
-        # fig5, ax5 = self.plot_TEA()
+        # TODO: Update this method so it works properly with streamlit and store_figures function.
+        if self.figures is None:
+            self.store_figures()
+
+        fig1 = self.figures["global_GWP"]
+        fig2 = self.figures["global_GWP_byprocess"]
+        fig3 = self.figures["average_GWP_byprocess"]
+        fig4 = self.figures["energy_global"]
+        fig5 = self.figures["energy_electricity"]
+        fig6 = self.figures["energy_heat"]
 
         # Create results directory if it does not exist already
         results_dir = os.path.join(storage_path, self.ID)

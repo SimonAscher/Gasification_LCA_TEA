@@ -9,8 +9,11 @@ heat = "natural gas"
 [default.user_inputs.process_conditions]
 
 [default.user_inputs.economic]
+CEPCI_year = 2020
 
 [default.user_inputs.economic.electricity_price_parameters]
+
+[default.user_inputs.economic.heat_price_parameters]
 
 [default.user_inputs.processes.milling]
 

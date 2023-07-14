@@ -35,6 +35,29 @@ def power_scale(baseline_size, design_size, baseline_cost, scaling_factor=0.7):
     return scaled_cost
 
 
+def get_most_recent_available_CEPCI_year():
+    """
+    Helper function to be used with CEPCI_scale.
+    Checks for most recent CEPCI value stored in database and returns corresponding year.
+
+    Returns
+    -------
+
+    """
+    CEPCI_values = dict(settings.data.economic.CEPCI)
+    CEPCI_values.pop("source")
+
+    count = 0
+    while True:
+        dict_key = str(int(max(CEPCI_values)) - count)
+        count += 1
+        dict_value = CEPCI_values[dict_key]
+        if dict_value != "unavailable":
+            break
+
+    return int(dict_key)
+
+
 def CEPCI_scale(base_year, design_year, value):
     """
     Converts a value from a base year to a design year using the Chemical Engineering Plant Cost Index (CEPCI).
@@ -64,8 +87,8 @@ def CEPCI_scale(base_year, design_year, value):
         raise ValueError("CEPCI value not available for base year.")
 
     if design_CEPCI == "unavailable":
-        design_CEPCI = CEPCI_data[str(2020)]
-        warnings.warn("CEPCI value not available for design year. Reverted to most recent (2020) CEPCI value.")
+        design_CEPCI = CEPCI_data[str(get_most_recent_available_CEPCI_year())]
+        warnings.warn("CEPCI value not available for design year. Reverted to most recent CEPCI value.")
 
     # Convert value
     scaled_value = value * (design_CEPCI / base_CEPCI)

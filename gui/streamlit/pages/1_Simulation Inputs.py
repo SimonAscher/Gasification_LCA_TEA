@@ -16,6 +16,7 @@ from human_id import generate_id
 
 from config import settings
 from functions.gui import display_correct_user_distribution_inputs
+from functions.TEA import get_most_recent_available_CEPCI_year
 
 # Background data
 country_options = settings.general.countries
@@ -123,16 +124,35 @@ if reactor_type != "Fixed bed":
 # %% Techno-economic analysis inputs
 st.header("Techno-economic analysis choices")
 
-electricity_price = st.radio(label="Select the electricity wholesale price [" + currency + "/kWh]",
-                             options=economic_inputs_options)
+CEPCI_year = st.number_input("Select the year to which prices should be updated to",
+                             value=get_most_recent_available_CEPCI_year(),
+                             step=1,
+                             min=2001,
+                             max=get_most_recent_available_CEPCI_year(),
+                             help="Generally the default year is the most recent CEPCI value."
+                             )
+st.markdown("""---""")
+
+electricity_price = st.selectbox(label="Select the electricity wholesale price [" + currency + "/kWh]",
+                                 options=economic_inputs_options)
 electricity_price_parameters = {}
 if electricity_price == "user selected":
-    electricity_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0)
-    electricity_price_parameters = display_correct_user_distribution_inputs(electricity_price_user_selected)
+    electricity_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
+                                               key="electricity price distribution type")
+    electricity_price_parameters = display_correct_user_distribution_inputs(choice=electricity_price_user_selected,
+                                                                            key="electricity price distribution " +
+                                                                                electricity_price_user_selected)
     st.markdown("""---""")
 
-elif electricity_price == "predefined scenario":
-    # TODO: Add predefined scenarios
+heat_price = st.selectbox(label="Select the heat/thermal energy wholesale price [" + currency + "/kWh]",
+                          options=economic_inputs_options)
+heat_price_parameters = {}
+if heat_price == "user selected":
+    heat_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
+                                        key="heat price distribution type")
+    heat_price_parameters = display_correct_user_distribution_inputs(choice=heat_price_user_selected,
+                                                                     key="heat price distribution " +
+                                                                         heat_price_user_selected)
     st.markdown("""---""")
 
 
@@ -299,8 +319,11 @@ def user_data_to_toml():
                                        "bed_material": bed_material
                                        },
 
-                "economic": {"electricity_price_choice": electricity_price,
-                             "electricity_price_parameters": electricity_price_parameters
+                "economic": {"CEPCI_year": CEPCI_year,
+                             "electricity_price_choice": electricity_price,
+                             "electricity_price_parameters": electricity_price_parameters,
+                             "heat_price_choice": heat_price,
+                             "heat_price_parameters": heat_price_parameters
                              },
 
                 "processes": {

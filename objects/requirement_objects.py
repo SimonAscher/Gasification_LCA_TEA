@@ -35,11 +35,13 @@ class _Requirement:
     source: str = None
 
     def __post_init__(self):
+        # Set short_label to name if not given.
         if self.short_label is None:
-            self.short_label = self.name  # set short_label to name if not given.
+            self.short_label = self.name
 
+        # Flatten values if required
         if len(self.values) == 1 and settings.user_inputs.general.MC_iterations != 1:
-            self.values = list(np.array(self.values).flatten())  # flatten if required
+            self.values = list(np.array(self.values).flatten())
 
 # Define requirement child classes
 # Energy Use
@@ -66,6 +68,22 @@ class Heat(_Requirement):
 # Direct environmental factors
 @dataclass(kw_only=True)
 class FossilGWP(_Requirement):
+    """
+    Fossil carbon emissions or global warming potential impact.
+
+    Attributes
+    ----------
+    values: list[float]
+        Carbon emissions before accounting for biogenic nature of carbon.
+    name : str
+    short_label : str
+    units: str
+    description: str
+    source: str
+    negative_emissions: bool
+        Ensures values are given as negative and always sets biogenic_fraction to 1.
+    """
+
     # Update defaults
     name: str = "Fossil CO2 eq."
     units: str = "kg CO2eq."

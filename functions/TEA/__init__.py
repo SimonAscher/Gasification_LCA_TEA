@@ -1,4 +1,5 @@
 from ._get_present_value import get_present_value
-from .scaling import power_scale
+from .scaling import power_scale, CEPCI_scale, get_most_recent_available_CEPCI_year
 from .currency_converter import convert_currency
 from .average_annual_currency_conversion import convert_currency_annual_average
+from .energy_use import electricity_cost_benefit, heat_cost_benefit

@@ -1,5 +1,6 @@
 import numpy as np
 
+from dynaconf.utils.boxing import DynaBox
 from config import settings
 from objects import triangular_dist_maker, gaussian_dist_maker, fixed_dist_maker, range_dist_maker
 
@@ -70,3 +71,37 @@ def get_distribution_draws(distribution_maker, length_array=settings.user_inputs
         distribution = float(distribution)
 
     return distribution
+
+
+def dist_maker_from_settings(location):
+    """
+    Takes distribution type and parameters stored in settings object and turns them back into a distribution maker.
+
+    Parameters
+    ----------
+    location: DynaBox
+        Location in settings object where the distribution type and its parameters are defined.
+
+    Returns
+    -------
+    triangular_dist_maker | gaussian_dist_maker | range_dist_maker | fixed_dist_maker
+        Distribution maker based on the parameters stored in the given storage location.
+    """
+
+    # Initialise variables
+    dist_maker = None
+
+    # Check which distribution type is present and create dist_maker accordingly.
+    if location.distribution_type == "fixed":
+        dist_maker = fixed_dist_maker(value=location.value)
+    elif location.distribution_type == "range":
+        dist_maker = range_dist_maker(low=location.low, high=location.high)
+    elif location.distribution_type == "triangular":
+        dist_maker = triangular_dist_maker(lower=location.lower, mode=location.mode, upper=location.upper)
+
+    elif location.distribution_type == "gaussian":
+        dist_maker = gaussian_dist_maker(mean=location.mean, std=location.std)
+    else:
+        ValueError("Distribution type not supported.")
+
+    return dist_maker
