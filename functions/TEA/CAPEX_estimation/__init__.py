@@ -1,1 +1,2 @@
 from .CAPEX_CHP import get_CHP_CAPEX_distribution
+from .CAPEX_gasification import get_gasification_and_gas_cleaning_CAPEX_distributions

@@ -13,7 +13,7 @@ Combustion turbine + accessories  (Shell IGCC and E-GasTM gasifier) (Case 1),gas
 Combustion turbine + accessories  (Shell IGCC and E-GasTM gasifier) (Case 2),gas turbine,94656000,USD,464000,2019,USA,,,middle case,COST AND PERFORMANCE BASELINE FOR FOSSIL ENERGY PLANTS VOLUME 1: BITUMINOUS COAL AND NATURAL GAS TO ELECTRICITY
 Combustion turbine + accessories  (Shell IGCC and E-GasTM gasifier) (Case 3),gas turbine,117856000,USD,464000,2019,USA,,,upper case,COST AND PERFORMANCE BASELINE FOR FOSSIL ENERGY PLANTS VOLUME 1: BITUMINOUS COAL AND NATURAL GAS TO ELECTRICITY
 Steam turbine + accessories  (Shell IGCC and E-GasTM gasifier and GEP Radiant IGCC - Quench) (Middle Case),steam turbine,47257000,USD,301000,2019,USA,,,middle case only as too little variation,COST AND PERFORMANCE BASELINE FOR FOSSIL ENERGY PLANTS VOLUME 1: BITUMINOUS COAL AND NATURAL GAS TO ELECTRICITY
-Steam cycle,steam turbine,66700000,USD,275000,2007,USA,0.67,1.15,,Fischer-tropsch fuels from coal and biomass
-Gas turbine,gas turbine,73200000,USD,266000,2007,USA,0.75,1.27,,Fischer-tropsch fuels from coal and biomass
+Steam cycle,steam turbine,76705000,USD,275000,2007,USA,0.67,1.15,original cost scaled up by installation factor of 1.15,Fischer-tropsch fuels from coal and biomass
+Gas turbine,gas turbine,92964000,USD,266000,2007,USA,0.75,1.27,original cost scaled up by installation factor of 1.27,Fischer-tropsch fuels from coal and biomass
 Organice Rankine cycle + syngas combustor,organice rankine cycle,890000,EUR,400,2015,Italy,,,alternatively 18 tonne SRF per day,10.1016/j.fuproc.2014.11.003
 Equipment Cost - Gas turbine,gas turbine,2500000,USD,419,2020,USA,,,altneratively 876 tonnes/year,https://doi.org/10.1016/j.compchemeng.2020.106758

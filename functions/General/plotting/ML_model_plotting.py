@@ -427,8 +427,8 @@ def combined_feat_imp_plot(performance_summary, model_type, plot_style=None, no_
 
         ax.set_xlabel('Norm. Gini Importance', fontsize=plot_style.labels_fontsize)
         ax.tick_params(labelsize=plot_style.ticks_fontsize)
-        ax.tick_params(axis="x", labelsize=plot_style.ticks_fontsize)
-        ax.tick_params(axis="y", labelsize=plot_style.ticks_fontsize - 8)
+        ax.tick_params(axis="x_source", labelsize=plot_style.ticks_fontsize)
+        ax.tick_params(axis="y_source", labelsize=plot_style.ticks_fontsize - 8)
 
         if save:
             filename = "gini_stacked" + ".png"
@@ -527,8 +527,8 @@ def combined_feat_imp_plot(performance_summary, model_type, plot_style=None, no_
 
         ax.set_xlabel('Norm. Perm. Imp. Scores', fontsize=plot_style.labels_fontsize)
         ax.tick_params(labelsize=plot_style.ticks_fontsize)
-        ax.tick_params(axis="x", labelsize=plot_style.ticks_fontsize)
-        ax.tick_params(axis="y", labelsize=plot_style.ticks_fontsize - 8)
+        ax.tick_params(axis="x_source", labelsize=plot_style.ticks_fontsize)
+        ax.tick_params(axis="y_source", labelsize=plot_style.ticks_fontsize - 8)
 
         if save:
             filename = "permutation_stacked" + ".png"
@@ -637,8 +637,8 @@ def combined_feat_imp_plot(performance_summary, model_type, plot_style=None, no_
 
         ax.set_xlabel('Norm. Shap Importance', fontsize=plot_style.labels_fontsize)
         ax.tick_params(labelsize=plot_style.ticks_fontsize)
-        ax.tick_params(axis="x", labelsize=plot_style.ticks_fontsize)
-        ax.tick_params(axis="y", labelsize=plot_style.ticks_fontsize - 8)
+        ax.tick_params(axis="x_source", labelsize=plot_style.ticks_fontsize)
+        ax.tick_params(axis="y_source", labelsize=plot_style.ticks_fontsize - 8)
 
         if save:
             filename = "shap_stacked" + ".png"

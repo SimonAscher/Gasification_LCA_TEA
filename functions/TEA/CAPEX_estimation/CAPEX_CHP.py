@@ -1,42 +1,41 @@
 import os
+import warnings
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.metrics import r2_score, mean_squared_error
-
+from scipy.optimize import curve_fit
+# from sklearn.metrics import r2_score, mean_squared_error
 from config import settings
 from functions.MonteCarloSimulation import get_distribution_draws
+from functions.general import MAPE
+from functions.general.curve_fitting import func_power_curve, func_straight_line
 from functions.general.utility import get_project_root
 from functions.TEA import convert_currency_annual_average
 from functions.TEA.scaling import CEPCI_scale
 from objects import triangular_dist_maker
 
 
-def get_CHP_CAPEX_distribution(system_size_kWel, currency=None, CEPCI_year=None):
+def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None):
     """
     Calculate the CAPEX distribution of a CHP plant.
+    CAPEX is given as total overnight cost (TOC) or total installed cost (TIC) (i.e. engineering works, procurement,
+    installation, etc. are considered included in CAPEX).
 
     Parameters
     ----------
-    system_size_kWel: float
-        Required CHP size/power rating [kWel].
-    currency: str
+    system_size_MWel: float
+        CHP size/power rating [MWel].
+    currency: str | None
         Currency that is to be used for analysis.
-    CEPCI_year: int
+    CEPCI_year: int | None
         Reference CEPCI year that is to be used for analysis.
-
 
     Returns
     -------
     list
         Distribution of CAPEX values in the supplied currency.
-
     """
+
     # Get defaults
     if currency is None:
         currency = settings.user_inputs.general.currency
@@ -69,94 +68,77 @@ def get_CHP_CAPEX_distribution(system_size_kWel, currency=None, CEPCI_year=None)
     df[currency_scaled_label] = CAPEX_currency_scaled
     df[currency_and_CEPCI_scaled_label] = CAPEX_currency_CEPCI_scaled
 
-    # Define thresholds to split data set into small scale and medium scale plants
-    threshold_small_scale_system = 5000  # kW
-    threshold_medium_scale_system = 500000  # kW
+    # Add system size in MWel to df
+    df["Plant size [MWel]"] = df["Plant size [kWel]"] / 1000
 
-    def get_polynomial_model_and_performance(dataframe, display_fit=False):
-        """
-        Returns polynomial model and its performance.
+    # Introduce limits to data frame - i.e. discard very large data/region where data gets too sparse
+    df = df[df["Plant size [MWel]"] < 500]
 
-        Parameters
-        ----------
-        dataframe
-        display_fit
+    # Define thresholds to split data set into small scale and medium scale plants and max allowable system size.
+    threshold_small_scale_system = 5  # MW
+    max_system_size = 500  # MW
 
-        Returns
-        -------
+    # Fit models, get performance metric, and make prediction
+    if system_size_MWel <= threshold_small_scale_system:  # small scale
+        df_small = df[df["Plant size [MWel]"] <= threshold_small_scale_system]
 
-        """
-        # Extract x and y data and sort it
-        x = dataframe["Plant size [kWel]"]
-        y = dataframe[currency_and_CEPCI_scaled_label]
-        temp_sorting_df = pd.DataFrame({'x_sorted':x, 'y_sorted':y})
-        temp_sorting_df = temp_sorting_df.sort_values('x_sorted')
-        x = np.array(temp_sorting_df["x_sorted"])
-        y = np.array(temp_sorting_df["y_sorted"])
+        # Fit power function based on previous analysis
+        popt, _ = curve_fit(func_power_curve,
+                            df_small["Plant size [MWel]"],
+                            df_small[currency_and_CEPCI_scaled_label],
+                            maxfev=10000)
 
-        def fit_polynomial_regression_and_get_performance(degree):
-            """
-            Fits nth degree polynomial and returns regression models and its performance.
+        # Performance metrics
+        # r2 = r2_score(df_small[currency_and_CEPCI_scaled_label],
+        #               func_power_curve(df_small["Plant size [MWel]"], *popt))
+        # rmse = mean_squared_error(df_small[currency_and_CEPCI_scaled_label],
+        #                           func_power_curve(df_small["Plant size [MWel]"], *popt),
+        #                           squared=False)
+        mape_decimal = MAPE(df_small[currency_and_CEPCI_scaled_label],
+                            func_power_curve(df_small["Plant size [MWel]"], *popt),
+                            return_as_decimal=True)
 
-            Parameters
-            ----------
-            degree: int
+        prediction = func_power_curve(system_size_MWel, *popt)
 
-            Returns
-            -------
-
-            """
-            # Get polynomial features and fit regression model
-            poly = PolynomialFeatures(degree=degree, include_bias=False)
-            poly_features = poly.fit_transform(x.reshape(-1, 1))
-            poly_reg_model = LinearRegression()
-            poly_reg_model.fit(poly_features, y)
-            y_predicted = poly_reg_model.predict(poly_features)
-
-            # Get error scores
-            model_r2 = r2_score(y, y_predicted)
-            model_rmse = mean_squared_error(y, y_predicted, squared=False)
-
-            return {"model": poly_reg_model, "R2": model_r2, "RMSE": model_rmse, "predictions": y_predicted, "degree": degree}
-
-        # Check if 1st or 2nd degree polynomial performs better
-        first_degree_results = fit_polynomial_regression_and_get_performance(degree=1)
-        second_degree_results = fit_polynomial_regression_and_get_performance(degree=2)
-        if first_degree_results["RMSE"] < second_degree_results["RMSE"]:
-            results = first_degree_results
-        else:
-            results = second_degree_results
-
-        if display_fit:
-            # Plot with fit
-            sns.scatterplot(data=dataframe, x="Plant size [kWel]", y=currency_and_CEPCI_scaled_label, hue="Type")
-            plt.plot(x, results["predictions"], c="red")
-            plt.xlabel("Plant size [kW${_{el}}$]")
-            plt.ylabel("CAPEX [GBP]")
-            plt.xticks(rotation=45)
-            plt.show()
-
-        return results
-
-    # Get predictions
-    if system_size_kWel < threshold_small_scale_system:  # small scale
-        df_small = df[df["Plant size [kWel]"] < threshold_small_scale_system]
-        regression_model_results = get_polynomial_model_and_performance(df_small)
     else:  # medium scale
-        if system_size_kWel < threshold_medium_scale_system:
-            df_medium = df[(df["Plant size [kWel]"] > threshold_small_scale_system) &
-                           (df["Plant size [kWel]"] <= threshold_medium_scale_system)]
-            regression_model_results = get_polynomial_model_and_performance(df_medium)
+        if system_size_MWel < max_system_size:
+            df_medium = df[(df["Plant size [MWel]"] > threshold_small_scale_system) &
+                           (df["Plant size [MWel]"] <= max_system_size)]
+
+            # Fit linear function based on previous analysis
+            popt, _ = curve_fit(func_straight_line,
+                                df_medium["Plant size [MWel]"],
+                                df_medium[currency_and_CEPCI_scaled_label],
+                                maxfev=10000)
+
+            # Performance metrics
+            # r2 = r2_score(df_medium[currency_and_CEPCI_scaled_label],
+            #               func_straight_line(df_medium["Plant size [MWel]"], *popt))
+            # rmse = mean_squared_error(df_medium[currency_and_CEPCI_scaled_label],
+            #                           func_straight_line(df_medium["Plant size [MWel]"], *popt),
+            #                           squared=False)
+            mape_decimal = MAPE(df_medium[currency_and_CEPCI_scaled_label],
+                                func_straight_line(df_medium["Plant size [MWel]"], *popt),
+                                return_as_decimal=True)
+
+            prediction = func_straight_line(system_size_MWel, *popt)
+
         else:  # too large - not supported
             raise ValueError("CHP size exceeds the supported size.")
 
-    # Make predictions
-    prediction = regression_model_results["model"].predict(PolynomialFeatures(
-        degree=regression_model_results["degree"], include_bias=False).
-                                                           fit_transform(np.array(system_size_kWel).reshape(-1, 1)))
-    error = regression_model_results["RMSE"]
+    # Raise warnings if necessary
+    if system_size_MWel < 0.05:
+        warnings.warn("CHP size very small - this might lead to unexpected behaviour")
 
-    distribution = triangular_dist_maker(lower=prediction-error, mode=prediction, upper=prediction+error)
+    if 5 < system_size_MWel < 10:
+        warnings.warn("Region of great uncertainty "
+                      "- 5MWel is the current cut off from small-scale to medium-scale system model.")
+
+    # Get lower and upper bounds of distribution based on the distributions MAPE
+    lower_bound = prediction - (prediction * mape_decimal)
+    upper_bound = prediction + (prediction * mape_decimal)
+
+    distribution = triangular_dist_maker(lower=lower_bound, mode=prediction, upper=upper_bound)
 
     distribution_draws = list(get_distribution_draws(distribution))
 

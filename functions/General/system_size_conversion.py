@@ -4,31 +4,34 @@ import numpy as np
 from warnings import warn
 from functions.general.utility import get_project_root
 from sklearn.linear_model import LinearRegression
+from typing import Literal
+
+_input_output_unit_types = Literal["tonnes/hour", "kWh/hour", "MWel"]
 
 
-def convert_system_size(value, input_units, output_units, additional_outputs=False):
+def convert_system_size(value, input_units: _input_output_unit_types, output_units: _input_output_unit_types,
+                        additional_outputs=False):
     """
 
     Parameters
     ----------
     value: float
         The value which is to be converted.
-    input_units: str
+    input_units: _input_output_unit_types
          Defines the units of the "value" variable which is to be converted to the given "output_units".
          Options:
             - "tonnes/hour" - if given as feedstock mass input per hour
             - "kWh/hour" - if given as feedstock energy input per hour
-            - "MWel" - if given as system size in terms of power generation
-
-    output_units: str
+            - "MWel" - if given as system size in terms of electric power generation
+    output_units: _input_output_unit_types
         Defines the units to which the given "value" variable is to be converted.
         Options:
             - "tonnes/hour" - if given as feedstock mass input per hour
             - "kWh/hour" - if given as feedstock energy input per hour
-            - "MWel" - if given as system size in terms of power generation
+            - "MWel" - if given as system size in terms of electric power generation
     additional_outputs: bool
         Defines whether additional outputs (i.e. output unit and R2 score of regressor are also to be given).
-         Default = False
+        Default = False
 
     Returns
     -------
@@ -36,6 +39,11 @@ def convert_system_size(value, input_units, output_units, additional_outputs=Fal
         System size in the selected units given by the "output_units" variable.
 
     """
+    # Check that units are in correct format
+    if input_units not in ["MWel", "kWh/hour", "tonnes/hour"] or\
+            output_units not in ["MWel", "kWh/hour", "tonnes/hour"]:
+        raise ValueError("Supplied units are not supported.")
+
     # Get project root and define data source
     project_root = get_project_root()
     file_name = str(project_root) + r"\data\system_size_data.csv"
@@ -50,9 +58,15 @@ def convert_system_size(value, input_units, output_units, additional_outputs=Fal
     if input_units == "tonnes/hour" and output_units == "MWel":
         regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
         R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
+    if input_units == "tonnes/hour" and output_units == "kWh/hour":
+        regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=feedstock_energy_data)
+        R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=feedstock_energy_data)
     if input_units == "kWh/hour" and output_units == "MWel":
         regressor = LinearRegression().fit(X=feedstock_energy_data.reshape(-1, 1), y=power_data)
         R2_score = regressor.score(X=feedstock_energy_data.reshape(-1, 1), y=power_data)
+    if input_units == "kWh/hour" and output_units == "tonnes/hour":
+        regressor = LinearRegression().fit(X=feedstock_energy_data.reshape(-1, 1), y=feedstock_mass_data)
+        R2_score = regressor.score(X=feedstock_energy_data.reshape(-1, 1), y=feedstock_mass_data)
     if input_units == "MWel" and output_units == "tonnes/hour":
         regressor = LinearRegression().fit(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
         R2_score = regressor.score(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
