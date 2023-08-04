@@ -602,7 +602,7 @@ def build_models(X, Y, predictor_pretreatment, target_pretreatment, modelname='R
             g.fig.set_figheight(2.25)  # change fig height for publication
             sns.scatterplot(x=Y_train_pretreated, y=y_train_pred, s=100, color='orange', ax=g.ax_joint)
             sns.scatterplot(x=Y_test_pretreated, y=y_test_pred, s=100, color='blue', ax=g.ax_joint)
-            # sns.regplot(x_source=Y_test_pretreated, y_source=y_test_pred, ax=g.ax_joint)
+            # sns.regplot(x=Y_test_pretreated, y=y_test_pred, ax=g.ax_joint)
             g.set_axis_labels(target_axis_string, predicted_axis_string, fontsize=16, fontname='Arial')
             sns.histplot(x=Y_train_pretreated, ax=g.ax_marg_x, color='orange')
             sns.histplot(x=Y_test_pretreated, ax=g.ax_marg_x, color='blue')
@@ -627,6 +627,3 @@ def build_models(X, Y, predictor_pretreatment, target_pretreatment, modelname='R
                 '# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # \n')
 
     return perf_sum
-
-
-print('We are working')

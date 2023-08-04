@@ -298,7 +298,7 @@ class Results:
         if display_total:  # Plot total whilst excluding zeros or very low values for plotting
             ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
                        label=process_names[-1],
-                       marker="x_source",
+                       marker="x",
                        s=self.plot_style.marker_size,
                        color="black",
                        alpha=0.8)
@@ -455,8 +455,8 @@ class Results:
                 subprocess_label = subprocess_names[subprocess_count][0]  # get subprocess name
                 if short_labels:
                     subprocess_label = subprocess_short_labels[subprocess_count]  # get shorthand labels for plotting
-                y_array = np.zeros(len(x_array))  # Initialise y_source-array
-                y_array[process_count] = subprocess_GWP_mean  # Update y_source-array with GWP in appropriate position
+                y_array = np.zeros(len(x_array))  # Initialise y-array
+                y_array[process_count] = subprocess_GWP_mean  # Update y-array with GWP in appropriate position
 
                 # Plot stacked bar graph for individual process
                 if subprocess_count == 0:  # plot first subprocess
@@ -494,14 +494,14 @@ class Results:
                                  horizontalalignment="center"
                                  )
         # Add final bar showing total/overall GWP
-        y_array = np.zeros(len(x_array))  # Initialise y_source-array
-        y_array[-1] = self.GWP_mean  # Update y_source-array with GWP
+        y_array = np.zeros(len(x_array))  # Initialise y-array
+        y_array[-1] = self.GWP_mean  # Update y-array with GWP
         ax.bar(x_array, y_array, bar_width, label="Total")
 
         # Set labels
         ax.set_ylabel("GWP " + settings.labels.LCA_output_plotting_string, fontsize=self.plot_style.labels_fontsize)
-        ax.tick_params(axis="x_source", labelsize=self.plot_style.labels_fontsize, rotation=45)
-        ax.tick_params(axis="y_source", labelsize=self.plot_style.ticks_fontsize)
+        ax.tick_params(axis="x", labelsize=self.plot_style.labels_fontsize, rotation=45)
+        ax.tick_params(axis="y", labelsize=self.plot_style.ticks_fontsize)
 
         # Display legend
         if legend_loc == "box":
@@ -573,7 +573,7 @@ class Results:
         if show_total:  # Plot total whilst excluding zeros or very low values for plotting
             ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
                        label=process_names[-1],
-                       marker="x_source",
+                       marker="x",
                        s=self.plot_style.marker_size,
                        color="black",
                        alpha=0.8)

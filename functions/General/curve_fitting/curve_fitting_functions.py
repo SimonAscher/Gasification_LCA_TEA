@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def func_straight_line(x, a, b):
     return a * x + b
 

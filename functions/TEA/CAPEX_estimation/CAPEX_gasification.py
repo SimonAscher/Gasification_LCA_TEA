@@ -307,9 +307,10 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
 
     # Gas cleaning costs
 
-    # Gas cleaning cost fractions of total cost. See note at the start of script for mode value and information on these.
+    # Gas cleaning cost fractions of total cost. See note at the start of script more information.
     gas_cleaning_fraction_of_total_CAPEX_lower = 0.17
     gas_cleaning_fraction_of_total_CAPEX_upper = 0.33
+    # mode value = 0.24 (defined above)
 
     # Gas cleaning fraction distribution and draws
     dist_draws_gas_cleaning_fraction_decimal = list(get_distribution_draws(

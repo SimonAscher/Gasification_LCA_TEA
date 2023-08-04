@@ -405,7 +405,7 @@ class Process:
         # Plot total whilst excluding zeros or very low values for plotting
         if show_total:
             ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold], label="Total",
-                       marker="x_source", s=self.plot_style.marker_size, color="black", alpha=0.8)
+                       marker="x", s=self.plot_style.marker_size, color="black", alpha=0.8)
 
         # Set legend, title, and labels
         ax.legend(fontsize=self.plot_style.legend_fontsize_small)
