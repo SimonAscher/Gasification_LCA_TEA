@@ -209,16 +209,7 @@ def demands_ele_aux_gas_cleaning(C=settings.user_inputs.feedstock.carbon,
             moisture = settings.user_inputs.feedstock.moisture_ar
 
     # Get feedstock LHV
-    # Get data in right format
-    feedstock_data_index = "feedstock data"
-    feedstock_df = pd.DataFrame(index=[feedstock_data_index], columns=settings.labels.input_data)
-    feedstock_df.loc[feedstock_data_index]["C [%daf]"] = C
-    feedstock_df.loc[feedstock_data_index]["H [%daf]"] = H
-    feedstock_df.loc[feedstock_data_index]["S [%daf]"] = S
-    feedstock_df.loc[feedstock_data_index]["Moisture [%wb]"] = moisture
-
-    # Calculate feedstock LHV
-    feedstock_LHV = calculate_LHV_HHV_feedstock(predictor_data=feedstock_df)  # MJ/kg wb
+    feedstock_LHV = settings.user_inputs.feedstock.LHV  # MJ/kg wb
 
     feedstock_mass = settings.general.FU
     total_feedstock_energy = MJ_to_kWh(value=(feedstock_mass * feedstock_LHV))

@@ -277,7 +277,7 @@ def sensitivity_analysis_energy_impact(widget_output, baseline_emissions, energy
         raise ValueError("Option not defined.")
 
     if energy_impact_value is not None:
-        st.write(f"Updated {energy_type} impact of {energy_impact_value} [kg CO2eq./kWh] will be used in "
+        st.write(f"Updated {energy_type} impact of {energy_impact_value:.3f} [kg CO2eq./kWh] will be used in "
                  f"sensitivity analysis.")
 
     return energy_impact_value

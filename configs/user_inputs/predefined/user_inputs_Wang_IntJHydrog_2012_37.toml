@@ -30,6 +30,8 @@ bed_material = "N/A"
 [default.user_inputs.economic]
 electricity_price_choice = "default"
 heat_price_choice = "default"
+carbon_tax_selection = true
+carbon_tax_choice = "user selected"
 
 [default.user_inputs.economic.electricity_price_parameters]
 

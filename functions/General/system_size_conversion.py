@@ -12,6 +12,7 @@ _input_output_unit_types = Literal["tonnes/hour", "kWh/hour", "MWel"]
 def convert_system_size(value, input_units: _input_output_unit_types, output_units: _input_output_unit_types,
                         additional_outputs=False):
     """
+    Convert between a range of different system size units.
 
     Parameters
     ----------

@@ -17,6 +17,8 @@ from human_id import generate_id
 from config import settings
 from functions.gui import display_correct_user_distribution_inputs
 from functions.TEA import get_most_recent_available_CEPCI_year
+from functions.general import convert_system_size, calculate_LHV_HHV_feedstock_from_direct_inputs
+from functions.general.utility import MJ_to_kWh
 
 # Background data
 country_options = settings.general.countries
@@ -38,6 +40,20 @@ st.title('Simulation Inputs')
 st.header("General simulation parameters")
 MC_iterations = st.slider(label="Monte Carlo simulation iterations", min_value=100, max_value=10000, value=1000,
                           step=100)
+
+system_life_span = int(st.number_input("The system's life span [years]", min_value=10, max_value=30, value=20, step=1,
+                                       help="This typically ranges between 15 and 30 years."))
+
+annual_operating_hours_check = st.checkbox("Are the annual operating hours known?",
+                                           help="If this is not known an estimate based on empirical data will be "
+                                                "made.")
+annual_operating_hours_value = None
+if annual_operating_hours_check:
+    annual_operating_hours_value = int(st.number_input("The system's annual operating hours [hours/year]",
+                                                       min_value=5000, max_value=8760, value=8000, step=1,
+                                                       help="This typically ranges between 6000 and 8500 hours/year."))
+    st.divider()
+
 country = st.selectbox(label="Country", options=country_options)
 
 change_currency = st.checkbox(label="Select currency independently of country", value=False)
@@ -79,7 +95,7 @@ feedstock_O_by_difference = 100 - feedstock_C - feedstock_H - feedstock_N - feed
 feedstock_O = st.number_input(label="Oxygen content [%daf] (calculated by difference)", value=feedstock_O_by_difference,
                               min_value=0.0, max_value=100.0)
 if feedstock_O < 0:
-    st.error("Feedstock oxygen is below zero. Check imputed elemental composition.")
+    st.error("Feedstock oxygen is below 0 %. Check imputed elemental composition.")
 st.subheader("Feedstock proximate composition",
              help="Typical feedstock data may be obtained from the [Phyllis2 database](https://phyllis.nl).")
 feedstock_moisture_ar = st.number_input(label="Feedstock moisture [%wb] (as received)", min_value=0.0, max_value=100.0)
@@ -90,13 +106,31 @@ feedstock_moisture_post_drying = None
 dryer_type = None
 if drying_included:
     feedstock_moisture_post_drying = st.number_input(label="Desired feedstock moisture post drying [%wb]",
-                                                     min_value=0.0, max_value=100.0)
+                                                     value=feedstock_moisture_ar,
+                                                     min_value=0.0,
+                                                     max_value=feedstock_moisture_ar)
     drying_additional_options = st.checkbox(label="Display additional drying options", value=False)
     if drying_additional_options:
         dryer_type = st.selectbox(label="Dryer type", options=dryer_type_options, index=0,
                                   help="Select which type of dryer is to be used.")
     st.markdown("""---""")
 feedstock_ash = st.number_input(label="Ash content [%db]", min_value=0.0, max_value=100.0)
+
+st.subheader("Feedstock energy")
+feedstock_LHV_given_by_user = st.checkbox("Is the feedstock's lower heating value (LHV) (also known as net calorific "
+                                          "value) known? If not it will be estimated based on the feedstock's ultimate "
+                                          "and proximate composition.")
+if feedstock_LHV_given_by_user:
+    feedstock_LHV = st.number_input(label="Feedstock LHV [MJ/kg wb]", min_value=0.0, max_value=50.0)
+else:
+    if drying_included:
+        feedstock_LHV = calculate_LHV_HHV_feedstock_from_direct_inputs(C=feedstock_C, H=feedstock_H, O=feedstock_O,
+                                                                       moisture=feedstock_moisture_post_drying)
+    else:
+        feedstock_LHV = calculate_LHV_HHV_feedstock_from_direct_inputs(C=feedstock_C, H=feedstock_H, O=feedstock_O,
+                                                                       moisture=feedstock_moisture_ar)
+    if feedstock_C != 0 or feedstock_H != 0 or feedstock_N != 0 or feedstock_S != 0:  # only display after user inputs
+        st.write(f"Estimated feedstock LHV is {feedstock_LHV:.2f} MJ/kg wb.")
 
 # %% Reactor information and processing conditions
 st.header("Reactor information and processing conditions")
@@ -121,19 +155,101 @@ if reactor_type != "Fixed bed":
     bed_material = st.selectbox(label="Reactor bed material", options=["Silica", "Alumina", "Olivine", "Other"])
     st.markdown("""---""")
 
+# %% System size
+st.header("System size information")
+
+st.write("Please define the system size based on at least one of the three metrics. More than one metric can be "
+         "defined. If not all size metrics are defined, the others will be estimated.")
+system_size_mass = st.checkbox("Define system size in terms of feedstock mass [tonnes feedstock/hour].")
+system_size_power_feedstock = st.checkbox("Define system size in terms of feedstock power/energy supply "
+                                          "[MW feedstock-LHV] or [MWh feedstock-LHV/hour].")
+system_size_power_electric = st.checkbox("Define system size in terms of net electric power [MWel].")
+
+# Ensure at least one metric is given
+if system_size_mass is False and system_size_power_feedstock is False and system_size_power_electric is False:
+    st.error("ERROR: Please supply at least one system size metric.")
+else:
+
+    # Display user inputs
+    if system_size_mass:
+        system_size_mass_value = st.number_input(label="System size [tonnes feedstock/hour]", value=10)
+
+    if system_size_power_feedstock:
+        system_size_power_feedstock_value = st.number_input(
+            label="System size [MW feedstock-LHV] or [MWh feedstock-LHV/hour]", value=10)
+
+    if system_size_power_electric:
+        system_size_power_electric_value = st.number_input(label="System size [MWel]", value=10)
+
+    # Calculate estimates if required
+    feedstock_LHV_MWh_per_tonne = MJ_to_kWh(feedstock_LHV)  # [MWh feedstock-LHV/tonne] calculate pre-requisite
+
+    if not system_size_mass:
+        if system_size_power_feedstock:
+            system_size_mass_value = system_size_power_feedstock_value / feedstock_LHV_MWh_per_tonne
+        else:
+            system_size_mass_value = convert_system_size(system_size_power_electric_value,
+                                                         input_units="MWel",
+                                                         output_units="tonnes/hour")
+            st.warning("Please note the system's size in terms of feedstock mass was estimated based on an empirical "
+                       "relationship. This may be recalculated using a different method during the full simulation.")
+
+    if not system_size_power_feedstock:
+        if system_size_mass:
+            system_size_power_feedstock_value = system_size_mass_value * feedstock_LHV_MWh_per_tonne
+        else:
+            system_size_power_feedstock_value = convert_system_size(system_size_power_electric_value,
+                                                                    input_units="MWel",
+                                                                    output_units="kWh/hour") / 1000
+            st.warning("Please note the system's size in terms of feedstock energy was estimated based on an empirical "
+                       "relationship. This may be recalculated using a different method during the full simulation.")
+
+    if not system_size_power_electric:
+        if system_size_mass:
+            system_size_power_electric_value = convert_system_size(system_size_mass_value,
+                                                                   input_units="tonnes/hour",
+                                                                   output_units="MWel")
+        else:
+            system_size_power_electric_value = convert_system_size(value=system_size_power_feedstock_value * 1000,
+                                                                   input_units="kWh/hour",
+                                                                   output_units="MWel")
+        st.warning("Please note the system's net electric power was estimated based on an empirical relationship. "
+                   "This may be recalculated using a different method during the full simulation.")
+
+    # Display estimated/given values.
+    if system_size_mass is True or system_size_power_feedstock is True or system_size_power_electric is True:
+        st.write("Your selected (or estimated) system size is:")
+        st.write(f"{system_size_mass_value:.1f} [tonnes/hour]")
+        st.write(f"{system_size_power_feedstock_value:.2f} [MW feedstock-LHV] or [MWh feedstock-LHV/hour]")
+        st.write(f"{system_size_power_electric_value:.2f} [MWel]")
+
+st.divider()
+
 # %% Techno-economic analysis inputs
 st.header("Techno-economic analysis choices")
 
-CEPCI_year = st.number_input("Select the year to which prices should be updated to",
+st.subheader("General")
+CEPCI_year = st.number_input("Select the year to which prices and costs should be updated to",
                              value=get_most_recent_available_CEPCI_year(),
                              step=1,
-                             min=2001,
-                             max=get_most_recent_available_CEPCI_year(),
-                             help="Generally the default year is the most recent CEPCI value."
-                             )
-st.markdown("""---""")
+                             min_value=2001,
+                             max_value=get_most_recent_available_CEPCI_year(),
+                             help="During the simulations all prices and costs will be updated to this year using "
+                                  "currency and cost index scaling. Generally the default year is the most recent "
+                                  "CEPCI value.")
+st.divider()
 
-electricity_price = st.selectbox(label="Select the electricity wholesale price [" + currency + "/kWh]",
+rate_of_return_percentage = st.number_input(label="Rate of return (or discount rate/interest rate) which is to be used "
+                                                  "for economic analysis [%]", value=5, min_value=0, max_value=20,
+                                            help="The rate of return is used to discount cash flows occurring at "
+                                            "different times (e.g. convert an annuity to its present value "
+                                            "equivalent.")
+rate_of_return_decimals = rate_of_return_percentage / 100
+st.divider()
+
+st.subheader("Energy prices")
+# Electricity price
+electricity_price = st.selectbox(label=f"Select the electricity wholesale price [{currency}/kWh]",
                                  options=economic_inputs_options)
 electricity_price_parameters = {}
 if electricity_price == "user selected":
@@ -142,9 +258,12 @@ if electricity_price == "user selected":
     electricity_price_parameters = display_correct_user_distribution_inputs(choice=electricity_price_user_selected,
                                                                             key="electricity price distribution " +
                                                                                 electricity_price_user_selected)
-    st.markdown("""---""")
+    st.divider()
+else:
+    st.divider()
 
-heat_price = st.selectbox(label="Select the heat/thermal energy wholesale price [" + currency + "/kWh]",
+# Heat/thermal energy price
+heat_price = st.selectbox(label=f"Select the heat/thermal energy wholesale price [{currency}/kWh]",
                           options=economic_inputs_options)
 heat_price_parameters = {}
 if heat_price == "user selected":
@@ -153,11 +272,80 @@ if heat_price == "user selected":
     heat_price_parameters = display_correct_user_distribution_inputs(choice=heat_price_user_selected,
                                                                      key="heat price distribution " +
                                                                          heat_price_user_selected)
-    st.markdown("""---""")
+    st.divider()
+else:
+    st.divider()
 
+# Biochar price
+st.subheader("Biochar price")
+biochar_price = st.selectbox(label=f"Select the biochar price [{currency}/tonne]",
+                             options=economic_inputs_options,
+                             index=1,
+                             help="Biochar prices can vary greatly based on local conditions. "
+                                  "User selected values are recommended.")
+biochar_price_parameters = {}
+if biochar_price == "user selected":
+    biochar_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
+                                           key="biochar price distribution type")
+    biochar_price_parameters = display_correct_user_distribution_inputs(choice=biochar_price_user_selected,
+                                                                        key="biochar price distribution " +
+                                                                            biochar_price_user_selected)
+    st.divider()
+else:
+    st.divider()
+
+# Gate fee/feedstock cost
+st.subheader("Gate fee/feedstock cost")
+gate_fee_feedstock_price_selector = st.selectbox(label="Select whether a gate fee will be received for treating the "
+                                                       "feedstock or the feedstock will need to be bought.",
+                                                 options=["gate fee", "feedstock cost"])
+
+gate_fee_feedstock_price = st.selectbox(label=f"Select the {gate_fee_feedstock_price_selector} [{currency}/tonne]",
+                                        options=economic_inputs_options,
+                                        index=1,
+                                        help="As this can drastically vary based on local conditions user "
+                                             "selected values are recommended.")
+
+if gate_fee_feedstock_price == "default":
+    st.error("Currently default values are not supported for gate fees/feedstock costs, because these vary "
+             "too much based on the feedstock choice and regional conditions etc.")
+
+gate_fee_feedstock_price_parameters = {}
+if gate_fee_feedstock_price == "user selected":
+    gate_fee_feedstock_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
+                                                      key="gate fee or feedstock price distribution type")
+    gate_fee_feedstock_price_parameters = display_correct_user_distribution_inputs(
+        choice=gate_fee_feedstock_price_user_selected,
+        key="gate fee or feedstock price distribution" + gate_fee_feedstock_price_user_selected)
+    st.divider()
+else:
+    st.divider()
+
+# Carbon tax
+st.subheader("Carbon tax")
+carbon_tax_selector = st.checkbox("Is a carbon tax to be considered?")
+
+if carbon_tax_selector:
+    carbon_tax = st.selectbox(label=f"Select the carbon tax [{currency}/tonne CO2eq.]",
+                              options=economic_inputs_options,
+                              index=1,
+                              help="A carbon tax or potential carbon tax are subject to frequent changes. "
+                                   "User selected values are recommended.")
+
+    carbon_tax_parameters = {}
+    if carbon_tax == "user selected":
+        carbon_tax_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
+                                            key="carbon tax distribution type")
+        carbon_tax_parameters = display_correct_user_distribution_inputs(choice=carbon_tax_user_selected,
+                                                                         key="carbon tax distribution " +
+                                                                             carbon_tax_user_selected)
+        st.divider()
+    else:
+        st.divider()
+else:
+    st.divider()
 
 # TODO: Add other user inputs required for economic analysis
-
 
 # %% Process selection and process choices.
 st.header("Process selector")
@@ -218,25 +406,29 @@ biochar_carbon_fraction = None
 biochar_stability = None
 
 if biochar_included:
-    biochar_yield_option = st.radio(label="Biochar yield", options=numeric_inputs_options)
-    if biochar_yield_option == "default":
-        biochar_yield = None
-    else:
-        biochar_yield = st.number_input(label="Biochar yield [g/kg wb]")
+    biochar_additional_inputs = st.checkbox(label="Display additional biochar inputs",
+                                            value=False, key="biochar_additional_inputs")
+    if biochar_additional_inputs:
+        st.write("A number of parameters regarding the biochar's yield and composition can be updated here if known.")
+        biochar_yield_option = st.radio(label="Biochar yield", options=numeric_inputs_options)
+        if biochar_yield_option == "default":
+            biochar_yield = None
+        else:
+            biochar_yield = st.number_input(label="Biochar yield [g/kg wb]")
 
-    biochar_carbon_fraction_option = st.radio(label="Biochar carbon fraction", options=numeric_inputs_options)
-    if biochar_carbon_fraction_option == "default":
-        biochar_carbon_fraction = None
-    else:
-        biochar_carbon_fraction = st.number_input(label="Biochar carbon fraction as a decimal")
+        biochar_carbon_fraction_option = st.radio(label="Biochar carbon fraction", options=numeric_inputs_options)
+        if biochar_carbon_fraction_option == "default":
+            biochar_carbon_fraction = None
+        else:
+            biochar_carbon_fraction = st.number_input(label="Biochar carbon fraction as a decimal")
 
-    biochar_stability_option = st.radio(label="Recalcitrant fraction of carbon in biochar",
-                                        options=numeric_inputs_options)
-    if biochar_stability_option == "default":
-        biochar_stability = None
-    else:
-        biochar_stability = st.number_input(label="Recalcitrant fraction of carbon in biochar as a decimal")
-    st.markdown("""---""")
+        biochar_stability_option = st.radio(label="Recalcitrant fraction of carbon in biochar",
+                                            options=numeric_inputs_options)
+        if biochar_stability_option == "default":
+            biochar_stability = None
+        else:
+            biochar_stability = st.number_input(label="Recalcitrant fraction of carbon in biochar as a decimal")
+        st.markdown("""---""")
 
 # %% Carbon capture
 st.subheader("Carbon capture and storage (CCS)")
@@ -253,7 +445,7 @@ if carbon_capture_included:
 # %% Combined heat and power (CHP) plant
 st.subheader("Optional user inputs")
 CHP_display_additional_inputs = st.checkbox(label="Display additional combined heat and power (CHP) inputs",
-                                            value=False, key="CHP")
+                                            value=False, key="CHP_additional_inputs")
 CHP_dict = {}
 if CHP_display_additional_inputs:
     CHP_unit = st.radio(label="Display additional inputs", options=CHP_options)
@@ -293,7 +485,10 @@ def user_data_to_toml():
             "user_inputs": {
                 "general": {"MC_iterations": MC_iterations,
                             "country": country,
-                            "currency": currency
+                            "currency": currency,
+                            "system_life_span": system_life_span,
+                            "annual_operating_hours_user_imputed": annual_operating_hours_check,
+                            "annual_operating_hours": annual_operating_hours_value
                             },
 
                 "feedstock": {"category": feedstock_category,  # general
@@ -304,6 +499,7 @@ def user_data_to_toml():
                               "nitrogen": feedstock_N,
                               "sulphur": feedstock_S,
                               "oxygen": feedstock_O,
+                              "LHV": feedstock_LHV,
                               "moisture_ar": feedstock_moisture_ar,  # proximate
                               "moisture_post_drying": feedstock_moisture_post_drying,
                               "ash": feedstock_ash,
@@ -318,12 +514,28 @@ def user_data_to_toml():
                                        "reactor_type": reactor_type,
                                        "bed_material": bed_material
                                        },
+                "system_size": {"mass_basis_user_imputed": system_size_mass,
+                                "power_feedstock_user_imputed": system_size_power_feedstock,
+                                "power_electric_user_imputed": system_size_power_electric,
+                                "mass_basis_tonnes_per_hour": system_size_mass_value,
+                                "power_feedstock_MW_feedstock_LHV": system_size_power_feedstock_value,
+                                "power_electric_MW_el": system_size_power_electric_value
+                                },
 
                 "economic": {"CEPCI_year": CEPCI_year,
+                             "rate_of_return_decimals": rate_of_return_decimals,
                              "electricity_price_choice": electricity_price,
                              "electricity_price_parameters": electricity_price_parameters,
                              "heat_price_choice": heat_price,
-                             "heat_price_parameters": heat_price_parameters
+                             "heat_price_parameters": heat_price_parameters,
+                             "biochar_price_choice": biochar_price,
+                             "biochar_price_parameters": biochar_price_parameters,
+                             "gate_fee_or_feedstock_price_selection": gate_fee_feedstock_price_selector,
+                             "gate_fee_or_feedstock_price_choice": gate_fee_feedstock_price,
+                             "gate_fee_or_feedstock_price_parameters": gate_fee_feedstock_price_parameters,
+                             "carbon_tax_included": carbon_tax_selector,
+                             "carbon_tax_choice": carbon_tax,
+                             "carbon_tax_parameters": carbon_tax_parameters,
                              },
 
                 "processes": {

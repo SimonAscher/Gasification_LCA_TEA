@@ -24,7 +24,7 @@ countries = ["UK", "EU", "Germany", "USA", "World"]
 feedstock_categories = ["plastics", "municipal solid waste", "herbaceous biomass", "woody biomass", "sewage sludge", "other"]
 
 # Functional unit (FU) used in LCA
-FU = 1000  # 1 tonne of feedstock
+FU = 1000  # [kg] (i.e. 1 tonne of feedstock)
 FU_label = "tonne of feedstock input"
 
 [default.labels]
@@ -284,6 +284,7 @@ USA = 0.045
 USD_TO_GBP = 0.8003
 EUR_TO_GBP = 0.8489
 source = "https://www.gov.uk/government/publications/exchange-rates-for-customs-and-vat-yearly"
+# TODO: Double check if this is unused now - use currency conversion functions instead.
 
 
 [default.data.economic.electricity_wholesale_prices.UK]  # Electricity wholesale prices
@@ -310,6 +311,34 @@ upper = 1.75
 units = "GBP/thm"
 distribution_type = "triangular"
 source = ["https://tradingeconomics.com/commodity/uk-natural-gas"]
+
+[default.data.economic.biochar_price.UK]  # biochar price
+lower = 200
+mode = 300
+upper = 400
+units = "GBP/tonne"
+distribution_type = "triangular"
+source = ["https://biochardemonstrator.ac.uk/info-for-farmers/#:~:text=How%20much%20does%20biochar%20cost,%C2%A37.99%20from%20Carbon%20Gold."]
+
+[default.data.economic.carbon_price.UK]  # carbon trading prices
+lower = 40
+mode = 60
+upper = 80
+units = "GBP/tonne"
+distribution_type = "triangular"
+source = ["https://ember-climate.org/data/data-tools/carbon-price-viewer/", "https://www.statista.com/statistics/1322275/carbon-prices-united-kingdom-emission-trading-scheme/#:~:text=UK%2DETS%20carbon%20pricing%20in%20the%20United%20Kingdom%202022%2D2023&text=The%20price%20of%20emissions%20allowances,ton%20on%20May%2031%2C%202023."]
+
+[default.data.economic.carbon_price.EU]  # carbon trading prices
+lower = 65
+mode = 85
+upper = 100
+units = "EUR/tonne"
+distribution_type = "triangular"
+source = ["https://ember-climate.org/data/data-tools/carbon-price-viewer/", "https://www.statista.com/statistics/1322214/carbon-prices-european-union-emission-trading-scheme/#:~:text=The%20price%20of%20emissions%20allowances,reform%20of%20the%20EU%20ETS."]
+
+
+
+
 
 [default.data.economic.CEPCI]  # Chemical Enginnering Plant Cost Index (CEPCI) values
 2001 = 394.3

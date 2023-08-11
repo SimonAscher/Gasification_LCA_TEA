@@ -2,7 +2,6 @@ import sys
 
 from pathlib import Path
 
-from functions.MonteCarloSimulation import run_simulation
 
 # Add root directory
 root_path = str(Path(__file__).parent.parent.parent.parent)
@@ -14,6 +13,7 @@ import streamlit as st
 
 from human_id import generate_id
 from config import settings
+from functions.MonteCarloSimulation import run_simulation
 from functions.gui.streamlit_helpers import update_settings_with_user_inputs, sensitivity_analysis_energy_impact, \
     update_settings_with_sensitivity_analysis_choices, show_simulation_results, download_zipped_figures
 
@@ -31,8 +31,10 @@ if uploaded_baseline_file is not None:  # Continue with script once a file has b
     # %% Run sensitivity analysis
     st.header("Run sensitivity analysis")
 
-    run_sensitivity_analysis_choice = st.selectbox(label='Choose whether sensitivity analysis should be run from a previously created .toml file or if you want to select the parameters now.',
-                                                   options=sensitivity_analysis_run_options, index=0)
+    run_sensitivity_analysis_choice = st.selectbox(label='Choose whether sensitivity analysis should be run from a '
+                                                         'previously created .toml file or if you want to select the '
+                                                         'parameters now.',
+                                                   options=sensitivity_analysis_run_options, index=1)
 
     if run_sensitivity_analysis_choice == sensitivity_analysis_run_options[0]:  # Run from uploaded .toml file
         uploaded_sensitivity_analysis_file = st.file_uploader(

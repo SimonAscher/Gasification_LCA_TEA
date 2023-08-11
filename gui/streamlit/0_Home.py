@@ -17,4 +17,3 @@ st.title('General Biomass and Waste Gasification LCA and TEA')
 
 # Test streamlit
 st.write(root_path)
-

@@ -10,7 +10,7 @@ from typing import Type, TypeVar
 from objects.requirement_objects import _Requirement, Requirements
 from objects.requirement_objects import Heat, Electricity, Steam, Oxygen, FossilGWP, BiogenicGWP
 from functions.LCA import electricity_GWP, thermal_energy_GWP
-from functions.TEA.energy_use import electricity_cost_benefit, heat_cost_benefit
+from functions.TEA.cost_benefit_components import electricity_cost_benefit, heat_cost_benefit
 from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
 
 
@@ -111,7 +111,7 @@ class CostBenefit:
         self.units = units
         self.requirement_type = str(type(requirement))
 
-        # Calculate GWP and store as object attribute
+        # Calculate Cost/Benefit and store as object attribute
         if isinstance(requirement, Electricity):
             self.values = electricity_cost_benefit(requirement.values)
             if requirement.generated:  # i.e. leading to sale of electricity

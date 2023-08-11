@@ -40,3 +40,46 @@ def calculate_LHV_HHV_feedstock(predictor_data, heating_value_choice="LHV"):
         raise ValueError("Invalid heating value type.")
 
     return output
+
+def calculate_LHV_HHV_feedstock_from_direct_inputs(*, C, H, O, moisture, heating_value_choice="LHV"):
+    """
+    Estimates the LHV or HHV of a feedstock based on its ultimate composition (and moisture content).
+    Copy of other function but this one uses direct function inputs - given as percentages.
+
+    HHV model source: https://doi.org/10.1063/5.0059376
+
+    Parameters
+    ----------
+    C: float
+        [% daf]
+    H: float
+        [% daf]
+    O: float
+        [% daf]
+    moisture: float
+        [% wb]
+    heating_value_choice: str
+        Determines whether the feedstock's heating value should be returned as "LHV" or "HHV".
+
+    Returns
+    -------
+    float
+        The estimated LHV or HHV of a feedstock [MJ/kg wb].
+    """
+    # Extract ultimate analysis data
+
+    HHV = 2.8799 + 0.2965 * C + 0.4826 * H - 0.0187 * O
+
+    if heating_value_choice == "LHV":
+        LHV = HHV - (9 * (H / 100 * (100 / (100 - moisture))) * (
+                settings.data.heats_vaporisation.water["18 degC"] / 1000))
+
+        output = float(LHV)
+
+    elif heating_value_choice == "HHV":
+        output = float(HHV)
+
+    else:
+        raise ValueError("Invalid heating value type.")
+
+    return output
