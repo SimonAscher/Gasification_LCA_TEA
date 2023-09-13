@@ -24,6 +24,7 @@ def get_carbon_capture_CAPEX_distribution(results, currency=None, CEPCI_year=Non
 
     Returns
     -------
+    AnnualValue
         Distribution of CAPEX values in the supplied currency.
 
     """
@@ -79,36 +80,8 @@ def get_carbon_capture_CAPEX_distribution(results, currency=None, CEPCI_year=Non
     # Convert per FU units to life cycle costs/benefits
     annuity_cash_flow_array_capture = costs_benefits_per_FU_capture * system_size_tonnes_per_year_array
 
-    CAPEX1 = AnnualValue(values=list(annuity_cash_flow_array_capture),
-                         name="Carbon Capture CAPEX",
-                         short_label="CC")
+    CAPEX = AnnualValue(values=list(annuity_cash_flow_array_capture),
+                        name="Carbon Capture CAPEX",
+                        short_label="CC")
 
-    # Alternative CAPEX
-    ref_size_tonnes_per_hour = 0.1  # [tonnes/hour]
-    ref_CAPEX = -253800  # [USD 2020] Note: Taken as -ve as it is a cost.
-    ref_year_CAPEX = 2020
-
-    CAPEX_CEPCI_scaled = functions.TEA.CEPCI_scale(base_year=ref_year_CAPEX,
-                                                   design_year=settings.user_inputs.economic.CEPCI_year,
-                                                   value=ref_CAPEX)
-    CAPEX_CEPCI_power_scaled = functions.TEA.power_scale(baseline_size=ref_size_tonnes_per_hour,
-                                                         design_size=system_size_tonnes_per_hour,
-                                                         baseline_cost=CAPEX_CEPCI_scaled)
-
-    CAPEX_converted = functions.TEA.convert_currency_annual_average(value=CAPEX_CEPCI_power_scaled,
-                                                                    year=ref_year_CAPEX,
-                                                                    base_currency="USD",
-                                                                    converted_currency=currency)
-
-    CAPEX_converted_AV = functions.TEA.get_annual_value(value=CAPEX_converted, value_type="PV")
-
-    CAPEX_converted_AV_array = list(functions.MonteCarloSimulation.to_fixed_MC_array(CAPEX_converted_AV))
-
-    CAPEX2 = AnnualValue(values=CAPEX_converted_AV_array,
-                         name="Carbon Capture CAPEX 2",
-                         short_label="CC 2")
-    # TODO: Currently methods agree with each other fairly well at ref system size of 0.1 tonnes/hour of method 2.
-    #  In other regions they don't agree well. Select which method should be used - could just use 1st method
-    #  throughout.
-    return {"CAPEX 1": CAPEX1,
-            "CAPEX 2": CAPEX2}
+    return CAPEX
