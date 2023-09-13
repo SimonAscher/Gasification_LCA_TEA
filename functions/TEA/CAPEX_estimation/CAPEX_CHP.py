@@ -12,7 +12,7 @@ from functions.general.curve_fitting import func_power_curve, func_straight_line
 from functions.general.utility import get_project_root
 from functions.TEA import convert_currency_annual_average
 from functions.TEA.scaling import CEPCI_scale
-from objects import triangular_dist_maker
+from objects import triangular_dist_maker, PresentValue
 
 
 def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None):
@@ -32,8 +32,8 @@ def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None)
 
     Returns
     -------
-    list
-        Distribution of CAPEX values in the supplied currency.
+    PresentValue
+        Present value object containing distribution of CAPEX values in the supplied currency.
     """
 
     # Get defaults
@@ -142,4 +142,8 @@ def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None)
 
     distribution_draws = list(get_distribution_draws(distribution))
 
-    return distribution_draws
+    CAPEX = PresentValue(values=distribution_draws,
+                         name="CAPEX CHP",
+                         short_label="CAPEX CHP")
+
+    return CAPEX

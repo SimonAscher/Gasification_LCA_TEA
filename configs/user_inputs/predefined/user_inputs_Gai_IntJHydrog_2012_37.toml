@@ -34,12 +34,11 @@ bed_material = "N/A"
 mass_basis_user_imputed = true
 power_feedstock_user_imputed = true
 power_electric_user_imputed = true
-mass_basis_tonnes_per_hour = 20
-power_feedstock_MW_feedstock_LHV = 100
-power_electric_MW_el = 66
+mass_basis_tonnes_per_hour = 0.1
 # FAKE VALUES CURRENTLY
 
 [default.user_inputs.economic]
+CEPCI_year = 2020
 rate_of_return_decimals = 0.05
 electricity_price_choice = "default"
 heat_price_choice = "default"
@@ -48,6 +47,8 @@ carbon_tax_choice = "default"
 biochar_price_choice = "default"
 gate_fee_or_feedstock_price_choice = "user selected"
 gate_fee_or_feedstock_price_selection = "feedstock cost"
+CO2_transport_price_choice = "default"
+CO2_storage_price_choice = "default"
 
 [default.user_inputs.economic.electricity_price_parameters]
 
@@ -69,6 +70,10 @@ std = 30.0
 distribution_type = "gaussian"
 # Fake values
 
+[default.user_inputs.economic.CO2_transport_price_parameters]
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+
 [default.user_inputs.processes.milling]
 included = false
 
@@ -88,6 +93,7 @@ included = true
 [default.user_inputs.processes.carbon_capture]
 included = true
 method = "VPSA post combustion"
+# method = "Amine post comb"
 
 [default.user_inputs.processes.CHP]
 type = "Jenbacher Type 6 gas engine (1600 kW) (default)"

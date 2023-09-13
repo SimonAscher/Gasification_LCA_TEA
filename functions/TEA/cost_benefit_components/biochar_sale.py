@@ -5,6 +5,7 @@ import numpy as np
 
 from config import settings
 
+
 def biochar_sale_cost_benefit():
     """
     Calculates benefits (or costs) resulting from the sale of biochar.

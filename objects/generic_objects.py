@@ -4,7 +4,7 @@ from config import settings
 
 # Named tuple objects - used for making distributions for Monte Carlo simulation
 fixed_dist_maker = namedtuple("fixed_dist_maker", "value")
-range_dist_maker = namedtuple("range_dist_maker", "low high")
+range_dist_maker = namedtuple("range_dist_maker", "low high")  # i.e. uniform distribution
 triangular_dist_maker = namedtuple("triangular_dist_maker", "lower mode upper")
 gaussian_dist_maker = namedtuple("gaussian_dist_maker", "mean std")
 
@@ -28,7 +28,7 @@ class _ParentPresentAnnualFutureValue:
         Given as a decimal. Note the rate of return, interest rate, and discount rate are used interchangeably in
         this context. Used to convert between PV, AV, and FV.
     number_of_periods: int
-        Used to convert between PV, AV, and FV. Typically, the systems life-cycle.
+        Used to convert between PV, AV, and FV. Typically, the system's life cycle.
     description: str
         Optional description can be added here.
     """

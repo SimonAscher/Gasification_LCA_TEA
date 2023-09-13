@@ -345,7 +345,47 @@ if carbon_tax_selector:
 else:
     st.divider()
 
-# TODO: Add other user inputs required for economic analysis
+
+carbon_capture_included_1 = st.checkbox(label="Is carbon capture and storage included?", value=False,
+                                        key="carbon_capture_included_1")
+
+if carbon_capture_included_1:
+    CO2_transport_price = st.selectbox(label=f"Select the CO2 transport price [{currency}/tonne CO2]",
+                                       options=economic_inputs_options,
+                                       index=1,
+                                       help="CO2 transport costs vary greatly depending on the transport method and "
+                                            "distance. User selected values are recommended.")
+
+    CO2_transport_parameters = {}
+    if CO2_transport_price == "user selected":
+        CO2_transport_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
+                                                     key="CO2 transport price distribution type")
+        CO2_transport_parameters = display_correct_user_distribution_inputs(choice=CO2_transport_price_user_selected,
+                                                                            key="CO2 transport price distribution " +
+                                                                                CO2_transport_price_user_selected)
+        st.divider()
+    else:
+        st.divider()
+
+    CO2_storage_price = st.selectbox(label=f"Select the CO2 storage price [{currency}/tonne CO2]",
+                                     options=economic_inputs_options,
+                                     index=1,
+                                     help="CO2 storage costs vary greatly depending on the locally available storage "
+                                          "options. User selected values are recommended.")
+
+    CO2_storage_parameters = {}
+    if CO2_storage_price == "user selected":
+        CO2_storage_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
+                                                   key="CO2 storage price distribution type")
+        CO2_storage_parameters = display_correct_user_distribution_inputs(choice=CO2_storage_price_user_selected,
+                                                                          key="CO2 storage price distribution " +
+                                                                              CO2_storage_price_user_selected)
+        st.divider()
+    else:
+        st.divider()
+
+else:
+    st.divider()
 
 # %% Process selection and process choices.
 st.header("Process selector")
@@ -432,10 +472,11 @@ if biochar_included:
 
 # %% Carbon capture
 st.subheader("Carbon capture and storage (CCS)")
-carbon_capture_included = st.checkbox(label="Select to include CCS", value=False)
+carbon_capture_included_2 = st.checkbox(label="Select to include CCS", value=carbon_capture_included_1,
+                                        key="carbon_capture_included_2")
 carbon_capture_method = None  # set default
 
-if carbon_capture_included:
+if carbon_capture_included_2:
     carbon_capture_method = st.radio(label="Display additional inputs", options=carbon_capture_options)
     if carbon_capture_method == "Vacuum pressure swing adsorption (VPSA) post combustion capture (default)":
         carbon_capture_method = "VPSA post combustion"
@@ -536,6 +577,10 @@ def user_data_to_toml():
                              "carbon_tax_included": carbon_tax_selector,
                              "carbon_tax_choice": carbon_tax,
                              "carbon_tax_parameters": carbon_tax_parameters,
+                             "CO2_transport_price_choice": CO2_transport_price,
+                             "CO2_transport_price_parameters": CO2_transport_parameters,
+                             "CO2_storage_price_choice": CO2_storage_price,
+                             "CO2_storage_price_parameters": CO2_storage_parameters
                              },
 
                 "processes": {
@@ -556,7 +601,7 @@ def user_data_to_toml():
                                 "biochar_carbon_fraction": biochar_carbon_fraction,
                                 "biochar_stability": biochar_stability
                                 },
-                    "carbon_capture": {"included": carbon_capture_included,
+                    "carbon_capture": {"included": carbon_capture_included_2,
                                        "method": carbon_capture_method
                                        },
                     "CHP": CHP_dict

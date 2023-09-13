@@ -14,7 +14,7 @@ from functions.general.curve_fitting import func_power_curve, func_straight_line
 from functions.general.utility import get_project_root
 from functions.TEA import convert_currency_annual_average
 from functions.TEA.scaling import CEPCI_scale
-from objects import triangular_dist_maker
+from objects import triangular_dist_maker, PresentValue
 
 _system_size_unit_types = Literal["tonnes/hour", "MW_feedstock_LHV", "MWel"]
 
@@ -47,9 +47,9 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
 
     Returns
     -------
-    tuple[list, list]
-        Distribution of CAPEX values in the supplied currency for the gasification plant (1st tuple entry) and
-        syngas cleaning (2nd tuple entry).
+    tuple[PresentValue, PresentValue]
+        Tuple of present value objects containing distribution of CAPEX values in the supplied currency.
+        1st tuple entry = CAPEX of gasification plant. 2nd tuple entry = CAPEX of syngas cleaning.
     """
 
     # Get defaults
@@ -223,7 +223,6 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
     df_fixed = df[df["Type"] == "fixed bed"]
 
     # Fit models, get performance metric, and make prediction
-
     # Small-scale fluidised bed reactor
     if system_size_MWel <= threshold_small_scale_system and reactor_type == "Fluidised bed":
         df_selected = df[df["Plant size [MWel]"] < threshold_small_scale_system]
@@ -294,9 +293,7 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
     if system_size_MWel > max_fluidised_bed_size:
         warnings.warn("System size limited to 70 MWel. Given value exceeds this.")
 
-
     # Gasification costs
-
     # Get lower and upper bounds of distribution based on the distributions MAPE
     lower_bound_gasification = prediction - (prediction * mape_decimal)
     upper_bound_gasification = prediction + (prediction * mape_decimal)
@@ -323,5 +320,13 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
         dist_draws_gas_cleaning.append((gasification_CAPEX_draw / (1-gas_cleaning_fraction_of_total_CAPEX_mode)) *
                                        dist_draws_gas_cleaning_fraction_decimal[count])
 
+    # Store CAPEX distributions in PresentValue objects.
+    CAPEX_gasification = PresentValue(values=dist_draws_gasification,
+                                      name="CAPEX gasification",
+                                      short_label="CAPEX gas.")
 
-    return dist_draws_gasification, dist_draws_gas_cleaning
+    CAPEX_gas_cleaning = PresentValue(values=dist_draws_gas_cleaning,
+                                      name="CAPEX gas cleaning",
+                                      short_label="CAPEX gas clean.")
+
+    return CAPEX_gasification, CAPEX_gas_cleaning

@@ -1,4 +1,6 @@
 from .energy_use import electricity_cost_benefit, heat_cost_benefit
-from .carbon_tax import carbon_tax_cost_benefit
+from .carbon_price import carbon_price_cost_benefit
 from .biochar_sale import biochar_sale_cost_benefit
 from .gate_fee_feedstock_cost import gate_fee_or_feedstock_cost_benefit
+from .carbon_capture_transport_storage import carbon_capture_transport_storage_cost_benefit
+from .carbon_capture_amine_consumption import carbon_capture_amine_consumption_cost_benefit

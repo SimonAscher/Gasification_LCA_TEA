@@ -5,9 +5,10 @@ from config import settings
 from objects import AnnualValue
 
 
-def carbon_tax_cost_benefit(results):
+def carbon_price_cost_benefit(results):
     """
-    Calculates costs/benefits resulting from the systems global net CO2eq. emissions.
+    Calculates costs/benefits due to a carbon price which could be the result of an emissions trading scheme,
+    a carbon tax, or a voluntary carbon market etc. The systems global net CO2eq. emissions are used.
 
     Parameters
     ----------
