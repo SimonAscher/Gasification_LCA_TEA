@@ -1,11 +1,12 @@
 import numpy as np
 
-from dynaconf.utils.boxing import DynaBox
 from config import settings
+from numpy.typing import ArrayLike
+from dynaconf.utils.boxing import DynaBox
 from objects import triangular_dist_maker, gaussian_dist_maker, fixed_dist_maker, range_dist_maker
 
 
-def to_fixed_MC_array(value, no_iterations=settings.user_inputs.general.MC_iterations):
+def to_fixed_MC_array(value, no_iterations=None):
     """
     Convenience function to turn any value into a repeating array the length of Monte Carlo iterations.
 
@@ -14,20 +15,23 @@ def to_fixed_MC_array(value, no_iterations=settings.user_inputs.general.MC_itera
     value: float
         Value which is to be repeated.
 
-    no_iterations: float
+    no_iterations: None | float
         Number of iterations. Default value loaded from settings.
 
     Returns
     -------
-    np.array
+    ArrayLike
         Numpy array repeating the input value.
     """
+
+    if no_iterations is None:
+        no_iterations = settings.user_inputs.general.MC_iterations
+
     mc_array = np.repeat(value, no_iterations)
     return mc_array
 
 
-def get_distribution_draws(distribution_maker, length_array=settings.user_inputs.general.MC_iterations,
-                           random_state: int = settings.background.random_seed):
+def get_distribution_draws(distribution_maker, length_array=settings.user_inputs.general.MC_iterations):
     """
     Function to get draws from a given distribution type (e.g. gaussian, triangular, fixed).
 
@@ -39,12 +43,10 @@ def get_distribution_draws(distribution_maker, length_array=settings.user_inputs
     length_array: int
         Length of created array. Default value is the number of Monte Carlo iterations loaded from settings.
         If set to 1 only a single value is drawn from distribution.
-    random_state: int
-        Random seed to be used in analysis. Default value defined in settings.
 
     Returns
     -------
-    np.array | float
+    ArrayLike | float
         Numpy array of distribution values or float if length_array has been set as 1.
     """
     # np.random.seed(random_state)  # set random seed

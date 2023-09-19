@@ -341,9 +341,15 @@ source = ["https://ember-climate.org/data/data-tools/carbon-price-viewer/", "htt
 
 
 [default.data.economic.CEPCI]  # Chemical Enginnering Plant Cost Index (CEPCI) values
+1995 = 381.1
+1996 = 381.7
+1997 = 386.5
+1998 = 389.5
+1999 = 390.6
+2000 = 394.1
 2001 = 394.3
 2002 = 395.6
-2003 = 402
+2003 = 402.0
 2004 = 444.2
 2005 = 468.2
 2006 = 499.6

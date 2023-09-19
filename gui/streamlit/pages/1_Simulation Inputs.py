@@ -172,47 +172,48 @@ else:
 
     # Display user inputs
     if system_size_mass:
-        system_size_mass_value = st.number_input(label="System size [tonnes feedstock/hour]", value=10)
+        system_size_mass_value = st.number_input(label="System size [tonnes feedstock/hour]", value=10.0, step=0.01)
 
     if system_size_power_feedstock:
-        system_size_power_feedstock_value = st.number_input(
-            label="System size [MW feedstock-LHV] or [MWh feedstock-LHV/hour]", value=10)
+        system_size_power_feedstock_value = st.number_input(label="System size [MW feedstock-LHV] or [MWh feedstock-LHV/hour]", value=10.0, step=0.01)
 
     if system_size_power_electric:
-        system_size_power_electric_value = st.number_input(label="System size [MWel]", value=10)
+        system_size_power_electric_value = st.number_input(label="System size [MWel]", value=10.0, step=0.01)
 
     # Calculate estimates if required
-    feedstock_LHV_MWh_per_tonne = MJ_to_kWh(feedstock_LHV)  # [MWh feedstock-LHV/tonne] calculate pre-requisite
-
     if not system_size_mass:
         if system_size_power_feedstock:
-            system_size_mass_value = system_size_power_feedstock_value / feedstock_LHV_MWh_per_tonne
+            system_size_mass_value = convert_system_size(value=system_size_power_feedstock_value,
+                                                         input_units="MWh/hour",
+                                                         feedstock_LHV=feedstock_LHV)["size_feedstock_mass"]
         else:
-            system_size_mass_value = convert_system_size(system_size_power_electric_value,
+            system_size_mass_value = convert_system_size(value=system_size_power_electric_value,
                                                          input_units="MWel",
-                                                         output_units="tonnes/hour")
+                                                         feedstock_LHV=feedstock_LHV)["size_feedstock_mass"]
             st.warning("Please note the system's size in terms of feedstock mass was estimated based on an empirical "
                        "relationship. This may be recalculated using a different method during the full simulation.")
 
     if not system_size_power_feedstock:
         if system_size_mass:
-            system_size_power_feedstock_value = system_size_mass_value * feedstock_LHV_MWh_per_tonne
+            system_size_power_feedstock_value = convert_system_size(value=system_size_mass_value,
+                                                                    input_units="tonnes/hour",
+                                                                    feedstock_LHV=feedstock_LHV)["size_feedstock_energy"]
         else:
             system_size_power_feedstock_value = convert_system_size(system_size_power_electric_value,
                                                                     input_units="MWel",
-                                                                    output_units="kWh/hour") / 1000
+                                                                    feedstock_LHV=feedstock_LHV)["size_feedstock_energy"]
             st.warning("Please note the system's size in terms of feedstock energy was estimated based on an empirical "
                        "relationship. This may be recalculated using a different method during the full simulation.")
 
     if not system_size_power_electric:
         if system_size_mass:
-            system_size_power_electric_value = convert_system_size(system_size_mass_value,
+            system_size_power_electric_value = convert_system_size(value=system_size_mass_value,
                                                                    input_units="tonnes/hour",
-                                                                   output_units="MWel")
+                                                                   feedstock_LHV=feedstock_LHV)["size_power"]
         else:
-            system_size_power_electric_value = convert_system_size(value=system_size_power_feedstock_value * 1000,
-                                                                   input_units="kWh/hour",
-                                                                   output_units="MWel")
+            system_size_power_electric_value = convert_system_size(value=system_size_power_feedstock_value,
+                                                                   input_units="MWh/hour",
+                                                                   feedstock_LHV=feedstock_LHV)["size_power"]
         st.warning("Please note the system's net electric power was estimated based on an empirical relationship. "
                    "This may be recalculated using a different method during the full simulation.")
 

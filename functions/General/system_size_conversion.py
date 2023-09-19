@@ -1,16 +1,15 @@
 import pandas as pd
 import numpy as np
 
-from warnings import warn
-from functions.general.utility import get_project_root
+from config import settings
+from functions.general.utility import get_project_root, MJ_to_kWh
 from sklearn.linear_model import LinearRegression
 from typing import Literal
 
-_input_output_unit_types = Literal["tonnes/hour", "kWh/hour", "MWel"]
+_input_output_unit_types = Literal["tonnes/hour", "MWh/hour", "MWel"]
 
 
-def convert_system_size(value, input_units: _input_output_unit_types, output_units: _input_output_unit_types,
-                        additional_outputs=False):
+def convert_system_size(value, input_units: _input_output_unit_types, feedstock_LHV=None):
     """
     Convert between a range of different system size units.
 
@@ -22,28 +21,20 @@ def convert_system_size(value, input_units: _input_output_unit_types, output_uni
          Defines the units of the "value" variable which is to be converted to the given "output_units".
          Options:
             - "tonnes/hour" - if given as feedstock mass input per hour
-            - "kWh/hour" - if given as feedstock energy input per hour
+            - "MWh/hour" - if given as feedstock energy input per hour
             - "MWel" - if given as system size in terms of electric power generation
-    output_units: _input_output_unit_types
-        Defines the units to which the given "value" variable is to be converted.
-        Options:
-            - "tonnes/hour" - if given as feedstock mass input per hour
-            - "kWh/hour" - if given as feedstock energy input per hour
-            - "MWel" - if given as system size in terms of electric power generation
-    additional_outputs: bool
-        Defines whether additional outputs (i.e. output unit and R2 score of regressor are also to be given).
-        Default = False
+    feedstock_LHV: None | float | int
+        Feedstock lower heating value [MJ/kg].
 
     Returns
     -------
-    float
-        System size in the selected units given by the "output_units" variable.
-
+    dict
+        Dictionary of system sizes in the three units.
     """
-    # Check that units are in correct format
-    if input_units not in ["MWel", "kWh/hour", "tonnes/hour"] or\
-            output_units not in ["MWel", "kWh/hour", "tonnes/hour"]:
-        raise ValueError("Supplied units are not supported.")
+
+    # Get default values
+    if feedstock_LHV is None:
+        feedstock_LHV = settings.user_inputs.feedstock.LHV  # [MJ/kg]
 
     # Get project root and define data source
     project_root = get_project_root()
@@ -52,59 +43,74 @@ def convert_system_size(value, input_units: _input_output_unit_types, output_uni
     # Load data
     data = pd.read_csv(file_name, index_col=0)
     feedstock_mass_data = np.array(data["Feedstock mass input (tonnes/h)"].values)
-    feedstock_energy_data = np.array(data["Feedstock energy input (kWh/h)"].values)
     power_data = np.array(data["Size electricity generation (MWe)"].values)
 
-    # Train required model
-    if input_units == "tonnes/hour" and output_units == "MWel":
-        regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
-        R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
-    if input_units == "tonnes/hour" and output_units == "kWh/hour":
-        regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=feedstock_energy_data)
-        R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=feedstock_energy_data)
-    if input_units == "kWh/hour" and output_units == "MWel":
-        regressor = LinearRegression().fit(X=feedstock_energy_data.reshape(-1, 1), y=power_data)
-        R2_score = regressor.score(X=feedstock_energy_data.reshape(-1, 1), y=power_data)
-    if input_units == "kWh/hour" and output_units == "tonnes/hour":
-        regressor = LinearRegression().fit(X=feedstock_energy_data.reshape(-1, 1), y=feedstock_mass_data)
-        R2_score = regressor.score(X=feedstock_energy_data.reshape(-1, 1), y=feedstock_mass_data)
-    if input_units == "MWel" and output_units == "tonnes/hour":
-        regressor = LinearRegression().fit(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
-        R2_score = regressor.score(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
-    if input_units == "MWel" and output_units == "kWh/hour":
-        regressor = LinearRegression().fit(X=power_data.reshape(-1, 1), y=feedstock_energy_data)
-        R2_score = regressor.score(X=power_data.reshape(-1, 1), y=feedstock_energy_data)
+    if input_units == "tonnes/hour":
+        size_feedstock_mass = value  # [tonnes/hour]
+        size_feedstock_energy = MJ_to_kWh(size_feedstock_mass * feedstock_LHV * 1000) / 1000  # [MWh/hour]
 
-    # Make prediction
-    try:  # for array data
-        prediction = regressor.predict(value)
-    except ValueError:  # for single prediction
-        prediction = float(regressor.predict(np.array(value).reshape(-1, 1)))
+        # Get size power from regression
+        if size_feedstock_mass < 2:
+            regressor = LinearRegression().fit(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
+                                               y=power_data[feedstock_mass_data < 2])
+            R2_score = regressor.score(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
+                                       y=power_data[feedstock_mass_data < 2])
+        else:
+            regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
+            R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
 
-    # Raise warnings if data far outside of size used for training
-    boundary_threshold_multiplier = 1.5
-    if input_units == "tonnes/hour" and value > (boundary_threshold_multiplier * feedstock_mass_data.max()):
-        warn("Input significantly outside range of training data.")
-    if input_units == "kWh/hour" and value > (boundary_threshold_multiplier * feedstock_energy_data.max()):
-        warn("Input significantly outside range of training data.")
-    if input_units == "MWel" and value > (boundary_threshold_multiplier * power_data.max()):
-        warn("Input significantly outside range of training data.")
+        # Get prediction
+        size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
 
-    if value < 0:
-        raise ValueError("Input value must be positive.")
+    if input_units == "MWh/hour":
+        size_feedstock_energy = value  # [MWh/hour]
+        size_feedstock_mass = MJ_to_kWh(value=size_feedstock_energy * 1000, reverse=True) / (
+                    feedstock_LHV * 1000)  # [tonnes/hour]
 
-    # Determine function output
-    if additional_outputs:
-        output = {"value": prediction, "units": output_units, "R2_score": R2_score}
-    else:
-        output = prediction
+        # Get size power from regression
+        if size_feedstock_mass < 2:
+            regressor = LinearRegression().fit(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
+                                               y=power_data[feedstock_mass_data < 2])
+            R2_score = regressor.score(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
+                                       y=power_data[feedstock_mass_data < 2])
+        else:
+            regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
+            R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
 
-    return output
+        # Get prediction
+        size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
 
+    if input_units == "MWel":
+        size_power = value  # [MWel]
 
-# # Examples
-# ex_1 = convert_system_size(4000, "kWh/hour", "MWel")
-# ex_2 = convert_system_size(1, "MWel", "kWh/hour")
-# ex_3 = convert_system_size(1.8, "tonnes/hour", "MWel")
-# ex_4 = convert_system_size(1, "MWel", "tonnes/hour")
-# ex_3 = convert_system_size(10, "tonnes/hour", "MWel")  # Note: Raises error correctly.
+        # Get size in mass basis from regression
+        if size_power < 2:
+            regressor = LinearRegression().fit(X=power_data[power_data < 2].reshape(-1, 1),
+                                               y=feedstock_mass_data[power_data < 2])
+            R2_score = regressor.score(X=power_data[power_data < 2].reshape(-1, 1),
+                                       y=feedstock_mass_data[power_data < 2])
+        else:
+            regressor = LinearRegression().fit(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
+            R2_score = regressor.score(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
+
+        # Get prediction
+        size_feedstock_mass = float(regressor.predict(np.array(size_power).reshape(-1, 1)))  # [tonnes/hour]
+
+        size_feedstock_energy = MJ_to_kWh(size_feedstock_mass * feedstock_LHV * 1000) / 1000  # [MWh/hour]
+
+        # Run some checks
+        if input_units not in ["MWel", "MWh/hour", "tonnes/hour"]:
+            raise ValueError("Supplied units are not supported.")
+
+        if value < 0:
+            raise ValueError("Input value must be positive.")
+
+    output_dict = {"size_feedstock_mass": size_feedstock_mass,
+                   "size_feedstock_energy": size_feedstock_energy,
+                   "size_power": size_power}
+
+    return output_dict
+
+    # TODO: Change all function calls so they work with this - note now return in MWh not kWh!!!
+
+    # TODO: Make sure streamlit supplies LHV directly to function.

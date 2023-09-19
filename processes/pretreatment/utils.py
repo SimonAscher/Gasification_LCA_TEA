@@ -84,7 +84,7 @@ def energy_drying(mass_feedstock=None,
 
     # Check for erroneous inputs
     if moisture_ar < 1 or moisture_post_drying < 1:
-        warnings.warn("Ensure that moisture contents are given as percentages.", UserWarning)
+        raise ValueError("Ensure that moisture contents are given as percentages.")
     if moisture_ar < moisture_post_drying:
         raise ValueError("Warning: Moisture content of as received feedstock must be higher than moisture content "
                          "post drying.")

@@ -2,6 +2,7 @@ import os
 import warnings
 
 import pandas as pd
+import numpy as np
 
 from scipy.optimize import curve_fit
 # from sklearn.metrics import r2_score, mean_squared_error
@@ -15,7 +16,7 @@ from functions.TEA.scaling import CEPCI_scale
 from objects import triangular_dist_maker, PresentValue
 
 
-def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None):
+def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=None):
     """
     Calculate the CAPEX distribution of a CHP plant.
     CAPEX is given as total overnight cost (TOC) or total installed cost (TIC) (i.e. engineering works, procurement,
@@ -23,7 +24,7 @@ def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None)
 
     Parameters
     ----------
-    system_size_MWel: float
+    system_size_MWel: None | float
         CHP size/power rating [MWel].
     currency: str | None
         Currency that is to be used for analysis.
@@ -37,6 +38,10 @@ def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None)
     """
 
     # Get defaults
+
+    if system_size_MWel is None:
+        system_size_MWel = settings.user_inputs.system_size.power_electric_MW_el
+
     if currency is None:
         currency = settings.user_inputs.general.currency
 
@@ -140,7 +145,7 @@ def get_CHP_CAPEX_distribution(system_size_MWel, currency=None, CEPCI_year=None)
 
     distribution = triangular_dist_maker(lower=lower_bound, mode=prediction, upper=upper_bound)
 
-    distribution_draws = list(get_distribution_draws(distribution))
+    distribution_draws = list(np.multiply(get_distribution_draws(distribution), -1))  # turn -ve as they are a cost
 
     CAPEX = PresentValue(values=distribution_draws,
                          name="CAPEX CHP",

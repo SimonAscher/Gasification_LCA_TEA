@@ -3,6 +3,20 @@
 # Energy units
 
 def kJ_to_kWh(value, reverse=False):
+    """
+    Convert from kJ to kWh (or reverse if reverse=True).
+
+    Parameters
+    ----------
+    value: float | int
+        Value which is to be converted.
+    reverse: bool
+        Determines whether conversion should be done reversed.
+
+    Returns
+    -------
+    Converted value in kWh (or kJ if reverse=True).
+    """
     value_out = value / 3600
     if reverse:
         value_out = 3600 * value
@@ -11,6 +25,20 @@ def kJ_to_kWh(value, reverse=False):
 
 
 def MJ_to_kWh(value, reverse=False):
+    """
+    Convert from MJ to kWh (or reverse if reverse=True).
+
+    Parameters
+    ----------
+    value: float | int
+        Value which is to be converted.
+    reverse: bool
+        Determines whether conversion should be done reversed.
+
+    Returns
+    -------
+    Converted value in kWh (or MJ if reverse=True).
+    """
     value_out = value / 3.6
     if reverse:
         value_out = 3.6 * value

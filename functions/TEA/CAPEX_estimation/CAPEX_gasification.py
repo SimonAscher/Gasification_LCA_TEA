@@ -16,12 +16,13 @@ from functions.TEA import convert_currency_annual_average
 from functions.TEA.scaling import CEPCI_scale
 from objects import triangular_dist_maker, PresentValue
 
-_system_size_unit_types = Literal["tonnes/hour", "MW_feedstock_LHV", "MWel"]
+_system_size_unit_types = Literal[None, "tonnes/hour", "MW_feedstock_LHV", "MWel"]
 
 
-def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
-                                                          system_size_units: _system_size_unit_types = "MWel",
-                                                          reactor_type=None, currency=None,
+def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
+                                                          system_size_units: _system_size_unit_types = None,
+                                                          reactor_type=None,
+                                                          currency=None,
                                                           CEPCI_year=None):
     """
     Calculate the CAPEX distribution of a gasification plant with syngas cleaning.
@@ -30,11 +31,12 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
 
     Parameters
     ----------
-    system_size: float
+    system_size: None | float
         Gasification size in units supplied by "system_size_units" parameter.
     system_size_units: _system_size_unit_types
         Defines the units of the "system_size" variable.
         Options:
+            - None - if system size is None this uses the appropriate size units.
             - "MWel" - System size in terms of electric power generation/power rating
             - "tonnes/hour" - System size in terms of feedstock mass input per hour
             - "MW_feedstock_LHV" - System size in terms of feedstock energy input (same as MWh_feedstock_LHV/hour).
@@ -53,6 +55,32 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
     """
 
     # Get defaults
+    if system_size is None:
+        if settings.user_inputs.system_size.power_electric_user_imputed:
+            system_size_MWel = settings.user_inputs.system_size.power_electric_MW_el
+        elif settings.user_inputs.system_size.mass_basis_user_imputed:
+            system_size_MWel = convert_system_size(value=settings.user_inputs.system_size.mass_basis_tonnes_per_hour,
+                                                   input_units="tonnes/hour")["size_power"]
+        else:
+            system_size_MWel = convert_system_size(value=settings.user_inputs.system_size.power_feedstock_MW_feedstock_LHV,
+                                                   input_units="MWh/hour")["size_power"]
+    else:
+        # Check that system size is supplied in valid units.
+        system_size_unit_types = ["tonnes/hour", "MW_feedstock_LHV", "MWel"]
+
+        # Model uses system size as MWel - if supplied in other units convert to that
+        if system_size_units == "MWel":
+            system_size_MWel = system_size
+
+        elif system_size_units == "tonnes/hour":
+            system_size_MWel = convert_system_size(value=system_size, input_units="tonnes/hour")["size_power"]
+
+        elif system_size_units == "MW_feedstock_LHV":
+            system_size_MWel = convert_system_size(value=system_size, input_units="MWh/hour")["size_power"]
+
+        else:
+            raise ValueError(f"Invalid system size unit. Expected one of: {system_size_unit_types}")
+
     if currency is None:
         currency = settings.user_inputs.general.currency
 
@@ -61,26 +89,6 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
 
     if reactor_type is None:
         reactor_type = settings.user_inputs.process_conditions.reactor_type
-
-    # Check that system size is supplied in valid units.
-    system_size_unit_types = ["tonnes/hour", "MW_feedstock_LHV", "MWel"]
-
-    # Model uses system size as MWel - if supplied in other units convert to that
-    if system_size_units == "MWel":
-        system_size_MWel = system_size
-
-    elif system_size_units == "tonnes/hour":
-        system_size_MWel = convert_system_size(value=system_size,
-                                               input_units="tonnes/hour",
-                                               output_units="MWel")
-
-    elif system_size_units == "MW_feedstock_LHV":
-        system_size_MWel = convert_system_size(value=system_size * 1000,
-                                               input_units="kWh/hour",
-                                               output_units="MWel")
-
-    else:
-        raise ValueError(f"Invalid system size unit. Expected one of: {system_size_unit_types}")
 
     # Load data
     root_dir = get_project_root()
@@ -114,18 +122,16 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
         warnings.filterwarnings("ignore", category=UserWarning)
         for count, value in enumerate(df_source["Plant size [tonnes/hour]"]):
             if math.isnan(value):
-                plant_size_kWh_per_hour_feedstock = df.loc[count, "Plant size [MW feedstock LHV] or [MWh/hour]"] * 1000
+                plant_size_MWh_per_hour_feedstock = df.loc[count, "Plant size [MW feedstock LHV] or [MWh/hour]"]
                 plant_size_MWel = df.loc[count, "Plant size [MWel]"]
 
-                if not math.isnan(plant_size_kWh_per_hour_feedstock):  # replace based on plant_size_MW_feedstock first
-                    converted_value = convert_system_size(value=plant_size_kWh_per_hour_feedstock,
-                                                          input_units="kWh/hour",
-                                                          output_units="tonnes/hour")
+                if not math.isnan(plant_size_MWh_per_hour_feedstock):  # replace based on plant_size_MW_feedstock first
+                    converted_value = convert_system_size(value=plant_size_MWh_per_hour_feedstock,
+                                                          input_units="MWh/hour")["size_feedstock_mass"]
                 else:
                     if not math.isnan(plant_size_MWel):  # otherwise replace based on plant_size_MWel
                         converted_value = convert_system_size(value=plant_size_MWel,
-                                                              input_units="MWel",
-                                                              output_units="tonnes/hour")
+                                                              input_units="MWel")["size_feedstock_mass"]
                     else:  # no suitable reference value to convert from - leave as nan
                         converted_value = np.NAN
                 # populate data frame
@@ -134,18 +140,16 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
         # Fill in plant size [MWel] data
         for count, value in enumerate(df_source["Plant size [MWel]"]):
             if math.isnan(value):
-                plant_size_kWh_per_hour_feedstock = df.loc[count, "Plant size [MW feedstock LHV] or [MWh/hour]"] * 1000
+                plant_size_MWh_per_hour_feedstock = df.loc[count, "Plant size [MW feedstock LHV] or [MWh/hour]"]
                 plant_size_tonnes_per_hour = df.loc[count, "Plant size [tonnes/hour]"]
 
-                if not math.isnan(plant_size_kWh_per_hour_feedstock):  # replace based on plant_size_MW_feedstock first
-                    converted_value = convert_system_size(value=plant_size_kWh_per_hour_feedstock,
-                                                          input_units="kWh/hour",
-                                                          output_units="MWel")
+                if not math.isnan(plant_size_MWh_per_hour_feedstock):  # replace based on plant_size_MW_feedstock first
+                    converted_value = convert_system_size(value=plant_size_MWh_per_hour_feedstock,
+                                                          input_units="MWh/hour")["size_power"]
                 else:
-                    if not math.isnan(plant_size_tonnes_per_hour):  # otherwise replace based on plant_size_tonnes_per_hour
+                    if not math.isnan(plant_size_tonnes_per_hour):  # otherwise replace based on size in tonnes per hour
                         converted_value = convert_system_size(value=plant_size_tonnes_per_hour,
-                                                              input_units="tonnes/hour",
-                                                              output_units="MWel")
+                                                              input_units="tonnes/hour")["size_power"]
                     else:  # no suitable reference value to convert from - leave as nan
                         converted_value = np.NAN
                 # populate data frame
@@ -159,13 +163,12 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
 
                 if not math.isnan(plant_size_MWel):  # replace based on plant_size_MWel
                     converted_value = convert_system_size(value=plant_size_MWel,
-                                                          input_units="MWel",
-                                                          output_units="kWh/hour") / 1000
+                                                          input_units="MWel")["size_feedstock_energy"]
                 else:
-                    if not math.isnan(plant_size_tonnes_per_hour):  # otherwise replace based on plant_size_tonnes_per_hour
+                    if not math.isnan(plant_size_tonnes_per_hour):  # otherwise replace based on size in tonnes per hour
                         converted_value = convert_system_size(value=plant_size_tonnes_per_hour,
-                                                              input_units="tonnes/hour",
-                                                              output_units="kWh/hour") / 1000
+                                                              input_units="tonnes/hour")["size_feedstock_energy"]
+
                     else:  # no suitable reference value to convert from - leave as nan
                         converted_value = np.NAN
                 # populate data frame
@@ -301,7 +304,6 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
     dist_draws_gasification = list(get_distribution_draws(triangular_dist_maker(lower=lower_bound_gasification,
                                                                                 mode=prediction,
                                                                                 upper=upper_bound_gasification)))
-
     # Gas cleaning costs
 
     # Gas cleaning cost fractions of total cost. See note at the start of script more information.
@@ -321,11 +323,11 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size,
                                        dist_draws_gas_cleaning_fraction_decimal[count])
 
     # Store CAPEX distributions in PresentValue objects.
-    CAPEX_gasification = PresentValue(values=dist_draws_gasification,
+    CAPEX_gasification = PresentValue(values=list(np.multiply(dist_draws_gasification, -1)),
                                       name="CAPEX gasification",
                                       short_label="CAPEX gas.")
 
-    CAPEX_gas_cleaning = PresentValue(values=dist_draws_gas_cleaning,
+    CAPEX_gas_cleaning = PresentValue(values=list(np.multiply(dist_draws_gas_cleaning, -1)),
                                       name="CAPEX gas cleaning",
                                       short_label="CAPEX gas clean.")
 

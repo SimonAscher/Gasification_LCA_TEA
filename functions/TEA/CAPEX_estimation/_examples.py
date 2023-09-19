@@ -1,0 +1,5 @@
+from functions.TEA.CAPEX_estimation import get_dryer_CAPEX_distribution, get_gasification_and_gas_cleaning_CAPEX_distributions, get_CHP_CAPEX_distribution
+
+dryer_CAPEX = get_dryer_CAPEX_distribution()
+gasification_gas_cleaning_CAPEX = get_gasification_and_gas_cleaning_CAPEX_distributions()
+CHP_CAPEX = get_CHP_CAPEX_distribution()
