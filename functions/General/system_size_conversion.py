@@ -50,17 +50,32 @@ def convert_system_size(value, input_units: _input_output_unit_types, feedstock_
         size_feedstock_energy = MJ_to_kWh(size_feedstock_mass * feedstock_LHV * 1000) / 1000  # [MWh/hour]
 
         # Get size power from regression
-        if size_feedstock_mass < 2:
+        if size_feedstock_mass < 1:
             regressor = LinearRegression().fit(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
                                                y=power_data[feedstock_mass_data < 2])
             R2_score = regressor.score(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
                                        y=power_data[feedstock_mass_data < 2])
+
+            # Get prediction
+            size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+
+        # Combine both models and take average in boundary region
+        elif 1 < size_feedstock_mass < 3:
+            regressor1 = LinearRegression().fit(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
+                                                y=power_data[feedstock_mass_data < 2])
+            regressor2 = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
+
+            # Get prediction
+            size_power1 = float(regressor1.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+            size_power2 = float(regressor2.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+            size_power = (size_power1 * 0.1 + size_power2 * 0.9)
+
         else:
             regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
             R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
 
-        # Get prediction
-        size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+            # Get prediction
+            size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
 
     if input_units == "MWh/hour":
         size_feedstock_energy = value  # [MWh/hour]
@@ -68,33 +83,64 @@ def convert_system_size(value, input_units: _input_output_unit_types, feedstock_
                     feedstock_LHV * 1000)  # [tonnes/hour]
 
         # Get size power from regression
-        if size_feedstock_mass < 2:
+        if size_feedstock_mass < 1:
             regressor = LinearRegression().fit(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
                                                y=power_data[feedstock_mass_data < 2])
             R2_score = regressor.score(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
                                        y=power_data[feedstock_mass_data < 2])
+
+            # Get prediction
+            size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+
+        # Combine both models and take average in boundary region
+        elif 1 < size_feedstock_mass < 3:
+            regressor1 = LinearRegression().fit(X=feedstock_mass_data[feedstock_mass_data < 2].reshape(-1, 1),
+                                                y=power_data[feedstock_mass_data < 2])
+            regressor2 = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
+
+            # Get prediction
+            size_power1 = float(regressor1.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+            size_power2 = float(regressor2.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+            size_power = (size_power1 * 0.1 + size_power2 * 0.9)
+
         else:
             regressor = LinearRegression().fit(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
             R2_score = regressor.score(X=feedstock_mass_data.reshape(-1, 1), y=power_data)
 
-        # Get prediction
-        size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
+            # Get prediction
+            size_power = float(regressor.predict(np.array(size_feedstock_mass).reshape(-1, 1)))  # [MWel]
 
     if input_units == "MWel":
         size_power = value  # [MWel]
 
         # Get size in mass basis from regression
-        if size_power < 2:
+        if size_power < 0.5:
             regressor = LinearRegression().fit(X=power_data[power_data < 2].reshape(-1, 1),
                                                y=feedstock_mass_data[power_data < 2])
             R2_score = regressor.score(X=power_data[power_data < 2].reshape(-1, 1),
                                        y=feedstock_mass_data[power_data < 2])
+            # Get prediction
+            size_feedstock_mass = float(regressor.predict(np.array(size_power).reshape(-1, 1)))  # [tonnes/hour]
+
+        # Combine both models and take average in boundary region
+        elif 1 < size_power < 3:
+            regressor1 = LinearRegression().fit(X=power_data[power_data < 2].reshape(-1, 1),
+                                                y=feedstock_mass_data[power_data < 2])
+            regressor2 = LinearRegression().fit(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
+
+            # Get prediction
+            size_feedstock_mass1 = float(regressor1.predict(np.array(size_power).reshape(-1, 1)))  # [MWel]
+            size_feedstock_mass2 = float(regressor2.predict(np.array(size_power).reshape(-1, 1)))  # [MWel]
+            size_feedstock_mass = (size_feedstock_mass1 * 0.1 + size_feedstock_mass2*0.9)
+            if size_feedstock_mass2 < size_feedstock_mass1:
+                size_feedstock_mass = size_feedstock_mass2
+
         else:
             regressor = LinearRegression().fit(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
             R2_score = regressor.score(X=power_data.reshape(-1, 1), y=feedstock_mass_data)
 
-        # Get prediction
-        size_feedstock_mass = float(regressor.predict(np.array(size_power).reshape(-1, 1)))  # [tonnes/hour]
+            # Get prediction
+            size_feedstock_mass = float(regressor.predict(np.array(size_power).reshape(-1, 1)))  # [tonnes/hour]
 
         size_feedstock_energy = MJ_to_kWh(size_feedstock_mass * feedstock_LHV * 1000) / 1000  # [MWh/hour]
 
@@ -110,7 +156,3 @@ def convert_system_size(value, input_units: _input_output_unit_types, feedstock_
                    "size_power": size_power}
 
     return output_dict
-
-    # TODO: Change all function calls so they work with this - note now return in MWh not kWh!!!
-
-    # TODO: Make sure streamlit supplies LHV directly to function.

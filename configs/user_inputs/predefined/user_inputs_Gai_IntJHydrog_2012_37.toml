@@ -34,13 +34,12 @@ bed_material = "N/A"
 mass_basis_user_imputed = true
 power_feedstock_user_imputed = false
 power_electric_user_imputed = false
-#mass_basis_tonnes_per_hour = 0.50
-#power_feedstock_MW_feedstock_LHV = 0.14
-#power_electric_MW_el = 0.50
-#mass_basis_tonnes_per_hour = 2.0
-#power_feedstock_MW_feedstock_LHV = 0.56
-#power_electric_MW_el = 4.62
-#TODO UPDATE THESE VALUES
+mass_basis_tonnes_per_hour = 1.00
+power_feedstock_MW_feedstock_LHV = 4.58
+power_electric_MW_el = 1.80
+#mass_basis_tonnes_per_hour = 2.00
+#power_feedstock_MW_feedstock_LHV = 9.17
+#power_electric_MW_el = 4.31
 
 
 
