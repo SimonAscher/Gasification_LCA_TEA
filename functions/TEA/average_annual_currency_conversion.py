@@ -1,10 +1,10 @@
 import datetime
 import cachetools.func
-import requests
 import warnings
 
 import numpy as np
-# import time
+
+from forex_python.converter import CurrencyRates
 
 
 def get_year_start_end_date(year):
@@ -35,7 +35,7 @@ def get_year_start_end_date(year):
 
 
 @cachetools.func.ttl_cache(maxsize=10, ttl=360)
-def get_average_annual_exchange_rate(year, base_currency, converted_currency):
+def get_average_annual_exchange_rate(year, base_currency, converted_currency, approximate_rate=False):
     """
     Gets the average annual exchange rate for a given year.
 
@@ -47,41 +47,36 @@ def get_average_annual_exchange_rate(year, base_currency, converted_currency):
         String indicating the base currency.
     converted_currency: str
         String indicating the currency which to convert to.
+    approximate_rate: bool
+        Calculates the approximate average exchange rate for a given year instead (only takes 1 values every 2 weeks).
+        This significantly speeds up the calculations but may be less accurate.
 
     Returns
     -------
     float
         Average exchange rate for the given year.
     """
-    # Inspired by Indently on Youtube (https://www.youtube.com/watch?v=dCUb1tky1-Q)
-
-    # start_time = time.time()
-
-    # Get start and end date of year
+    # Get parameters to iterate through year
     start_date, end_date = get_year_start_end_date(year)
+    date_delta = datetime.timedelta(days=1)  # set increment by which date should be increased - i.e. 1 day
+    date = start_date  # initiate date which is used for counting
+    historic_rates_array = []
+    currency_rates = CurrencyRates()
 
-    # Get data from api
-    url = f"https://api.exchangerate.host/timeseries"
-    url_params = {"base": base_currency, "start_date": start_date, "end_date": end_date}
-    url_response = requests.get(url, url_params)
-    url_data = url_response.json()
-    # TODO: Consider storing data in a database etc. to speed things up and avoid url request every time function is run
+    # Iterate over range of dates and get exchange rates
+    while date <= end_date:
+        date += date_delta
+        if approximate_rate:
+            date += datetime.timedelta(days=13)
+        historic_rates_array.append(currency_rates.get_rate(base_cur=base_currency,
+                                                            dest_cur=converted_currency,
+                                                            date_obj=date))
+    historic_rates_array = np.mean(historic_rates_array)
 
-    # Store data in array
-    rate_history_array = []
-
-    for item in url_data["rates"]:
-        currency_rate = url_data["rates"][item][converted_currency]
-        rate_history_array.append(currency_rate)
-
-    rate_history_average = np.mean(rate_history_array)
-    # end_time = time.time()
-    # print(end_time-start_time)
-
-    return rate_history_average
+    return historic_rates_array
 
 
-def convert_currency_annual_average(value, year, base_currency, converted_currency):
+def convert_currency_annual_average(value, year, base_currency, converted_currency, approximate_rate=False):
     """
     Converts a value from an original currency to a new currency for a given year.
 
@@ -95,13 +90,16 @@ def convert_currency_annual_average(value, year, base_currency, converted_curren
         String indicating the base currency.
     converted_currency: str
         String indicating the currency which to convert to.
+    approximate_rate: bool
+        Calculates the approximate average exchange rate for a given year instead (only takes 1 values every 2 weeks).
+        This significantly speeds up the calculations but may be less accurate.
 
     Returns
     -------
     float
         Converted value in desired currency.
     """
-    average_exchange_rate = get_average_annual_exchange_rate(year, base_currency, converted_currency)
+    average_exchange_rate = get_average_annual_exchange_rate(year, base_currency, converted_currency, approximate_rate)
     converted_value = average_exchange_rate * value
 
     return converted_value
