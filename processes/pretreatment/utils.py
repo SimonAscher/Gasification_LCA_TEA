@@ -188,9 +188,6 @@ def energy_drying(mass_feedstock=None,
     return energies_out
 
 
-# Define models for milling and pelleting process based on analysis in:
-# analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption.ipynb
-
 def load_milling_pelleting_data(full_file_path=None):
     """
     Load pickled data done in analysis on milling and pelleting energy demands.
@@ -216,26 +213,33 @@ def load_milling_pelleting_data(full_file_path=None):
     return loaded_data
 
 
-def electricity_milling(screensize=3.2, feedstock_type=settings.user_inputs.feedstock.category, show_warnings=True):
+def electricity_milling(screensize=None, feedstock_type=None, show_warnings=True):
     """
     Calculates the electricity requirements for milling 1 tonne of feedstock.
     Analysis and data: analysis/preliminary/milling_pelleting/milling_pelleting_energy_consumption.ipynb.
 
     Parameters
     ----------
-    screensize: float
+    screensize: None | float
         Defines which size mill screen should be used in process [mm].
-    feedstock_type: str
+    feedstock_type: None | str
         Specifies the type of feedstock
     show_warnings: bool
         Determine whether warnings should be displayed.
 
     Returns
     -------
-    float
-        (1) Electricity requirement for milling [kWh/tonne].
-        (2) Particle size post milling [mm].
+    tuple[float, float]
+        1st Entry: Electricity requirement for milling [kWh/tonne].
+        2nd Entry: Particle size post milling [mm].
     """
+    # Load defaults
+    if screensize is None:
+        screensize = 3.2
+
+    if feedstock_type is None:
+        feedstock_type = settings.user_inputs.feedstock.category
+
     # Load required data
     data = load_milling_pelleting_data()
 

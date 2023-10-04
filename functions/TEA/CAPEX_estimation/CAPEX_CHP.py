@@ -62,7 +62,9 @@ def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=
         CAPEX_currency_scaled.append(convert_currency_annual_average(value=df["CAPEX"][row_no],
                                                                      year=df["Reference Year"][row_no],
                                                                      base_currency=df["Currency"][row_no],
-                                                                     converted_currency=currency))
+                                                                     converted_currency=currency,
+                                                                     approximate_rate=False,
+                                                                     method="yfinance"))
         CAPEX_currency_CEPCI_scaled.append(CEPCI_scale(base_year=df["Reference Year"][row_no],
                                                        design_year=CEPCI_year,
                                                        value=CAPEX_currency_scaled[row_no]))
@@ -86,6 +88,7 @@ def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=
     # Fit models, get performance metric, and make prediction
     if system_size_MWel <= threshold_small_scale_system:  # small scale
         df_small = df[df["Plant size [MWel]"] <= threshold_small_scale_system]
+        df_small = df_small.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
 
         # Fit power function based on previous analysis
         popt, _ = curve_fit(func_power_curve,
@@ -109,6 +112,7 @@ def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=
         if system_size_MWel < max_system_size:
             df_medium = df[(df["Plant size [MWel]"] > threshold_small_scale_system) &
                            (df["Plant size [MWel]"] <= max_system_size)]
+            df_medium = df_medium.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
 
             # Fit linear function based on previous analysis
             popt, _ = curve_fit(func_straight_line,

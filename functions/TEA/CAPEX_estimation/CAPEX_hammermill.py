@@ -1,4 +1,8 @@
 import os
+
+from scipy.optimize import curve_fit
+from sklearn.metrics import mean_squared_error
+
 import functions
 
 import pandas as pd
@@ -6,13 +10,11 @@ import numpy as np
 
 from config import settings
 from objects import PresentValue, triangular_dist_maker
-from scipy.optimize import curve_fit
-from sklearn.metrics import mean_squared_error
 
 
-def get_dryer_CAPEX_distribution(currency=None, CEPCI_year=None):
+def get_milling_CAPEX_distribution(currency=None, CEPCI_year=None):
     """
-    Calculate the CAPEX distribution of a dryer for feedstock drying.
+    Calculate the CAPEX distribution of a feedstock mill to reduce the particle size of a feedstock.
     CAPEX is given as total overnight cost (TOC) or total installed cost (TIC) (i.e. engineering works, procurement,
     installation, etc. are considered included in CAPEX).
 
@@ -26,46 +28,22 @@ def get_dryer_CAPEX_distribution(currency=None, CEPCI_year=None):
     Returns
     -------
     PresentValue
-        Present value object containing distribution of CAPEX values in the supplied currency.
-    """
+        Distribution of CAPEX values in the supplied currency.
 
-    # Get default inputs
+    """
+    # Get defaults
     if currency is None:
         currency = settings.user_inputs.general.currency
 
     if CEPCI_year is None:
         CEPCI_year = settings.user_inputs.economic.CEPCI_year
 
-    # Calculate system size in terms of kg H2O removed/hour.
-    # Get background data
-    mass_feedstock = settings.general.FU  # i.e. 1000 kg
-    moisture_ar = settings.user_inputs.feedstock.moisture_ar
-    moisture_post_drying = settings.user_inputs.feedstock.moisture_post_drying
-
-    # Check for erroneous inputs
-    if moisture_ar < 1 or moisture_post_drying < 1:
-        raise ValueError("Ensure that moisture contents are given as percentages.")
-    if moisture_ar < moisture_post_drying:
-        raise ValueError("Warning: Moisture content of as received feedstock must be higher than moisture content "
-                         "post drying.")
-
-    # Turn moisture's from percentages to decimals
-    moisture_ar /= 100
-    moisture_post_drying /= 100
-
-    # Calculate mass of evaporated water:
-    mass_water_initial = mass_feedstock * moisture_ar
-    mass_feed_dry = mass_feedstock * (1 - moisture_ar)
-    mass_water_post_drying = (mass_feed_dry * moisture_post_drying) / (1 - moisture_post_drying)
-    mass_evaporated_water_per_FU = mass_water_initial - mass_water_post_drying  # [kg/FU]
-
-    # Get final system size
-    system_size_tonnes_per_hour = settings.user_inputs.system_size.mass_basis_tonnes_per_hour  # [tonnes/hour]
-    system_size_kg_H2O_per_hour = mass_evaporated_water_per_FU * system_size_tonnes_per_hour  # [kg H2O/hour]
+    # Get system size
+    system_size_tonnes_per_hour = settings.user_inputs.system_size.mass_basis_tonnes_per_hour
 
     # Load data
     root_dir = functions.general.utility.get_project_root()
-    data_file = "CAPEX_dryer.csv"
+    data_file = "CAPEX_hammermill.csv"
     data_file_path = os.path.join(root_dir, "data", data_file)
     df = pd.read_csv(data_file_path)
 
@@ -91,32 +69,26 @@ def get_dryer_CAPEX_distribution(currency=None, CEPCI_year=None):
     df[currency_scaled_label] = CAPEX_currency_scaled
     df[currency_and_CEPCI_scaled_label] = CAPEX_currency_CEPCI_scaled
 
-    # Select data to fit model based on system's size
-    if system_size_kg_H2O_per_hour < 1000:  # size < 1,000
-        df = df[df["Ignore"] != True].copy()
-        df = df[df["Plant size [kg H2O/hour]"] < 1000]
-        df = df.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
-    elif system_size_kg_H2O_per_hour < 10000:  # size 1,000 to 10,000
-        df = df[df["Ignore"] != True].copy()
-        df = df[df["Plant size [kg H2O/hour]"].between(1000, 10000)]
-        df = df[df["Reference_label"] == "g"]
-        df = df.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
-    else:  # size >10,000
-        df = df[df["Ignore"] != True].copy()
-        df = df[df["Plant size [kg H2O/hour]"].between(1000, 30000)]
-        df = df.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
+    # Remove data points which should be ignored
+    df = df[df["Ignore"] != True].copy()
+
     # Fit model, get error metrics, and prediction.
     popt, _ = curve_fit(f=functions.general.curve_fitting.func_straight_line,
-                        xdata=df["Plant size [kg H2O/hour]"],
+                        xdata=df["Plant size [tonnes/hour]"],
                         ydata=df[currency_and_CEPCI_scaled_label],
                         maxfev=10000)
 
+    # rmse = mean_squared_error(df[currency_and_CEPCI_scaled_label],
+    #                           functions.general.curve_fitting.func_straight_line(df["Plant size [tonnes/hour]"],
+    #                                                                              *popt),
+    #                           squared=False)
+
     mape_decimal = functions.general.MAPE(df[currency_and_CEPCI_scaled_label],
                                           functions.general.curve_fitting.func_straight_line(
-                                              df["Plant size [kg H2O/hour]"], *popt),
+                                              df["Plant size [tonnes/hour]"], *popt),
                                           return_as_decimal=True)
 
-    prediction = functions.general.curve_fitting.func_straight_line(system_size_kg_H2O_per_hour, *popt)
+    prediction = functions.general.curve_fitting.func_straight_line(system_size_tonnes_per_hour, *popt)
 
     # Get lower and upper bounds of distribution based on the distributions MAPE
     lower_bound = prediction - (prediction * mape_decimal)
@@ -124,11 +96,21 @@ def get_dryer_CAPEX_distribution(currency=None, CEPCI_year=None):
 
     distribution = triangular_dist_maker(lower=lower_bound, mode=prediction, upper=upper_bound)
 
-    distribution_draws = list(np.multiply(
-        functions.MonteCarloSimulation.get_distribution_draws(distribution), -1))  # turn -ve as they are a cost
+    distribution_draws = list(np.multiply(functions.MonteCarloSimulation.get_distribution_draws(distribution), -1))  # turn -ve as they are a cost
 
     CAPEX = PresentValue(values=distribution_draws,
-                         name="CAPEX Feedstock Dryer",
-                         short_label="CAPEX Dry")
+                         name="CAPEX Feedstock Mill",
+                         short_label="CAPEX Mill")
+
+    # TODO: Incorporate this
+    """
+    operation_and_maintenance_cost = 10% to 18%
+    sources:
+    "Development of agri-pellet production cost and optimum size", Sultana et al., 2010
+    "Economics of producing fuel pellets from biomass", Mani et al., 2006
+    life span of 10 years
+    """
 
     return CAPEX
+
+

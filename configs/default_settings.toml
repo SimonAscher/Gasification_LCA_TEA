@@ -369,7 +369,15 @@ source = ["https://ember-climate.org/data/data-tools/carbon-price-viewer/", "htt
 2020 = 597.5
 2021 = "unavailable"
 2022 = "unavailable"
-source = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.191", "10.1016/j.biortech.2020.123076"]
+2023 = "unavailable"
+2024 = "unavailable"
+2025 = "unavailable"
+2026 = "unavailable"
+2027 = "unavailable"
+2028 = "unavailable"
+2029 = "unavailable"
+2030 = "unavailable"
+sources = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.191", "10.1016/j.biortech.2020.123076"]
 # TODO add values for 2021 and 2022
 
 

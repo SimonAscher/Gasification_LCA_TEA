@@ -45,7 +45,7 @@ def get_most_recent_available_CEPCI_year():
 
     """
     CEPCI_values = dict(settings.data.economic.CEPCI)
-    CEPCI_values.pop("source")
+    CEPCI_values.pop("sources")
 
     count = 0
     while True:
@@ -84,11 +84,15 @@ def CEPCI_scale(base_year, design_year, value):
 
     # Raise Error/Warning if CEPCI value unavailable.
     if base_CEPCI == "unavailable":
-        raise ValueError("CEPCI value not available for base year.")
+        if base_year < 2020:
+            raise ValueError("CEPCI value not available for base year.")
+        else:
+            base_CEPCI = CEPCI_data[str(get_most_recent_available_CEPCI_year())]
+            warnings.warn("CEPCI value not available for base year. Reverted to most recent available CEPCI value.")
 
     if design_CEPCI == "unavailable":
         design_CEPCI = CEPCI_data[str(get_most_recent_available_CEPCI_year())]
-        warnings.warn("CEPCI value not available for design year. Reverted to most recent CEPCI value.")
+        warnings.warn("CEPCI value not available for design year. Reverted to most recent available CEPCI value.")
 
     # Convert value
     scaled_value = value * (design_CEPCI / base_CEPCI)
