@@ -1,11 +1,96 @@
-import datetime
+import functools
 import cachetools.func
 import warnings
+import datetime
 
 import numpy as np
 import yfinance as yf
 
+from config import settings
 from forex_python.converter import CurrencyRates, RatesNotAvailableError
+
+
+def convert_currency_simple(base_currency, output_currency, amounts, date_obj=2022):
+    """
+    Simple function to convert a value or a list (or "np.array") of values to another currency.
+    In techno-economic analysis convert_currency_annual_average function is usually preferred.
+    Currency keys are: "GBP", "USD", "EUR".
+
+    Parameters
+    ----------
+    base_currency: str
+        Original currency.
+    output_currency: str
+        Desired currency post conversion.
+    amounts : float | int | list[float] | list[int]
+        Amount which is to be converted.
+    date_obj: str | int | datetime
+        Determines which reference date or timeframe should be used for conversion.
+
+    Returns
+    -------
+    float| list[float]
+        Amount converted to output currency.
+    """
+
+    # Helper function for single value case
+    def _convert_single_currency(_base_currency, _output_currency, _amount, _date_obj):
+        """
+        Converts a single currency value from a base currency to a desired currency.
+        Expanded by convert_currency function to extend to list and numpy arrays.
+
+        Parameters
+        ----------
+        _base_currency: str
+        _output_currency: str
+        _amount : float | int
+        _date_obj: str | int
+
+        Returns
+        -------
+        float
+            Amount converted to output currency.
+        """
+        # Set up converter
+        _output_amount = None
+        converter = CurrencyRates()
+        if _date_obj == "reference date":
+            reference_date_time = datetime.datetime(*settings.data.economic.reference_date)
+            _output_amount = converter.convert(_base_currency, _output_currency, _amount, reference_date_time)
+
+        if _date_obj == "most recent":
+            _output_amount = converter.convert(_base_currency, _output_currency, _amount)
+
+        if isinstance(_date_obj, datetime.datetime):
+            _output_amount = converter.convert(_base_currency, _output_currency, _amount, _date_obj)
+
+        if _date_obj == 2022:  # uses annual averages
+            annual_average_data = settings.data.economic.conversion_rates.year_2022
+
+            if _base_currency == "USD" and _output_currency == "GBP":
+                _output_amount = _amount * annual_average_data.USD_TO_GBP
+            if _base_currency == "USD" and _output_currency == "EUR":
+                _output_amount = _amount * annual_average_data.USD_TO_GBP * 1 / annual_average_data.EUR_TO_GBP
+            if _base_currency == "EUR" and _output_currency == "GBP":
+                _output_amount = _amount * annual_average_data.EUR_TO_GBP
+            if _base_currency == "EUR" and _output_currency == "USD":
+                _output_amount = _amount * annual_average_data.EUR_TO_GBP * 1 / annual_average_data.USD_TO_GBP
+            if _base_currency == "GBP" and _output_currency == "USD":
+                _output_amount = _amount * 1 / annual_average_data.USD_TO_GBP
+            if _base_currency == "GBP" and _output_currency == "EUR":
+                _output_amount = _amount * 1 / annual_average_data.EUR_TO_GBP
+
+        return _output_amount
+
+    # Extension of inner function to lists and numpy arrays if required.
+    if isinstance(amounts, int) or isinstance(amounts, float):  # single value case
+        output_amount = _convert_single_currency(base_currency, output_currency, amounts, _date_obj="reference date")
+    else:  # list or other iterable of values case
+        partial_function = functools.partial(_convert_single_currency, base_currency=base_currency,
+                                             output_currency=output_currency, date_obj=date_obj)
+        output_amount = [partial_function(amount=x) for x in amounts]
+
+    return output_amount
 
 
 def get_year_start_end_date(year):
@@ -119,7 +204,6 @@ def get_average_annual_exchange_rate(year, base_currency, converted_currency, ap
         except:  # slower but sometimes yfinance breaks
             warnings.warn("Error with forex_python - revert to yfinance library")
             historic_rates_array = run_with_yfinance()
-
 
     elif method == "yfinance":
         try:

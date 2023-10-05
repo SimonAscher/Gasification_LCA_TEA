@@ -1,5 +1,4 @@
 from .cash_flow_conversion import get_present_value, get_annual_value
 from .scaling import power_scale, CEPCI_scale, get_most_recent_available_CEPCI_year
-from .currency_converter import convert_currency
-from .average_annual_currency_conversion import convert_currency_annual_average
+from .currency_conversion import convert_currency_simple, convert_currency_annual_average
 from .annual_operating_hours import get_annual_operating_hours_draws
