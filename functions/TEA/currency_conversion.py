@@ -86,9 +86,11 @@ def convert_currency_simple(base_currency, output_currency, amounts, date_obj=20
     if isinstance(amounts, int) or isinstance(amounts, float):  # single value case
         output_amount = _convert_single_currency(base_currency, output_currency, amounts, _date_obj="reference date")
     else:  # list or other iterable of values case
-        partial_function = functools.partial(_convert_single_currency, base_currency=base_currency,
-                                             output_currency=output_currency, date_obj=date_obj)
-        output_amount = [partial_function(amount=x) for x in amounts]
+        partial_function = functools.partial(_convert_single_currency,
+                                             _base_currency=base_currency,
+                                             _output_currency=output_currency,
+                                             _date_obj=date_obj)
+        output_amount = [partial_function(_amount=x) for x in amounts]
 
     return output_amount
 
