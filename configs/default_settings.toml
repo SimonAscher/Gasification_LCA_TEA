@@ -337,9 +337,6 @@ distribution_type = "triangular"
 source = ["https://ember-climate.org/data/data-tools/carbon-price-viewer/", "https://www.statista.com/statistics/1322214/carbon-prices-european-union-emission-trading-scheme/#:~:text=The%20price%20of%20emissions%20allowances,reform%20of%20the%20EU%20ETS."]
 
 
-
-
-
 [default.data.economic.CEPCI]  # Chemical Enginnering Plant Cost Index (CEPCI) values
 1995 = 381.1
 1996 = 381.7

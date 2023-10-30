@@ -1,8 +1,4 @@
 import os
-
-from scipy.optimize import curve_fit
-from sklearn.metrics import mean_squared_error
-
 import functions
 
 import pandas as pd
@@ -10,17 +6,20 @@ import numpy as np
 
 from config import settings
 from objects import PresentValue, triangular_dist_maker
+from scipy.optimize import curve_fit
+from sklearn.metrics import mean_squared_error
 
 
-def get_shredding_CAPEX_distribution(currency=None, CEPCI_year=None):
+def get_boiler_CAPEX_distribution(unit_steam_requirement, currency=None, CEPCI_year=None):
     """
-    Calculate the CAPEX distribution of a shredder/primary grinder to reduce size of bales or other feedstocks received
-    at a large particle size.
+    Calculate the CAPEX distribution of a boiler for steam generation.
     CAPEX is given as total overnight cost (TOC) or total installed cost (TIC) (i.e. engineering works, procurement,
     installation, etc. are considered included in CAPEX).
 
     Parameters
     ----------
+    unit_steam_requirement: float
+        Steam requirement [kg steam/kg feedstock wb].
     currency: str | None
         Currency that is to be used for analysis.
     CEPCI_year: int | None
@@ -29,10 +28,10 @@ def get_shredding_CAPEX_distribution(currency=None, CEPCI_year=None):
     Returns
     -------
     PresentValue
-        Distribution of CAPEX values in the supplied currency.
-
+        Present value object containing distribution of CAPEX values in the supplied currency.
     """
-    # Get defaults
+
+    # Get default inputs
     if currency is None:
         currency = settings.user_inputs.general.currency
 
@@ -40,11 +39,13 @@ def get_shredding_CAPEX_distribution(currency=None, CEPCI_year=None):
         CEPCI_year = settings.user_inputs.economic.CEPCI_year
 
     # Get system size
-    system_size_tonnes_per_hour = settings.user_inputs.system_size.mass_basis_tonnes_per_hour
+    system_size_tonnes_per_hour = settings.user_inputs.system_size.mass_basis_tonnes_per_hour  # [tonnes/hour]
+    unit_steam_requirement *= 1000  # update to [kg steam/tonne feedstock wb]
+    steam_requirement = unit_steam_requirement * system_size_tonnes_per_hour  # [kg steam/hour]
 
     # Load data
     root_dir = functions.general.utility.get_project_root()
-    data_file = "CAPEX_grinder_shredder.csv"
+    data_file = "CAPEX_boiler.csv"
     data_file_path = os.path.join(root_dir, "data", data_file)
     df = pd.read_csv(data_file_path)
 
@@ -70,26 +71,33 @@ def get_shredding_CAPEX_distribution(currency=None, CEPCI_year=None):
     df[currency_scaled_label] = CAPEX_currency_scaled
     df[currency_and_CEPCI_scaled_label] = CAPEX_currency_CEPCI_scaled
 
-    # Remove data points which should be ignored
-    df = df[df["Ignore"] != True].copy()
+    # Discard outliers
+    df = df[df["CAPEX"] < 500000]
 
     # Fit model, get error metrics, and prediction.
     popt, _ = curve_fit(f=functions.general.curve_fitting.func_straight_line,
-                        xdata=df["Plant size [tonnes/hour]"],
+                        xdata=df["Plant size [kg steam/hour]"],
                         ydata=df[currency_and_CEPCI_scaled_label],
                         maxfev=10000)
 
-    # rmse = mean_squared_error(df[currency_and_CEPCI_scaled_label],
-    #                           functions.general.curve_fitting.func_straight_line(df["Plant size [tonnes/hour]"],
-    #                                                                              *popt),
-    #                           squared=False)
-
     mape_decimal = functions.general.MAPE(df[currency_and_CEPCI_scaled_label],
                                           functions.general.curve_fitting.func_straight_line(
-                                              df["Plant size [tonnes/hour]"], *popt),
+                                              df["Plant size [kg steam/hour]"], *popt),
                                           return_as_decimal=True)
 
-    prediction = functions.general.curve_fitting.func_straight_line(system_size_tonnes_per_hour, *popt)
+    prediction = functions.general.curve_fitting.func_straight_line(steam_requirement, *popt)
+
+    if steam_requirement < 2000:
+        # Overwrite prediction if system is very small scale - use power scaling approach instead
+        smallest_system_data = (df[df["Plant size [kg steam/hour]"] == df["Plant size [kg steam/hour]"].min()])
+        smallest_system_cost = smallest_system_data[currency_and_CEPCI_scaled_label]
+        smallest_system_size = smallest_system_data["Plant size [kg steam/hour]"]
+
+        prediction = float(functions.TEA.power_scale(baseline_size=float(smallest_system_size),
+                                                     design_size=steam_requirement,
+                                                     baseline_cost=float(smallest_system_cost),
+                                                     scaling_factor=0.8))
+        mape_decimal = 0.30  # Add significant uncertainty to model - since reliant on individual data point here.
 
     # Get lower and upper bounds of distribution based on the distributions MAPE
     lower_bound = prediction - (prediction * mape_decimal)
@@ -97,10 +105,12 @@ def get_shredding_CAPEX_distribution(currency=None, CEPCI_year=None):
 
     distribution = triangular_dist_maker(lower=lower_bound, mode=prediction, upper=upper_bound)
 
-    distribution_draws = list(np.multiply(functions.MonteCarloSimulation.get_distribution_draws(distribution), -1))  # turn -ve as they are a cost
+    distribution_draws = list(np.multiply(
+        functions.MonteCarloSimulation.get_distribution_draws(distribution), -1))  # turn -ve as they are a cost
 
     CAPEX = PresentValue(values=distribution_draws,
-                         name="CAPEX Feedstock Shredder/Primary Grinder",
-                         short_label="CAPEX Shred",
+                         name="CAPEX Boiler for Steam Generation",
+                         short_label="CAPEX Stm",
                          tag="CAPEX")
+
     return CAPEX

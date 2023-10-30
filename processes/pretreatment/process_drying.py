@@ -1,9 +1,11 @@
+import functions
+
 from dataclasses import dataclass
-from objects import Process
-from objects import Requirements, Electricity, Heat
+from objects import Process, Requirements, Electricity, Heat, AnnualValue
 from functions.general.utility import kJ_to_kWh
 from processes.pretreatment.utils import energy_drying
-from functions.MonteCarloSimulation import to_fixed_MC_array
+from functions.TEA.CAPEX_estimation import get_dryer_CAPEX_distribution
+from functions.TEA.cost_benefit_components import get_operation_and_maintenance_cost
 
 
 @dataclass()
@@ -34,14 +36,25 @@ class FeedstockDrying(Process):
             energy_drying_dict["electricity"] = kJ_to_kWh(energy_drying_dict["electricity"])  # [kWh/FU]
             energy_drying_dict["units"] = "kWh"
 
+        # Get economic requirements
+        CAPEX = get_dryer_CAPEX_distribution()
+        o_and_m_costs = get_operation_and_maintenance_cost(CAPEX.values)
+
         # Initialise Requirements object and add requirements
         feedstock_drying_requirements = Requirements(name=self.name)
-        feedstock_drying_requirements.add_requirement(Heat(values=list(to_fixed_MC_array(energy_drying_dict["heat"])),
-                                                           name="Heat use for feedstock drying",
-                                                           source=energy_drying_dict["heat source"]))
-        feedstock_drying_requirements.add_requirement(Electricity(values=list(to_fixed_MC_array(energy_drying_dict
-                                                                                                ["electricity"])),
-                                                                  name="Electricity use for feedstock drying"))
+        feedstock_drying_requirements.add_requirement(
+            Heat(values=list(functions.MonteCarloSimulation.to_fixed_MC_array(energy_drying_dict["heat"])),
+                 name="Heat use for feedstock drying",
+                 source=energy_drying_dict["heat source"]))
+        feedstock_drying_requirements.add_requirement(
+            Electricity(values=list(functions.MonteCarloSimulation.to_fixed_MC_array(energy_drying_dict
+                                                                                     ["electricity"])),
+                        name="Electricity use for feedstock drying"))
+        feedstock_drying_requirements.add_requirement(CAPEX)
+        feedstock_drying_requirements.add_requirement(AnnualValue(name="O&M Costs Feedstock Dryer",
+                                                                  short_label="O&M Dry",
+                                                                  values=o_and_m_costs,
+                                                                  tag="O&M"))
 
         # Add requirements to object
         self.add_requirements(feedstock_drying_requirements)

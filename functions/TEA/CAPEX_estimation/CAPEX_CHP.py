@@ -153,6 +153,7 @@ def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=
 
     CAPEX = PresentValue(values=distribution_draws,
                          name="CAPEX CHP",
-                         short_label="CAPEX CHP")
+                         short_label="CAPEX CHP",
+                         tag="CAPEX")
 
     return CAPEX

@@ -65,7 +65,8 @@ def biochar_sale_cost_benefit():
     annuity_cash_flow_array = costs_benefits_per_FU * system_size_tonnes_per_year_array
 
     output_cost_benefit = objects.AnnualValue(values=list(annuity_cash_flow_array),
-                                              name="biochar sale",
-                                              short_label="BC")
+                                              name="Biochar Sale",
+                                              short_label="BC",
+                                              tag="Sale of products")
 
     return output_cost_benefit

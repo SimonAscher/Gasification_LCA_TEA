@@ -1,12 +1,15 @@
-import numpy as np
+import math
 import warnings
+
+import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from objects import Process
-from objects import Requirements, Electricity
+from objects import Process, Requirements, Electricity, range_dist_maker, AnnualValue
 from processes.pretreatment.utils import electricity_milling
 from dynaconf.loaders.toml_loader import write
+from functions.TEA.cost_benefit_components import get_operation_and_maintenance_cost
+from functions.TEA.CAPEX_estimation import get_milling_CAPEX_distribution
 
 
 @dataclass()
@@ -52,10 +55,30 @@ class FeedstockMilling(Process):
                                  {"particle_size_post_milling": float(average_particle_size)}}}},
                   merge=True)
 
+        # Get economic requirements
+        CAPEX = get_milling_CAPEX_distribution()
+
+        # Check if CAPEX occurs more than once
+        global_life_span = settings.user_inputs.general.system_life_span
+        if CAPEX.number_of_periods < global_life_span:
+            repetitions = math.floor(global_life_span / CAPEX.number_of_periods)
+            CAPEX.values = list(np.multiply(CAPEX.values, repetitions))
+
+        # Calculate O&M Cost
+        o_and_m_costs = get_operation_and_maintenance_cost(CAPEX.values, range_dist_maker(0.10, 0.18))
+        # operation_and_maintenance_cost = 10% to 18%
+        # Sources: "Development of agri-pellet production cost and optimum size", Sultana et al., 2010
+        # "Economics of producing fuel pellets from biomass", Mani et al., 2006
+
         # Initialise Requirements object and add requirements
-        feedstock_drying_requirements = Requirements(name=self.name)
-        feedstock_drying_requirements.add_requirement(Electricity(values=electricity_req,
-                                                                  name="Electricity use for feedstock milling"))
+        feedstock_milling_requirements = Requirements(name=self.name)
+        feedstock_milling_requirements.add_requirement(Electricity(values=electricity_req,
+                                                                   name="Electricity use for feedstock milling"))
+        feedstock_milling_requirements.add_requirement(CAPEX)
+        feedstock_milling_requirements.add_requirement(AnnualValue(name="O&M Costs Feedstock Mill",
+                                                                   short_label="O&M Mill",
+                                                                   values=o_and_m_costs,
+                                                                   tag="O&M"))
 
         # Add requirements to object
-        self.add_requirements(feedstock_drying_requirements)
+        self.add_requirements(feedstock_milling_requirements)

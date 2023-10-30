@@ -5,15 +5,15 @@ from config import settings
 from objects import AnnualValue
 
 
-def carbon_price_cost_benefit(results):
+def carbon_price_cost_benefit(total_GWP_per_FU):
     """
     Calculates costs/benefits due to a carbon price which could be the result of an emissions trading scheme,
     a carbon tax, or a voluntary carbon market etc. The systems global net CO2eq. emissions are used.
 
     Parameters
     ----------
-    results:
-        Results object with calculated GWP.
+    total_GWP_per_FU:
+        The system's global/total GWP per FU [kg CO2eq./FU].
 
     Returns
     -------
@@ -24,7 +24,7 @@ def carbon_price_cost_benefit(results):
 
     # Get background data
     # Get GWP
-    GWP_tonnes_per_FU = np.array(results.GWP_total) / 1000  # tonnes CO2eq./FU
+    GWP_tonnes_per_FU = np.array(total_GWP_per_FU) / 1000  # tonnes CO2eq./FU
 
     # Get system size
     system_size_tonnes_per_hour = settings.user_inputs.system_size.mass_basis_tonnes_per_hour
@@ -69,6 +69,9 @@ def carbon_price_cost_benefit(results):
     # Convert per FU units to life cycle costs/benefits
     annuity_cash_flow_array = costs_benefits_per_FU * system_size_tonnes_per_year_array
 
-    output_cost_benefit = AnnualValue(values=list(annuity_cash_flow_array), name="carbon tax", short_label="CT")
+    output_cost_benefit = AnnualValue(values=list(annuity_cash_flow_array),
+                                      name="Carbon tax",
+                                      short_label="CT",
+                                      tag="Other")
 
     return output_cost_benefit

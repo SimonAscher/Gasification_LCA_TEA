@@ -327,10 +327,12 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
     # Store CAPEX distributions in PresentValue objects.
     CAPEX_gasification = PresentValue(values=list(np.multiply(dist_draws_gasification, -1)),
                                       name="CAPEX gasification",
-                                      short_label="CAPEX gas.")
+                                      short_label="CAPEX gas.",
+                                      tag="CAPEX")
 
     CAPEX_gas_cleaning = PresentValue(values=list(np.multiply(dist_draws_gas_cleaning, -1)),
                                       name="CAPEX gas cleaning",
-                                      short_label="CAPEX gas clean.")
+                                      short_label="CAPEX gas clean.",
+                                      tag="CAPEX")
 
     return CAPEX_gasification, CAPEX_gas_cleaning

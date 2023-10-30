@@ -4,10 +4,9 @@ import numpy as np
 
 from config import settings
 from objects import AnnualValue, range_dist_maker
-from processes.carbon_capture.process import CarbonCapture
 
 
-def get_carbon_capture_CAPEX_distribution(results, currency=None, CEPCI_year=None):
+def get_carbon_capture_CAPEX_distribution(CO2_capture_rate, currency=None, CEPCI_year=None):
     """
     Calculate the CAPEX distribution of a carbon capture plant.
     CAPEX is given as total overnight cost (TOC) or total installed cost (TIC) (i.e. engineering works, procurement,
@@ -15,8 +14,8 @@ def get_carbon_capture_CAPEX_distribution(results, currency=None, CEPCI_year=Non
 
     Parameters
     ----------
-    results:
-        Results object with CarbonCapture process.
+    CO2_capture_rate: list[float]
+        CO2 capture rate of system [kg CO2eq./tonne feedstock].
     currency: str | None
         Currency that is to be used for analysis.
     CEPCI_year: int | None
@@ -48,13 +47,8 @@ def get_carbon_capture_CAPEX_distribution(results, currency=None, CEPCI_year=Non
     system_size_tonnes_per_year_array = system_size_tonnes_per_hour * annual_operating_hours_array
 
     # Get flue gas available for capture
-    CCS_results = [process for process in results.processes if isinstance(process, CarbonCapture)][0]
-
-    GWP_results_fossil_CO2 = CCS_results.GWP_results[0].values
-    GWP_results_biogenic_CO2 = CCS_results.GWP_results[1].values
-    flue_gas_CO2_array = list(np.add(GWP_results_fossil_CO2, GWP_results_biogenic_CO2) / 1000 * -1)
-    # [tonne CO2/FU] i.e. [tonne CO2/tonne feedstock]
-    # divide by 1000 to turn into tonnes and multiply by -1 to turn values positive
+    # Convert from [kg CO2/FU] to [tonnes CO2/FU] i.e. [tonne CO2/tonne feedstock]
+    flue_gas_CO2_array = list(np.divide(CO2_capture_rate, 1000) * -1)
 
     # Capture only cost
     # Prices currency/tonne CO2
@@ -82,6 +76,7 @@ def get_carbon_capture_CAPEX_distribution(results, currency=None, CEPCI_year=Non
 
     CAPEX = AnnualValue(values=list(annuity_cash_flow_array_capture),
                         name="Carbon Capture CAPEX",
-                        short_label="CC")
+                        short_label="CC",
+                        tag="CAPEX")
 
     return CAPEX

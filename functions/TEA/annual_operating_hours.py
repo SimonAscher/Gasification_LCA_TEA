@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 
 import functions
-from objects import triangular_dist_maker
 
 
 def get_annual_operating_hours_draws():
@@ -16,6 +15,7 @@ def get_annual_operating_hours_draws():
     list
         Distribution draws [hours/year].
     """
+    from objects import triangular_dist_maker  # import here to avoid circular import error
 
     # Load and display data
     root_dir = functions.general.utility.get_project_root()

@@ -8,5 +8,5 @@ results_file = results.save_report(storage_path=r"C:\Users\2270577A\OneDrive - U
                                    save_figures=True)
 
 a = biochar_sale_cost_benefit()
-b = carbon_price_cost_benefit(results)
+b = carbon_price_cost_benefit(results.GWP_total)
 c = gate_fee_or_feedstock_cost_benefit()

@@ -2,15 +2,16 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from objects import Process
-from objects import Requirements, Heat, Electricity
+from objects import Process, Requirements, Heat, Electricity, AnnualValue
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.general.utility.unit_conversions import MJ_to_kWh
+from functions.TEA.CAPEX_estimation import get_CHP_CAPEX_distribution
+from functions.TEA.cost_benefit_components import get_operation_and_maintenance_cost
 
 
 @dataclass()
 class CombinedHeatPower(Process):
-    name: str = "Combined heat and power (CHP)"
+    name: str = "Combined heat and power"
     short_label: str = "CHP"
 
     def instantiate_default_requirements(self):
@@ -89,11 +90,15 @@ class CombinedHeatPower(Process):
         energy_production_rate = np.array(gas_supplied) * np.array(LHV_gas)  # [MJ/kg]
         energy_produced = MJ_to_kWh(energy_production_rate * FU)  # [kWh/FU]
 
-        # Calculate GWP due to electricity displacement
+        # Calculate electricity displacement
         electricity_produced = list((energy_produced * efficiency_electrical) * (1 - demand_parasitic))  # [kWh/FU]
 
-        # Calculate GWP due to heat displacement
+        # Calculate heat displacement
         heat_produced = energy_produced * efficiency_heat  # [kWh/FU]
+
+        # Economic requirements
+        CAPEX = get_CHP_CAPEX_distribution()
+        o_and_m_costs = get_operation_and_maintenance_cost(CAPEX.values)
 
         # Initialise Requirements object and add requirements
         CHP_requirements = Requirements(name=self.name)
@@ -101,6 +106,10 @@ class CombinedHeatPower(Process):
                                               source=displaced_heat_source, generated=True))
         CHP_requirements.add_requirement(Electricity(values=electricity_produced, name="Electricity production by CHP",
                                                      generated=True))
-
+        CHP_requirements.add_requirement(CAPEX)
+        CHP_requirements.add_requirement(AnnualValue(name="O&M Costs CHP",
+                                                     short_label="O&M CHP",
+                                                     values=o_and_m_costs,
+                                                     tag="O&M"))
         # Add requirements to object
         self.add_requirements(CHP_requirements)

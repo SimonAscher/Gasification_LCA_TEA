@@ -6,14 +6,15 @@ import numpy as np
 from config import settings
 from objects import AnnualValue, triangular_dist_maker
 
-def carbon_capture_amine_consumption_cost_benefit(results):
+
+def carbon_capture_amine_consumption_cost_benefit(CO2_capture_rate):
     """
      Calculates costs/benefits due to amine (MEA) consumption for amine-based carbon capture process.
 
     Parameters
     ----------
-    results:
-        Results object with CarbonCapture process.
+    CO2_capture_rate: list[float]
+        CO2 capture rate of system [kg CO2eq./tonne feedstock].
 
     Returns
     -------
@@ -23,8 +24,6 @@ def carbon_capture_amine_consumption_cost_benefit(results):
         Returned as the currency defined in settings.user_inputs.general.currency.
 
     """
-    from processes.carbon_capture.process import CarbonCapture
-
     # Check that right type of carbon capture process is defined in user inputs
     if settings.user_inputs.processes.carbon_capture.method != "Amine post comb":
         output_cost_benefit = AnnualValue(values=list(np.zeros(settings.user_inputs.general.MC_iterations)),
@@ -46,11 +45,8 @@ def carbon_capture_amine_consumption_cost_benefit(results):
         system_size_tonnes_per_year_array = system_size_tonnes_per_hour * annual_operating_hours_array
 
         # Get flue gas available for capture
-        CCS_results = [process for process in results.processes if isinstance(process, CarbonCapture)][0]
-
-        GWP_results_fossil_CO2 = CCS_results.GWP_results[0].values
-        GWP_results_biogenic_CO2 = CCS_results.GWP_results[1].values
-        flue_gas_CO2_array = list(np.add(GWP_results_fossil_CO2, GWP_results_biogenic_CO2) / 1000)  # [tonne CO2/FU] i.e. [tonne CO2/tonne feedstock]
+        # Convert from [kg CO2/FU] to [tonnes CO2/FU] i.e. [tonne CO2/tonne feedstock]
+        flue_gas_CO2_array = list(np.divide(CO2_capture_rate, 1000))
 
         # Define MEA degradation rate and MEA price
         amine_degradation_rate = triangular_dist_maker(lower=0.3, mode=0.7, upper=2.2)  # [kg MEA/tonne CO2]
@@ -89,6 +85,7 @@ def carbon_capture_amine_consumption_cost_benefit(results):
         # Get final annual value objects
         output_cost_benefit = AnnualValue(values=list(annuity_cash_flow_array_amine_consumption),
                                           name="Amine requirements for carbon capture",
-                                          short_label="CC MEA")
+                                          short_label="CC MEA",
+                                          tag="Other operational expenses")
 
     return output_cost_benefit

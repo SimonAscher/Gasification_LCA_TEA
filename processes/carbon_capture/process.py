@@ -2,11 +2,15 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from objects import Process
-from objects import Requirements, BiogenicGWP, FossilGWP, Electricity, Heat
+from objects import Process, Requirements, BiogenicGWP, FossilGWP, Electricity, Heat, AnnualValue
 from processes.carbon_capture.utils import carbon_capture_VPSA_post_comb, carbon_capture_amine_post_comb
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from processes.syngas_combustion.process import SyngasCombustion
+from functions.TEA.CAPEX_estimation import get_carbon_capture_CAPEX_distribution
+from functions.TEA import get_present_value
+from functions.TEA.cost_benefit_components import (get_operation_and_maintenance_cost,
+                                                   carbon_capture_transport_storage_cost_benefit,
+                                                   carbon_capture_amine_consumption_cost_benefit)
 
 
 @dataclass()
@@ -111,6 +115,26 @@ class CarbonCapture(Process):
 
         else:
             raise ValueError("Carbon capture method not supported")
+
+        # Economic requirements
+        CO2_capture_rate = list(np.add(captured_CO2_fossil, captured_CO2_biogenic))  # [tonne CO2/FU]
+        CAPEX = get_carbon_capture_CAPEX_distribution(CO2_capture_rate)
+
+        o_and_m_costs = get_operation_and_maintenance_cost(get_present_value(values=CAPEX.values,
+                                                                             value_type="AV"))
+
+        CC_transport, CC_storage = carbon_capture_transport_storage_cost_benefit(CO2_capture_rate)
+
+        CCS_requirements.add_requirement(CAPEX)
+        CCS_requirements.add_requirement(AnnualValue(name="O&M Costs Carbon Capture",
+                                                     short_label="O&M CC",
+                                                     values=o_and_m_costs,
+                                                     tag="O&M"))
+        CCS_requirements.add_requirement(CC_transport)
+        CCS_requirements.add_requirement(CC_storage)
+
+        if cc_method == "Amine post comb":
+            CCS_requirements.add_requirement(carbon_capture_amine_consumption_cost_benefit(CO2_capture_rate))
 
         # Add requirements to object
         self.add_requirements(CCS_requirements)

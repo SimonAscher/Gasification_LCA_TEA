@@ -29,7 +29,7 @@ def check_args_for_percentage(*args):
     return decorator
 
 
-@check_args_for_percentage("interest_rate")
+# @check_args_for_percentage("interest_rate")
 def get_present_value(values, value_type: _value_type_options_pv, interest_rate=None, discount_period=None):
     """
     Convert future value or annual value to present value.
@@ -47,7 +47,7 @@ def get_present_value(values, value_type: _value_type_options_pv, interest_rate=
 
     Returns
     -------
-    float
+    float | list[float]
         Present value of imputed cost or benefit object
     """
 
@@ -88,6 +88,10 @@ def get_present_value(values, value_type: _value_type_options_pv, interest_rate=
         else:
             raise ValueError(r"Warning: This type of reference value is not supported. Only 'FV' or 'AV' supported.")
 
+        # Run check
+        if _interest_rate > 1:
+            raise ValueError("Interest rate should be given as a decimal.")
+
         return _pv
 
     # Extension of inner function to lists and numpy arrays if required.
@@ -103,7 +107,7 @@ def get_present_value(values, value_type: _value_type_options_pv, interest_rate=
     return pv
 
 
-@check_args_for_percentage("interest_rate")
+# @check_args_for_percentage("interest_rate")
 def get_annual_value(values, value_type: _value_type_options_av, interest_rate=None, discount_period=None):
     """
     Convert present values or future values to annual values (also called annuity).
@@ -121,7 +125,7 @@ def get_annual_value(values, value_type: _value_type_options_av, interest_rate=N
 
     Returns
     -------
-    float
+    float | list[float]
         Annual value (also called annuity) of imputed cost or benefit object
     """
 
@@ -159,6 +163,10 @@ def get_annual_value(values, value_type: _value_type_options_av, interest_rate=N
             _av = _value * (_interest_rate / (((1 + _interest_rate) ** _discount_period) - 1))
         else:
             raise ValueError(r"Warning: This type of reference value is not supported. Only 'PV' or 'FV' supported.")
+
+        # Run check
+        if _interest_rate > 1:
+            raise ValueError("Interest rate should be given as a decimal.")
 
         return _av
 

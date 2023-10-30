@@ -1,16 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import functions
 
 from config import settings
 from dynaconf.utils.boxing import DynaBox
 from dataclasses import dataclass, InitVar
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Literal
 
 from objects.requirement_objects import _Requirement, Requirements
 from objects.requirement_objects import Heat, Electricity, Steam, Oxygen, FossilGWP, BiogenicGWP
+from objects.requirement_objects import PresentValue, AnnualValue, FutureValue
 from functions.LCA import electricity_GWP, thermal_energy_GWP
-from functions.TEA.cost_benefit_components import electricity_cost_benefit, heat_cost_benefit
+from functions.TEA import get_present_value, get_annual_value, get_annual_operating_hours_draws
 from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
 
 
@@ -77,73 +79,161 @@ class GlobalWarmingPotential:
         self.mean = np.mean(self.values)
 
 
+_tag_options = Literal[None, "CAPEX", "O&M", "Other operational expenses", "Sale of products", "Other form of income",
+                       "Transport", "Other", "Not classified"]
+
+
 @dataclass
 class CostBenefit:
     """
-    Costs or benefits of a process.
+    Cost or benefit item of a process.
+    Use either cash_flow or requirement object to initiate CostBenefit object.
 
     Attributes
     ----------
     requirement : InitVar[Type[_Requirement]]
         A "_Requirement" child object which is to be converted to its cost or benefit.
-    per_FU: bool
-        Determines whether the costs/benefits are absolute (False) or per functional unit (True).
+    values_PV: list[float]
+        Present value equivalent of the cost or benefit.
+    values_AV: list[float]
+        Present value equivalent of the cost or benefit.
+    values_PV_mean: float
+        Mean value of all PV values.
+    values_AV_mean: float
+        Mean value of all AV values.
+    currency: str
+        Currency of cost benefit object.
+    cost: bool
+        Specifies whether the object is a cost or a benefit.
+    benefit: bool
+        Specifies whether the object is a cost or a benefit.
+    tag: _tag_options
+        Identifier to categorise cost and benefit objects.
+
+    Methods
+    -------
+    add_tag(tag)
+        Updates the CostBenefit object's tag.
     """
     # Update defaults
     requirement: InitVar[Type[_Requirement]]
-    per_FU: bool = None
+    values_PV: float | list[float] = None
+    values_AV: float | list[float] = None
+    values_PV_mean: float = None
+    values_AV_mean: float = None
+    currency: str = None
     cost: bool = None
     benefit: bool = None
+    tag: _tag_options = None
 
     def __post_init__(self, requirement):
-        # Get right units
-        if self.per_FU:
-            units = settings.user_inputs.general.currency + "/" + settings.general.FU_label
-        else:
-            units = settings.user_inputs.general.currency
-
-        # Take values from requirement object
-        self.values = []
+        # Store requirement object and other information.
+        self.requirement = requirement
         self.name = requirement.name
         self.short_label = requirement.short_label
         self.description = requirement.description
-        self.source = requirement.source
-        self.units = units
-        self.requirement_type = str(type(requirement))
 
-        # Calculate Cost/Benefit and store as object attribute
-        if isinstance(requirement, Electricity):
-            self.values = electricity_cost_benefit(requirement.values)
-            if requirement.generated:  # i.e. leading to sale of electricity
-                if all(val <= 0 for val in requirement.values):  # Check that values are not already positive.
-                    self.values = list(np.array(self.values) * -1)
-                self.cost = False
-                self.benefit = True
+        # Store other values and calculate Cost/Benefit and store as object attribute
+        if (isinstance(requirement, PresentValue) or
+                isinstance(requirement, AnnualValue) or
+                isinstance(requirement, FutureValue)):  # Case 1 - Costs/Benefits as a result of direct cash flows
+            # Store general properties
+            self.currency = requirement.currency
+            self.tag = requirement.tag
+
+            # Calculate Costs/Benefits based on which cash flow is present and store as object attribute
+            if isinstance(requirement, PresentValue):
+                self.values_PV = requirement.values
+                self.values_AV = get_annual_value(values=requirement.values,
+                                                  value_type="PV",
+                                                  interest_rate=requirement.rate_of_return,
+                                                  discount_period=requirement.number_of_periods)
+
+            if isinstance(requirement, AnnualValue):
+                self.values_PV = get_present_value(values=requirement.values,
+                                                   value_type="AV",
+                                                   interest_rate=requirement.rate_of_return,
+                                                   discount_period=requirement.number_of_periods)
+                self.values_AV = requirement.values
+
+            if isinstance(requirement, FutureValue):
+                self.values_PV = get_present_value(values=requirement.values,
+                                                   value_type="FV",
+                                                   interest_rate=requirement.rate_of_return,
+                                                   discount_period=requirement.number_of_periods)
+                self.values_AV = get_annual_value(values=requirement.values,
+                                                  value_type="FV",
+                                                  interest_rate=requirement.rate_of_return,
+                                                  discount_period=requirement.number_of_periods)
+
+        else:  # Case 2 - Costs/Benefits as a result of other requirements
+            # Store general properties
+            self.currency = settings.user_inputs.general.currency
+
+            # These requirements are given per FU. Convert to per annum.
+            # Get system size
+            system_size_tonnes_per_hour = settings.user_inputs.system_size.mass_basis_tonnes_per_hour
+
+            # Get annual operating hours
+            if settings.user_inputs.general.annual_operating_hours_user_imputed:
+                annual_operating_hours_array = functions.MonteCarloSimulation.to_fixed_MC_array(
+                    value=settings.user_inputs.general.annual_operating_hours)
             else:
-                self.cost = True
-                self.benefit = False
+                annual_operating_hours_array = np.array(get_annual_operating_hours_draws())
 
-        if isinstance(requirement, Heat):
-            self.values = heat_cost_benefit(requirement.values)
-            if requirement.generated:  # i.e. leading to sale of heat
-                if all(val <= 0 for val in requirement.values):  # Check that values are not already positive.
-                    self.values = list(np.array(self.values) * -1)
-                self.cost = False
-                self.benefit = True
-            else:
-                self.cost = True
-                self.benefit = False
+            system_size_tonnes_per_year_array = system_size_tonnes_per_hour * annual_operating_hours_array
 
-        # TODO: Finish this function.
+            # Convert value
+            requirement_value_per_year = np.multiply(system_size_tonnes_per_year_array, requirement.values)
+
+            # Calculate Costs/Benefits based on which requirement is present and store as object attribute
+            if isinstance(requirement, Electricity) or isinstance(requirement, Heat):
+                # Calculate AV and PV resulting from requirement.
+                if isinstance(requirement, Electricity):
+                    self.values_AV = functions.TEA.cost_benefit_components.electricity_cost_benefit(
+                        requirement_value_per_year)
+                else:
+                    self.values_AV = functions.TEA.cost_benefit_components.heat_cost_benefit(requirement_value_per_year)
+                self.values_PV = get_present_value(values=self.values_AV, value_type="AV")
+
+                # Check that values are right sign
+                if requirement.generated:  # i.e. leading to sale of electricity
+                    if all(val <= 0 for val in requirement.values):  # Check that values are not already positive.
+                        self.values_AV = list(np.array(self.values_AV) * -1)
+                        self.values_PV = list(np.array(self.values_PV) * -1)
+                    self.cost = False
+                    self.benefit = True
+                else:
+                    if all(val >= 0 for val in requirement.values):  # Check that values are not already negative.
+                        self.values_AV = list(np.array(self.values_AV) * -1)
+                        self.values_PV = list(np.array(self.values_PV) * -1)
+                    self.cost = True
+                    self.benefit = False
+
+                # Set tag
+                self.tag = "Other operational expenses"
+
+        # Store mean values
+        if self.values_PV is not None:
+            self.values_PV_mean = np.mean(self.values_PV)
+        if self.values_AV is not None:
+            self.values_AV_mean = np.mean(self.values_AV)
+
+        # Assign cost or benefit values to object if not done so when object was initiated.
+        if self.values_PV is not None:
+            if self.cost is None and self.benefit is None:
+                if all(i > 0 for i in self.values_PV):
+                    self.benefit = True
+                if all(i < 0 for i in self.values_PV):
+                    self.cost = True
 
         # Run some checks
-        if self.cost:
-            if self.benefit:
-                raise ValueError("Cannot have object be both a cost and a benefit.")
+        if self.cost and self.benefit:
+            raise ValueError("Cannot have object be both a cost and a benefit.")
 
-        if self.benefit:
-            if self.cost:
-                raise ValueError("Cannot have object be both a cost and a benefit.")
+    def update_tag(self, tag: _tag_options):
+        self.tag = tag
+
 
 # Dataclass to store process requirements
 @dataclass
@@ -194,6 +284,13 @@ class Process:
     GWP_total: list[float] = None
     GWP_mean: float = None
 
+    # Economic results
+    CBA_results: tuple[CostBenefit] = None
+    PV_total: list[float] = None
+    PV_mean: float = None
+    AV_total: list[float] = None
+    AV_mean: float = None
+
     def __post_init__(self):
         if self.short_label is None:
             self.short_label = self.name  # set short_label to name if not given.
@@ -204,7 +301,7 @@ class Process:
             self.calculate_GWP()
             self.calculate_TEA()
 
-        if type(self.plot_style) != DynaBox:
+        if not isinstance(self.plot_style, DynaBox):
             self.plot_style = settings.plotting[self.plot_style]  # update plot style
 
     def add_subprocess(self, subprocess, update_results=True):
@@ -252,7 +349,7 @@ class Process:
 
     def calculate_GWP(self, consider_subprocesses=True):
         """
-        Convert a processes requirements to their corresponding Global Warming Potential (GWP).
+        Convert a process' requirements to their corresponding Global Warming Potential (GWP).
 
         Parameters
         ----------
@@ -318,7 +415,7 @@ class Process:
 
                     # Check that no deeper nested subprocesses exist
                     if self.subprocesses[subprocess_no].subprocesses[sub_subprocess_no].subprocesses != ():
-                        raise Warning("Deeper nested subprocesses may exist and have not been considered.")
+                        raise NotImplementedError("Deeper nested subprocesses may exist and have not been considered.")
 
         # Calculate total GWP
         GWP_lists = []
@@ -327,8 +424,96 @@ class Process:
         self.GWP_total = list(np.array([sum(x) for x in zip(*GWP_lists)]).flatten())
         self.GWP_mean = float(np.mean(self.GWP_total))
 
-    def calculate_TEA(self, consider_nested=True):
-        pass
+        # Set GWP to zero if no requirements led to a GWP
+        if len(self.GWP_total) == 0 and np.isnan(self.GWP_mean):
+            self.GWP_mean = 0
+            self.GWP_total = list(np.zeros(settings.user_inputs.general.MC_iterations))
+
+    def calculate_TEA(self, consider_subprocesses=True):
+        """
+        Convert a process' requirements to their corresponding Costs and Benefits.
+
+        Parameters
+        ----------
+        consider_subprocesses: bool
+            Indicates whether subprocess requirements should be considered too.
+
+        Returns
+        -------
+
+        """
+        # Define helper function
+        def process_requirements_to_CBA(requirements):
+            """
+            Convert a process' requirements to their corresponding Costs and Benefits.
+
+            Parameters
+            ----------
+            requirements: tuple[Requirements]
+                Requirements attribute of "Process" object.
+
+            Returns
+            -------
+            tuple[CostBenefit]
+                Costs/Benefits resulting from process requirements.
+            """
+            CBA_results = ()
+            for requirement_no in range(len(requirements)):  # iterate through requirements objects
+                for electricity_requirements in requirements[requirement_no].electricity:
+                    CBA_results += (CostBenefit(electricity_requirements),)
+                for heat_requirements in requirements[requirement_no].heat:
+                    CBA_results += (CostBenefit(heat_requirements),)
+                for cash_flow_pv_requirements in requirements[requirement_no].cash_flow_pv:
+                    CBA_results += (CostBenefit(cash_flow_pv_requirements),)
+                for cash_flow_av_requirements in requirements[requirement_no].cash_flow_av:
+                    CBA_results += (CostBenefit(cash_flow_av_requirements),)
+                for cash_flow_fv_requirements in requirements[requirement_no].cash_flow_fv:
+                    CBA_results += (CostBenefit(cash_flow_fv_requirements),)
+
+            return CBA_results
+
+        # Employ helper function
+        self.CBA_results = process_requirements_to_CBA(self.requirements)  # calculate GWP for process' requirements.
+
+        if consider_subprocesses:  # add requirements in subprocess.
+            # Consider subprocesses
+            for subprocess_no in range(len(self.subprocesses)):
+                if self.subprocesses[subprocess_no].CBA_results is None:  # Calculate from requirements
+                    self.CBA_results += process_requirements_to_CBA(self.subprocesses[subprocess_no].requirements)
+                else:  # add if already calculated
+                    self.CBA_results += self.subprocesses[subprocess_no].CBA_results
+                # Consider sub-subprocesses
+                for sub_subprocess_no in range(len(self.subprocesses[subprocess_no].subprocesses)):
+                    if self.subprocesses[subprocess_no].subprocesses[sub_subprocess_no].CBA_results is None:
+                        self.CBA_results += process_requirements_to_CBA(self.subprocesses[subprocess_no].
+                                                                        subprocesses[
+                                                                            sub_subprocess_no].requirements)
+                    else:
+                        self.CBA_results += self.subprocesses[subprocess_no].subprocesses[
+                            sub_subprocess_no].CBA_results
+
+                    # Check that no deeper nested subprocesses exist
+                    if self.subprocesses[subprocess_no].subprocesses[sub_subprocess_no].subprocesses != ():
+                        raise NotImplementedError("Deeper nested subprocesses may exist and have not been considered.")
+
+        # Calculate total PV and AV
+        pv_values_list = []
+        av_values_list = []
+        for cost_benefit_object in self.CBA_results:
+            pv_values_list.append(cost_benefit_object.values_PV)
+            av_values_list.append(cost_benefit_object.values_AV)
+        self.PV_total = list(np.array([sum(x) for x in zip(*pv_values_list)]).flatten())
+        self.PV_mean = float(np.mean(self.PV_total))
+        self.AV_total = list(np.array([sum(x) for x in zip(*av_values_list)]).flatten())
+        self.AV_mean = float(np.mean(self.AV_total))
+
+        # Set values to zero if no requirements led to a av or pv
+        if len(self.PV_total) == 0 and np.isnan(self.PV_mean):
+            self.PV_mean = 0
+            self.PV_total = list(np.zeros(settings.user_inputs.general.MC_iterations))
+        if len(self.AV_total) == 0 and np.isnan(self.AV_mean):
+            self.AV_mean = 0
+            self.AV_total = list(np.zeros(settings.user_inputs.general.MC_iterations))
 
     def update_plot_style(self, style=None, style_box=None):
         """

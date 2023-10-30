@@ -1,11 +1,9 @@
 import pickle
 
-import pandas as pd
 import numpy as np
 
 from config import settings
 from functions.general.utility import ultimate_comp_daf_to_wb, get_project_root
-from functions.general import calculate_LHV_HHV_feedstock
 from functions.general.utility import MJ_to_kWh
 from processes.CHP import CombinedHeatPower
 from functions.MonteCarloSimulation import get_distribution_draws
@@ -80,7 +78,7 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
     mass_steam = None
 
     if agent_type == "Air":
-        agent_mass = max_oxygen * (100 / 23)  # air is 23% oxygen by weight
+        agent_mass = max_oxygen * (1 / 0.23)  # air is 23% oxygen by weight
 
     elif agent_type == "Oxygen":
         agent_mass = max_oxygen  # no conversion required
@@ -105,7 +103,7 @@ def mass_agent(agent_type=None, ER=None, **kwargs):
         steam_fraction = kwargs.get('steam_fraction', None)
 
         # Calculate mass air
-        mass_air = max_oxygen * air_fraction * (100 / 23)  # air is 23% oxygen by weight
+        mass_air = max_oxygen * air_fraction * (1 / 0.23)  # air is 23% oxygen by weight
         mass_air = mass_air * ER
 
         # Calculate mass steam
@@ -228,10 +226,13 @@ def demands_ele_aux_gas_cleaning(C=settings.user_inputs.feedstock.carbon,
 
 
 def demands_heat_auxiliary_gasification(CHP_results_object=None,
-                                        MC_iterations=settings.user_inputs.general.MC_iterations):
-
+                                        MC_iterations=None):
+    # Get defaults
     if CHP_results_object is None:
         CHP_results_object = CombinedHeatPower()
+
+    if MC_iterations is None:
+        MC_iterations = settings.user_inputs.general.MC_iterations
 
     heat_production = CHP_results_object.requirements[0].heat[0].values
 

@@ -2,8 +2,7 @@ import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from objects import Process
-from objects import Requirements, BiogenicGWP, FossilGWP
+from objects import Process, Requirements, BiogenicGWP, FossilGWP
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.general.utility import scale_gas_fractions
 from processes.syngas_combustion.utils import syngas_combustion_CO2_eq

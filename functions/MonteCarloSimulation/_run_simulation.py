@@ -4,9 +4,10 @@ from processes.gasification import Gasification
 from processes.syngas_combustion import SyngasCombustion
 from processes.biochar_soil_application import BiocharSoilApplication
 from processes.carbon_capture import CarbonCapture
-from processes.pretreatment import FeedstockDrying, FeedstockPelleting, FeedstockMilling, FeedstockBaleShredding
+from processes.pretreatment import (FeedstockDrying, FeedstockPelleting, FeedstockMilling, FeedstockBaleShredding,
+                                    Pretreatment)
 from objects.result_objects import Results
-from objects import Process
+
 
 def run_simulation():
     # Create processes
@@ -15,7 +16,7 @@ def run_simulation():
     # Pretreatment - Note: Run first so that particle size gets updated
     process_pretreatment = None
     if settings.user_inputs.processes.drying.included or settings.user_inputs.processes.milling.included or settings.user_inputs.processes.pelleting.included or settings.user_inputs.processes.bale_shredding.included:
-        process_pretreatment = Process(name="Pretreatment", short_label="Pre.", instantiate_with_default_reqs=False)
+        process_pretreatment = Pretreatment()
 
         if settings.user_inputs.processes.drying.included:
             process_pretreatment.add_subprocess(FeedstockDrying())
@@ -32,7 +33,7 @@ def run_simulation():
         processes = processes + (process_pretreatment,)
 
     # Gasification
-    process_gasification = Gasification(short_label="Gasif.")
+    process_gasification = Gasification(short_label="Gasifier")
     processes = processes + (process_gasification,)
 
     # Syngas combustion and CHP
@@ -43,7 +44,7 @@ def run_simulation():
 
     # Biochar application to soil
     if settings.user_inputs.processes.biochar.included:
-        process_biochar = BiocharSoilApplication(short_label="Biochar.")
+        process_biochar = BiocharSoilApplication(short_label="Biochar")
         processes = processes + (process_biochar,)
 
     # Carbon Capture
@@ -59,9 +60,11 @@ def run_simulation():
     # Create results object
     results = Results(processes=processes, plot_style="digital")
     results.calculate_total_GWP()
+    results.calculate_global_economic_effects()
+    results.calculate_total_TEA()
     results.calculate_electricity_heat_output()
 
     # # Plot results
-    results.store_figures()
+    results.plot_all_results()
 
     return results

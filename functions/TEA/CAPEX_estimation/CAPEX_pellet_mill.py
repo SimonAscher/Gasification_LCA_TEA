@@ -1,8 +1,4 @@
 import os
-
-from scipy.optimize import curve_fit
-from sklearn.metrics import mean_squared_error
-
 import functions
 
 import pandas as pd
@@ -10,6 +6,9 @@ import numpy as np
 
 from config import settings
 from objects import PresentValue, triangular_dist_maker
+from scipy.optimize import curve_fit
+from sklearn.metrics import mean_squared_error
+
 
 
 def get_pellet_mill_and_cooler_CAPEX_distribution(currency=None, CEPCI_year=None):
@@ -126,7 +125,9 @@ def get_pellet_mill_and_cooler_CAPEX_distribution(currency=None, CEPCI_year=None
 
     CAPEX_mill = PresentValue(values=distribution_draws_mill,
                               name="CAPEX Pellet Mill",
-                              short_label="CAPEX Pel_M")
+                              short_label="CAPEX Pel_M",
+                              tag="CAPEX",
+                              number_of_periods=10)   # "Economics of producing fuel pellets from biomass", Mani et al., 2006
 
     # Cooler
     df_pellet_cooler = df_pellet_cooler[df_pellet_cooler["Reference Label"] != "b"]  # Discard outlier
@@ -156,15 +157,9 @@ def get_pellet_mill_and_cooler_CAPEX_distribution(currency=None, CEPCI_year=None
 
     CAPEX_cooler = PresentValue(values=distribution_draws_cooler,
                                 name="CAPEX Pellet Cooler",
-                                short_label="CAPEX Pel_C")
+                                short_label="CAPEX Pel_C",
+                                tag="CAPEX",
+                                number_of_periods=15)  # "Economics of producing fuel pellets from biomass", Mani et al., 2006
 
-    # TODO: Incorporate this
-    """
-    operation_and_maintenance_cost = 10%
-    sources:
-    "Development of agri-pellet production cost and optimum size", Sultana et al., 2010
-    "Economics of producing fuel pellets from biomass", Mani et al., 2006
-    life span of 10 years
-    """
 
     return CAPEX_mill, CAPEX_cooler

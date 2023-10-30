@@ -51,11 +51,20 @@ def gate_fee_or_feedstock_cost_benefit():
 
     # Gate fee case (i.e. +ve cash flows)
     annuity_cash_flow_array = np.multiply(system_size_tonnes_per_year_array, prices_array)  # currency/year
+    name = "Gate fee"
+    short_label = "Gate"
+    tag = "Other form of income"
 
-    # Feedstock cost case (i.e. -ve cash flows)
+    # Overwrite values for feedstock cost case (i.e. -ve cash flows)
     if settings.user_inputs.economic.gate_fee_or_feedstock_price_selection == "feedstock cost":
         annuity_cash_flow_array *= -1  # currency/year
+        name = "Feedstock cost"
+        short_label = "Feed"
+        tag = "Other operational expenses"
 
-    output_cost_benefit = objects.AnnualValue(values=list(annuity_cash_flow_array), name="biochar sale", short_label="BC")
+    output_cost_benefit = objects.AnnualValue(values=list(annuity_cash_flow_array),
+                                              name=name,
+                                              short_label=short_label,
+                                              tag=tag)
 
     return output_cost_benefit

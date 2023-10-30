@@ -61,7 +61,7 @@ def electricity_cost_benefit(electricity_array):
     Parameters
     ----------
     electricity_array: ArrayLike
-        List or array of electricity requirements in [kWh] or [kWh/FU].
+        List or array of electricity requirements in [kWh].
 
     Returns
     -------

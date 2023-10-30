@@ -100,17 +100,7 @@ def get_milling_CAPEX_distribution(currency=None, CEPCI_year=None):
 
     CAPEX = PresentValue(values=distribution_draws,
                          name="CAPEX Feedstock Mill",
-                         short_label="CAPEX Mill")
-
-    # TODO: Incorporate this
-    """
-    operation_and_maintenance_cost = 10% to 18%
-    sources:
-    "Development of agri-pellet production cost and optimum size", Sultana et al., 2010
-    "Economics of producing fuel pellets from biomass", Mani et al., 2006
-    life span of 10 years
-    """
-
+                         short_label="CAPEX Mill",
+                         number_of_periods=10,  # "Economics of producing fuel pellets from biomass", Mani et al., 2006
+                         tag="CAPEX")
     return CAPEX
-
-

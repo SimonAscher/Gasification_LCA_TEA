@@ -11,12 +11,19 @@ import seaborn as sns
 from config import settings
 from dynaconf.utils.boxing import DynaBox
 from dataclasses import dataclass
-from typing import Type
+from typing import Type, Literal
 from human_id import generate_id
-from objects.process_objects import Process
+
+from objects.process_objects import Process, CostBenefit
+from objects.requirement_objects import Requirements
+
 from matplotlib.backends.backend_pdf import PdfPages
 from functions.LCA import electricity_GWP, thermal_energy_GWP
+from functions.TEA.cost_benefit_components import carbon_price_cost_benefit, gate_fee_or_feedstock_cost_benefit
 from processes.general import oxygen_rng_elect_req, steam_rng_heat_req
+
+
+plot_legend_options = Literal["plot", "box"]
 
 
 @dataclass
@@ -69,16 +76,31 @@ class Results:
     plot_style: str | DynaBox = "digital"  # default style for plots
 
     # Define defaults which are to be populated later
+
+    # Environmental
     GWP_total: list[float] = None
     GWP_mean: float = None
+
+    # Economics
+    CBA_results: tuple[CostBenefit] = None
+    PV_distribution: list[float] | float = None
+    PV_mean: float = None
+    AV_distribution: list[float] | float = None
+    AV_mean: float = None
+    benefit_cost_ratio_distribution: list[float] | float = None
+    benefit_cost_ratio_mean: float = None
+
+    # Energy
     electricity_results: dict = None
     heat_results: dict = None
+
+    # Other
     figures: dict = None
 
     def __post_init__(self):
         self.ID: str = generate_id()
         self.date_time: str = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        if type(self.plot_style) != DynaBox:
+        if not isinstance(self.plot_style, DynaBox):
             self.plot_style = settings.plotting[self.plot_style]  # update plot style
 
     def add_process(self, process):
@@ -91,6 +113,72 @@ class Results:
             Process object which is to be added to results.
         """
         self.processes += (process, )
+
+    def calculate_global_economic_effects(self):
+        """
+        Adds other economic factors which are process independent, such as a potential carbon tax, feedstock costs,
+        or gate fees, etc.
+        """
+        # Set up general process which can be added to results object
+        from processes.other import General
+
+        general_process = General()
+        economic_requirements = Requirements(name="Economic")
+
+        # Gate fee or feedstock cost
+        economic_requirements.add_requirement(gate_fee_or_feedstock_cost_benefit())
+
+        # Effects of a carbon price, due to e.g. a carbon tax or emissions trading scheme
+        if settings.user_inputs.economic.carbon_tax_included:
+            if self.GWP_total is None:
+                self.calculate_total_GWP()
+            economic_requirements.add_requirement(carbon_price_cost_benefit(self.GWP_total))
+
+        # Add requirements to new process object, calculate LCA and TEA effects, and add process to results object.
+        general_process.add_requirements(economic_requirements)
+        general_process.calculate_GWP()
+        general_process.calculate_TEA()
+        self.add_process(general_process)
+
+    def calculate_total_TEA(self):
+        """
+        Calculates the overall present and annual value of the system.
+        """
+        # Calculate totals for each Monte Carlo instance
+        pv_totals = []
+        av_totals = []
+        for process in self.processes:
+            pv_totals.append(np.array(process.PV_total).flatten())
+            av_totals.append(np.array(process.AV_total).flatten())
+        pv_totals = np.array(pv_totals)
+        av_totals = np.array(av_totals)
+
+        # Sum totals elementwise
+        self.PV_distribution = list(np.sum(pv_totals, axis=0))
+        self.AV_distribution = list(np.sum(av_totals, axis=0))
+
+        # Calculate overall sums
+        self.PV_mean = float(np.mean(self.PV_distribution))
+        self.AV_mean = float(np.mean(self.AV_distribution))
+
+        # Calculate benefit cost ratio for each Monte Carlo instance
+        cost_distributions = []
+        benefit_distributions = []
+
+        # Fetch cost and benefit distributions
+        for process in self.processes:
+            for CBA_result in process.CBA_results:
+                if CBA_result.cost:
+                    cost_distributions.append(CBA_result.values_PV)
+                if CBA_result.benefit:
+                    benefit_distributions.append(CBA_result.values_PV)
+
+        total_costs_distribution = np.sum(np.array(cost_distributions), axis=0)
+        total_benefits_distribution = np.sum(np.array(benefit_distributions), axis=0)
+
+        # Add benefit cost ratio to results
+        self.benefit_cost_ratio_distribution = list(total_benefits_distribution / (-1 * total_costs_distribution))
+        self.benefit_cost_ratio_mean = np.mean(self.benefit_cost_ratio_distribution)
 
     def calculate_total_GWP(self):
         """
@@ -105,10 +193,6 @@ class Results:
 
         # Calculate overall sum
         self.GWP_mean = float(np.mean(self.GWP_total))
-
-
-    def calculate_total_TEA(self):
-        pass
 
     def calculate_electricity_heat_output(self):
         """
@@ -200,6 +284,15 @@ class Results:
 
         return electricity_output, heat_output
 
+    def calculate_all(self):
+        """
+        Convenience function which calculates all results (i.e. environmental, economic, and energy performance).
+        """
+        self.calculate_total_GWP()
+        self.calculate_global_economic_effects()
+        self.calculate_total_TEA()
+        self.calculate_electricity_heat_output()
+
     def update_plot_style(self, style=None, style_box=None):
         """
         Updates the plot style to be used - which effects figure size, font size, dpi, etc.
@@ -218,6 +311,7 @@ class Results:
         else:
             raise ValueError("Either use default style via 'style' parameter or supply style_box. Do not use both.")
 
+    # Energy plots
     def plot_energy_global(self, bins=10):
         """
         Create plot to illustrate the global energy generation performance of the system.
@@ -366,9 +460,10 @@ class Results:
 
         return fig, ax
 
+    # Environmental plots
     def plot_global_GWP(self, bins=20):
         """
-        Creates plot of the systems overall global warming potential (GWP).
+        Creates plot of the system's overall global warming potential (GWP).
         Parameters
         ----------
         bins: int
@@ -404,7 +499,7 @@ class Results:
 
         Parameters
         ----------
-        legend_loc: str
+        legend_loc: plot_legend_options
             Determine whether subprocess labels should be placed on plot ("plot") or in legend box ("box").
         short_labels: bool
             Determines whether shortened labels should be used (True) or not (False).
@@ -430,6 +525,13 @@ class Results:
                 names.append(process.name)
             x_array = names
         x_array.append("Total")  # Last element on axis
+
+        # Get max height of stacked bar - used to avoid labels overlapping later
+        process_mean_GWPs = []
+        for process in self.processes:
+            process_mean_GWPs.append(process.GWP_mean)
+        process_mean_GWPs.append(self.GWP_mean)
+        process_mean_GWPs_max_difference = max(process_mean_GWPs) - min(process_mean_GWPs)
 
         # Initialise figure
         # fig_size = (self.plot_style.fig_size[0], 0.8 * self.plot_style.fig_size[0])  # to allow for more labels space
@@ -458,41 +560,43 @@ class Results:
                 y_array = np.zeros(len(x_array))  # Initialise y-array
                 y_array[process_count] = subprocess_GWP_mean  # Update y-array with GWP in appropriate position
 
-                # Plot stacked bar graph for individual process
-                if subprocess_count == 0:  # plot first subprocess
-                    ax.bar(x_array, y_array, bar_width, label=subprocess_label)
-                    if subprocess_GWP_mean > 0:  # positive number case
-                        running_total_pos = y_array
-                        running_total_neg = np.zeros(len(x_array))  # Initialise other case as zero
-                    else:  # negative number case
-                        running_total_neg = y_array
-                        running_total_pos = np.zeros(len(x_array))  # Initialise other case as zero
-                else:  # plot other subprocesses
-                    if subprocess_GWP_mean > 0:  # positive number case
-                        ax.bar(x_array, y_array, bar_width, bottom=running_total_pos, label=subprocess_label)
-                        running_total_pos += y_array  # update running total
-                    else:  # negative number case
-                        ax.bar(x_array, y_array, bar_width, bottom=running_total_neg, label=subprocess_label)
-                        running_total_neg += y_array  # update running total
+                if not np.all(y_array == 0):  # Only plot non-zero elements
+                    # Plot stacked bar graph for individual process
+                    if subprocess_count == 0:  # plot first subprocess
+                        ax.bar(x_array, y_array, bar_width, label=subprocess_label)
+                        if subprocess_GWP_mean > 0:  # positive number case
+                            running_total_pos = y_array
+                            running_total_neg = np.zeros(len(x_array))  # Initialise other case as zero
+                        else:  # negative number case
+                            running_total_neg = y_array
+                            running_total_pos = np.zeros(len(x_array))  # Initialise other case as zero
+                    else:  # plot other subprocesses
+                        if subprocess_GWP_mean > 0:  # positive number case
+                            ax.bar(x_array, y_array, bar_width, bottom=running_total_pos, label=subprocess_label)
+                            running_total_pos += y_array  # update running total
+                        else:  # negative number case
+                            ax.bar(x_array, y_array, bar_width, bottom=running_total_neg, label=subprocess_label)
+                            running_total_neg += y_array  # update running total
 
-                # Plot labels on graph
-                if legend_loc == "plot":
-                    if abs(y_array[
-                               process_count]) > 50:  # Set threshold for minimum stack size to avoid overlapping labels
-                        if subprocess_GWP_mean > 0:
-                            y_position = (running_total_pos[process_count] - y_array[process_count]) \
-                                         + y_array[process_count] * 0.5
-                        else:
-                            y_position = (running_total_neg[process_count] - y_array[process_count]) \
-                                         + y_array[process_count] * 0.5
+                    # Plot labels on graph
+                    if legend_loc == "plot":
+                        # Set threshold for minimum stack size to avoid overlapping labels
+                        if abs(y_array[process_count]) > (0.05 * process_mean_GWPs_max_difference):
+                            if subprocess_GWP_mean > 0:
+                                y_position = (running_total_pos[process_count] - y_array[process_count]) \
+                                             + y_array[process_count] * 0.5
+                            else:
+                                y_position = (running_total_neg[process_count] - y_array[process_count]) \
+                                             + y_array[process_count] * 0.5
 
-                        plt.text(x=x_array[process_count],
-                                 y=y_position,
-                                 s=subprocess_label,
-                                 color="black",
-                                 fontsize=self.plot_style.legend_fontsize_small,
-                                 horizontalalignment="center"
-                                 )
+                            plt.text(x=x_array[process_count],
+                                     y=y_position,
+                                     s=subprocess_label,
+                                     color="black",
+                                     fontsize=self.plot_style.legend_fontsize_small,
+                                     horizontalalignment="center",
+                                     verticalalignment="center"
+                                     )
         # Add final bar showing total/overall GWP
         y_array = np.zeros(len(x_array))  # Initialise y-array
         y_array[-1] = self.GWP_mean  # Update y-array with GWP
@@ -516,7 +620,7 @@ class Results:
 
     def plot_global_GWP_byprocess(self, bins=50, short_labels=False, show_total=True):
         """
-        Creates plot of the Monte Carlo distributions of each process' global warming potential (GWP).
+        Creates plot of the Monte Carlo distribution of each process' global warming potential (GWP).
 
         Parameters
         ----------
@@ -535,21 +639,27 @@ class Results:
         process_names = []
         process_short_names = []
         GWP_matrix = []
-        for process_count, process in enumerate(self.processes):  # get Monte Carlo emissions of processes
+        for process_count, process in enumerate(self.processes):  # get distributions of each process' GWP
             process_names.append(process.name)
             process_short_names.append(process.short_label)
             GWP_matrix.append(np.array(process.GWP_total).flatten())
 
-        # Add total and prepare plotting format
+        # Prepare lists for plotting
         process_names.append("Total")
         process_short_names.append("Total")
-        GWP_matrix.append(np.array(self.GWP_total))
-        GWP_matrix = np.transpose(np.array(GWP_matrix))  # convert to right format
-        GWP_exc_total = GWP_matrix[:, 0:-1]  # get list without the total
-        GWP_total = GWP_matrix[:, -1]  # get list of total GWP
-
         if short_labels:
             process_names = process_short_names
+
+        # Add total to matrix
+        GWP_matrix.append(np.array(self.GWP_total))
+        GWP_matrix = np.transpose(np.array(GWP_matrix))  # convert to right format
+        GWP_exc_total = GWP_matrix[:, 0:-1]  # get array without the total
+        GWP_total = GWP_matrix[:, -1]  # get list of total GWP
+
+        # Delete entries containing all zeros
+        all_zero_indices = np.where(~GWP_exc_total.any(axis=0))[0]
+        GWP_exc_total = np.delete(arr=GWP_exc_total, obj=all_zero_indices, axis=1)
+        process_names = np.delete(arr=process_names, obj=all_zero_indices)
 
         # Turn bin number into a bin vector which can be used to plot histograms and total
         bin_width = round((np.max(GWP_matrix) - np.min(GWP_matrix)) / bins)
@@ -591,59 +701,310 @@ class Results:
 
         return fig, ax
 
-    def plot_TEA(self):
-        pass
-
-    def plot_sankey_diagram(self):
-        pass
-
-    def plot_results(self, show_GWP=True, show_TEA=True, show_energy_generation=True):
+    # Economic plots
+    def plot_global_NPV(self, bins=20):
         """
-        Convenience function to generate all plots.
-
+        Creates plot of the system's net present value distribution.
         Parameters
         ----------
-        show_GWP: bool
-            Show environmental analysis results.
-        show_TEA: bool
-            Show economic analysis results.
-        show_energy_generation: bool
-            Show energy generation results.
-        """
-        if show_GWP:
-            self.plot_global_GWP()
-            self.plot_global_GWP_byprocess()
-            self.plot_average_GWP_byprocess()
-        if show_TEA:
-            self.plot_TEA()
-
-        if show_energy_generation:
-            self.plot_energy_global()
-            self.plot_energy_electricity()
-            self.plot_energy_heat()
-
-    def store_figures(self):
-        """
-        Store all figures in results object.
+        bins: int
+            Number of bins for histogram.
 
         Returns
         -------
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+            Resulting matplotlib figure and axes object.
 
         """
-        # Get figure objects
+        sns.set_theme()
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
+        ax.hist(self.PV_distribution, bins=bins)
+
+        # Set title and labels
+        ax.set_xlabel(f"Net Present Value [{settings.user_inputs.general.currency}]",
+                      fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
+
+        # Display plot
+        plt.tight_layout()
+        plt.show()
+        plt.close(fig)
+
+        return fig, ax
+
+    def plot_global_BCR(self, bins=20):
+        """
+        Creates plot of the system's benefit-cost ratio distribution.
+        Parameters
+        ----------
+        bins: int
+            Number of bins for histogram.
+
+        Returns
+        -------
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+            Resulting matplotlib figure and axes object.
+
+        """
+        sns.set_theme()
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
+        ax.hist(self.benefit_cost_ratio_distribution, bins=bins)
+
+        # Set title and labels
+        ax.set_xlabel(f"Benefit-cost ratio",
+                      fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
+
+        # Display plot
+        plt.tight_layout()
+        plt.show()
+        plt.close(fig)
+
+        return fig, ax
+
+    def plot_average_NPV_byprocess(self, legend_loc="plot", short_labels=True):
+        """
+        Creates plot of the systems average net present value (NPV) shown for each process.
+        Note: Generally legend_loc="plot" and short_labels=True OR legend_loc="box" and short_labels=False
+        produces the best results.
+
+        Parameters
+        ----------
+        legend_loc: plot_legend_options
+            Determine whether subprocess labels should be placed on plot ("plot") or in legend box ("box").
+        short_labels: bool
+            Determines whether shortened labels should be used (True) or not (False).
+
+        Returns
+        -------
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+            Resulting matplotlib figure and axes object.
+        """
+        # Setup general variables
+        sns.set_theme()
+        bar_width = 0.5
+
+        # Get process names and shorthands for names
+        if short_labels:
+            short_names = []
+            for process in self.processes:
+                short_names.append(process.short_label)
+            x_array = short_names
+        else:
+            names = []
+            for process in self.processes:
+                names.append(process.name)
+            x_array = names
+        x_array.append("Total")  # Last element on axis
+
+        # Get max height of stacked bar - used to avoid labels overlapping later
+        process_mean_NPVs = []
+        for process in self.processes:
+            process_mean_NPVs.append(process.PV_mean)
+        process_mean_NPVs.append(self.PV_mean)
+        process_mean_NPVs_max_difference = max(process_mean_NPVs) - min(process_mean_NPVs)
+
+        # Initialise figure
+        # fig_size = (self.plot_style.fig_size[0], 0.8 * self.plot_style.fig_size[0])  # to allow for more labels space
+        fig_size = tuple(self.plot_style.fig_size)
+        fig, ax = plt.subplots(figsize=fig_size, dpi=self.plot_style.fig_dpi)
+
+        # Plotting logic
+        for process_count, process in enumerate(self.processes):
+            # Get subprocess names
+            subprocess_names = []
+            subprocess_short_labels = []
+            NPV_distributions = []
+
+            for CBA_result in process.CBA_results:
+                subprocess_names.append(CBA_result.name)
+                subprocess_short_labels.append(CBA_result.short_label)
+                NPV_distributions.append(np.array(CBA_result.values_PV))
+            NPV_distributions = np.array(NPV_distributions)
+
+            # Get subprocess means and labels
+            for subprocess_count, _ in enumerate(list(NPV_distributions)):
+                subprocess_NPV_mean = np.mean(NPV_distributions[subprocess_count])  # calculate subprocess NPV mean
+                subprocess_label = subprocess_names[subprocess_count]  # get subprocess name
+                if short_labels:
+                    subprocess_label = subprocess_short_labels[subprocess_count]  # get shorthand labels for plotting
+                y_array = np.zeros(len(x_array))  # Initialise y-array
+                y_array[process_count] = subprocess_NPV_mean  # Update y-array with GWP in appropriate position
+
+                # Plot stacked bar graph for individual process
+                if subprocess_count == 0:  # plot first subprocess
+                    ax.bar(x_array, y_array, bar_width, label=subprocess_label)
+                    if subprocess_NPV_mean > 0:  # positive number case
+                        running_total_pos = y_array
+                        running_total_neg = np.zeros(len(x_array))  # Initialise other case as zero
+                    else:  # negative number case
+                        running_total_neg = y_array
+                        running_total_pos = np.zeros(len(x_array))  # Initialise other case as zero
+                else:  # plot other subprocesses
+                    if subprocess_NPV_mean > 0:  # positive number case
+                        ax.bar(x_array, y_array, bar_width, bottom=running_total_pos, label=subprocess_label)
+                        running_total_pos += y_array  # update running total
+                    else:  # negative number case
+                        ax.bar(x_array, y_array, bar_width, bottom=running_total_neg, label=subprocess_label)
+                        running_total_neg += y_array  # update running total
+
+                # Plot labels on graph
+                if legend_loc == "plot":
+                    # Set threshold for minimum stack size to avoid overlapping labels
+                    if abs(y_array[process_count]) > (0.05 * process_mean_NPVs_max_difference):
+                        if subprocess_NPV_mean > 0:
+                            y_position = (running_total_pos[process_count] - y_array[process_count]) \
+                                         + y_array[process_count] * 0.5
+                        else:
+                            y_position = (running_total_neg[process_count] - y_array[process_count]) \
+                                         + y_array[process_count] * 0.5
+
+                        plt.text(x=x_array[process_count],
+                                 y=y_position,
+                                 s=subprocess_label,
+                                 color="black",
+                                 fontsize=self.plot_style.legend_fontsize_small,
+                                 horizontalalignment="center",
+                                 verticalalignment="center"
+                                 )
+        # Add final bar showing total/overall NPV
+        y_array = np.zeros(len(x_array))  # Initialise y-array
+        y_array[-1] = self.PV_mean  # Update y-array with global PV
+        ax.bar(x_array, y_array, bar_width, label="Total")
+
+        # Set labels
+        ax.set_ylabel(f"Net Present Value [{settings.user_inputs.general.currency}]",
+                      fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(axis="x", labelsize=self.plot_style.labels_fontsize, rotation=45)
+        ax.tick_params(axis="y", labelsize=self.plot_style.ticks_fontsize)
+
+        # Display legend
+        if legend_loc == "box":
+            ax.legend(fontsize=self.plot_style.legend_fontsize_small)
+
+        # Display plot
+        plt.tight_layout()
+        plt.show()
+        plt.close(fig)
+
+        return fig, ax
+
+    def plot_global_NPV_byprocess(self, bins=50, short_labels=False, show_total=True):
+        """
+        Creates plot of the Monte Carlo distribution of each process' net present value (NPV).
+
+        Parameters
+        ----------
+        bins: int
+            Number of bins across all histograms.
+        short_labels: bool
+            Determines whether shortened labels should be used (True) or not (False).
+        show_total: bool
+            Show total GWP of process in addition to processes.
+        Returns
+        -------
+        matplotlib.pyplot.figure, matplotlib.pyplot.axes
+            Resulting matplotlib figure and axes object.
+        """
+        # Extract required values
+        process_names = []
+        process_short_names = []
+        NPV_matrix = []
+        for process_count, process in enumerate(self.processes):  # get present value distribution of each process
+            process_names.append(process.name)
+            process_short_names.append(process.short_label)
+            NPV_matrix.append(np.array(process.PV_total).flatten())
+
+        # Prepare lists for plotting
+        process_names.append("Total")
+        process_short_names.append("Total")
+        if short_labels:
+            process_names = process_short_names
+
+        # Add total to matrix
+        NPV_matrix.append(np.array(self.PV_distribution))
+        NPV_matrix = np.transpose(np.array(NPV_matrix))  # convert to right format
+        NPV_exc_total = NPV_matrix[:, 0:-1]  # get array without the total
+        NPV_total = NPV_matrix[:, -1]  # get array of totals
+
+        # Delete entries containing all zeros
+        all_zero_indices = np.where(~NPV_exc_total.any(axis=0))[0]
+        NPV_exc_total = np.delete(arr=NPV_exc_total, obj=all_zero_indices, axis=1)
+        process_names = np.delete(arr=process_names, obj=all_zero_indices)
+
+        # Turn bin number into a bin vector which can be used to plot histograms and total
+        bin_width = round((np.max(NPV_matrix) - np.min(NPV_matrix)) / bins)
+        min_value = math.floor(np.min(NPV_matrix))
+        max_value = math.ceil(np.max(NPV_matrix))
+        bin_vector = range(min_value, max_value + bin_width, bin_width)
+
+        # Get total marker coordinates
+        marker_x = np.array(plt.hist(NPV_total, bins=bin_vector, alpha=0, histtype='bar')[1][0:-1])
+        marker_y = np.array(plt.hist(NPV_total, bins=bin_vector, alpha=0, histtype='bar')[0])
+        plt.clf()  # to prevent interference with actual plot
+        marker_threshold = settings.user_inputs.general.MC_iterations * 0.01  # threshold below which markers are not displayed
+
+        # Plot histograms and total
+        sns.set_theme()  # Use seaborn style
+        fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
+
+        # Plot histograms
+        ax.hist(NPV_exc_total, bins=bin_vector, histtype='bar', stacked=True, label=process_names[0:-1])
+
+        if show_total:  # Plot total whilst excluding zeros or very low values for plotting
+            ax.scatter(marker_x[marker_y > marker_threshold], marker_y[marker_y > marker_threshold],
+                       label=process_names[-1],
+                       marker="x",
+                       s=self.plot_style.marker_size,
+                       color="black",
+                       alpha=0.8)
+
+        # Set legend and labels
+        ax.legend(fontsize=self.plot_style.legend_fontsize_small, loc=0)
+        ax.set_xlabel(f"Net Present Value [{settings.user_inputs.general.currency}]",
+                      fontsize=self.plot_style.labels_fontsize)
+        ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
+        ax.tick_params(labelsize=self.plot_style.labels_fontsize)
+
+        # Display plot
+        plt.tight_layout()
+        plt.show()
+        plt.close(fig)
+
+        return fig, ax
+
+    def plot_all_results(self):
+        """
+        Convenience function to generate all plots and store them in results object.
+        """
+        # Environmental
         fig1, _ = self.plot_global_GWP()
         fig2, _ = self.plot_global_GWP_byprocess()
         fig3, _ = self.plot_average_GWP_byprocess()
+
+        # Energy
         fig4, _ = self.plot_energy_global()
         fig5, _ = self.plot_energy_electricity()
         fig6, _ = self.plot_energy_heat()
+
+        # Economic
+        fig7, _ = self.plot_global_NPV()
+        fig8, _ = self.plot_global_BCR()
+        fig9, _ = self.plot_average_NPV_byprocess()
+        fig10, _ = self.plot_global_NPV_byprocess()
 
         self.figures = {"global_GWP": fig1,
                         "global_GWP_byprocess": fig2,
                         "average_GWP_byprocess": fig3,
                         "energy_global": fig4,
                         "energy_electricity": fig5,
-                        "energy_heat": fig6
+                        "energy_heat": fig6,
+                        "global_NPV": fig7,
+                        "global_BCR": fig8,
+                        "average_NPV_byprocess": fig9,
+                        "global_NPV_byprocess": fig10
                         }
 
     def save_report(self, storage_path, save_figures=False):
@@ -661,9 +1022,9 @@ class Results:
         -------
 
         """
-        # TODO: Update this method so it works properly with streamlit and store_figures function.
+        # TODO: Update this method so it works properly with streamlit and plotting function.
         if self.figures is None:
-            self.store_figures()
+            self.plot_all_results()
 
         fig1 = self.figures["global_GWP"]
         fig2 = self.figures["global_GWP_byprocess"]
@@ -671,6 +1032,10 @@ class Results:
         fig4 = self.figures["energy_global"]
         fig5 = self.figures["energy_electricity"]
         fig6 = self.figures["energy_heat"]
+        fig7 = self.figures["global_NPV"]
+        fig8 = self.figures["global_BCR"]
+        fig9 = self.figures["average_NPV_byprocess"]
+        fig10 = self.figures["global_NPV_byprocess"]
 
         # Create results directory if it does not exist already
         results_dir = os.path.join(storage_path, self.ID)
@@ -687,6 +1052,11 @@ class Results:
         file.savefig(fig4)
         file.savefig(fig5)
         file.savefig(fig6)
+        file.savefig(fig7)
+        file.savefig(fig8)
+        file.savefig(fig9)
+        file.savefig(fig10)
+
         file.close()
 
         # TODO: Implement this method again - could just extract [user_inputs] and [sensitivity_analysis] sections from
@@ -707,3 +1077,7 @@ class Results:
             fig4.savefig(os.path.join(results_dir, "energy_global.png"))
             fig5.savefig(os.path.join(results_dir, "energy_electricity.png"))
             fig6.savefig(os.path.join(results_dir, "energy_heat.png"))
+            fig7.savefig(os.path.join(results_dir, "global_NPV.png"))
+            fig8.savefig(os.path.join(results_dir, "global_BCR.png"))
+            fig9.savefig(os.path.join(results_dir, "average_NPV_byprocess.png"))
+            fig10.savefig(os.path.join(results_dir, "global_NPV_byprocess.png"))

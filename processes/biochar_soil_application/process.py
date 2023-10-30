@@ -8,6 +8,7 @@ from objects import Process
 from objects import Requirements, BiogenicGWP, FossilGWP
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.MonteCarloSimulation import to_fixed_MC_array, get_distribution_draws
+from functions.TEA.cost_benefit_components import biochar_sale_cost_benefit
 from processes.biochar_soil_application.utils import load_biochar_properties_data, avoided_N2O_emissions
 
 
@@ -176,6 +177,10 @@ class BiocharSoilApplication(Process):
                         name="Avoided emissions due to lowered N2O emissions from soil",
                         negative_emissions=True,
                         short_label="Avoid. $N_{2}O$"))
+
+        # Economic requirements
+        annual_value_biochar_sale = biochar_sale_cost_benefit()
+        biochar_requirements.add_requirement(annual_value_biochar_sale)
 
         # Add requirements to object
         self.add_requirements(biochar_requirements)

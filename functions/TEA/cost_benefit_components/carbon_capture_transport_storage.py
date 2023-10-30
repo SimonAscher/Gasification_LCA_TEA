@@ -6,15 +6,14 @@ from config import settings
 from objects import AnnualValue, triangular_dist_maker
 
 
-def carbon_capture_transport_storage_cost_benefit(results):
+def carbon_capture_transport_storage_cost_benefit(CO2_capture_rate):
     """
     Calculates costs/benefits due to transport and storage part of carbon capture and storage (CCS) process.
 
     Parameters
     ----------
-    results:
-        Results object with CarbonCapture process.
-
+    CO2_capture_rate: list[float]
+        CO2 capture rate of system [kg CO2eq./tonne feedstock].
     Returns
     -------
     tuple[AnnualValue, AnnualValue]
@@ -23,8 +22,6 @@ def carbon_capture_transport_storage_cost_benefit(results):
         Returned as the currency defined in settings.user_inputs.general.currency.
 
     """
-    from processes.carbon_capture.process import CarbonCapture
-
     # Get system size
     system_size_tonnes_per_hour = settings.user_inputs.system_size.mass_basis_tonnes_per_hour
 
@@ -37,11 +34,8 @@ def carbon_capture_transport_storage_cost_benefit(results):
     system_size_tonnes_per_year_array = system_size_tonnes_per_hour * annual_operating_hours_array
 
     # Get flue gas available for capture
-    CCS_results = [process for process in results.processes if isinstance(process, CarbonCapture)][0]
-
-    GWP_results_fossil_CO2 = CCS_results.GWP_results[0].values
-    GWP_results_biogenic_CO2 = CCS_results.GWP_results[1].values
-    flue_gas_CO2_array = list(np.add(GWP_results_fossil_CO2, GWP_results_biogenic_CO2) / 1000)  # [tonne CO2/FU] i.e. [tonne CO2/tonne feedstock]
+    # Convert from [kg CO2/FU] to [tonnes CO2/FU] i.e. [tonne CO2/tonne feedstock]
+    flue_gas_CO2_array = list(np.divide(CO2_capture_rate, 1000))
 
     # Get CO2 transport prices [currency/tonne CO2]
     if settings.user_inputs.economic.CO2_transport_price_choice == "default":
@@ -106,9 +100,11 @@ def carbon_capture_transport_storage_cost_benefit(results):
     # Get final annual value objects
     output_cost_benefit_transport = AnnualValue(values=list(annuity_cash_flow_array_transport),
                                                 name="CO2 transport cost",
-                                                short_label="CO2-T")
+                                                short_label="CO2-T",
+                                                tag="Other operational expenses")
     output_cost_benefit_storage = AnnualValue(values=list(annuity_cash_flow_array_storage),
                                               name="CO2 storage cost",
-                                              short_label="CO2-S")
+                                              short_label="CO2-S",
+                                              tag="Other operational expenses")
 
     return output_cost_benefit_transport, output_cost_benefit_storage

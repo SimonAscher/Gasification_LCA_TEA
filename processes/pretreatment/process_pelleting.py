@@ -1,11 +1,14 @@
+import math
+
 import numpy as np
 
 from dataclasses import dataclass
 from config import settings
-from objects import Process
-from objects import Requirements, Electricity
+from objects import Process, Requirements, Electricity, fixed_dist_maker, AnnualValue
 from processes.pretreatment.utils import electricity_pelleting
 from dynaconf.loaders.toml_loader import write
+from functions.TEA.CAPEX_estimation import get_pellet_mill_and_cooler_CAPEX_distribution
+from functions.TEA.cost_benefit_components import get_operation_and_maintenance_cost
 
 
 @dataclass()
@@ -54,10 +57,39 @@ class FeedstockPelleting(Process):
                              {"particle_size_post_pelleting": float(particle_size_post_pelleting_mm)}}}},
               merge=True)
 
+        # Get economic requirements
+        CAPEX_mill, CAPEX_cooler = get_pellet_mill_and_cooler_CAPEX_distribution()
+
+        # Check if CAPEX occurs more than once
+        global_life_span = settings.user_inputs.general.system_life_span
+        if CAPEX_mill.number_of_periods < global_life_span:
+            repetitions_mill = math.floor(global_life_span / CAPEX_mill.number_of_periods)
+            CAPEX_mill.values = list(np.multiply(CAPEX_mill.values, repetitions_mill))
+        if CAPEX_cooler.number_of_periods < global_life_span:
+            repetitions_cooler = math.floor(global_life_span / CAPEX_mill.number_of_periods)
+            CAPEX_cooler.values = list(np.multiply(CAPEX_cooler.values, repetitions_cooler))
+
+        # Calculate O&M Cost
+        o_and_m_mill = get_operation_and_maintenance_cost(CAPEX_mill.values, fixed_dist_maker(0.10))
+        o_and_m_cooler = get_operation_and_maintenance_cost(CAPEX_cooler.values, fixed_dist_maker(0.10))
+        # O&M cost = 10%
+        # Source: "Development of agri-pellet production cost and optimum size, Sultana et al., 2010 and Economics of
+        # producing fuel pellets from biomass", Mani et al., 2006"
+
         # Initialise Requirements object and add requirements
         feedstock_pelleting_requirements = Requirements(name=self.name)
         feedstock_pelleting_requirements.add_requirement(Electricity(values=electricity_requirement_pelleting,
                                                                      name="Electricity use for feedstock pelleting"))
+        feedstock_pelleting_requirements.add_requirement(CAPEX_mill)
+        feedstock_pelleting_requirements.add_requirement(CAPEX_cooler)
+        feedstock_pelleting_requirements.add_requirement(AnnualValue(name="O&M Costs Pellet Mill",
+                                                                     short_label="O&M Pellet-M",
+                                                                     values=o_and_m_mill,
+                                                                     tag="O&M"))
+        feedstock_pelleting_requirements.add_requirement(AnnualValue(name="O&M Costs Pellet Cooler",
+                                                                     short_label="O&M Pellet-C",
+                                                                     values=o_and_m_cooler,
+                                                                     tag="O&M"))
 
         # Add requirements to object
         self.add_requirements(feedstock_pelleting_requirements)

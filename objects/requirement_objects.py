@@ -1,8 +1,10 @@
 import warnings
+
 import numpy as np
 
 from dataclasses import dataclass
 from config import settings
+from typing import Literal
 
 
 # Define requirement parent class
@@ -42,6 +44,7 @@ class _Requirement:
         # Flatten values if required
         if len(self.values) == 1 and settings.user_inputs.general.MC_iterations != 1:
             self.values = list(np.array(self.values).flatten())
+
 
 # Define requirement child classes
 # Energy Use
@@ -134,19 +137,77 @@ class BiogenicGWP(_Requirement):
                 warnings.warn("Negative emission values were given as positives - turned into negatives.")
 
 
-# Economics - costs and benefits
-@dataclass(kw_only=True)
-class Cost(_Requirement):
-    # Update defaults
-    name: str = "Cost"
-    units: str = "GBP"
+_tag_options = Literal[None, "CAPEX", "O&M", "Other operational expenses", "Sale of products", "Other form of income",
+                       "Transport", "Other", "Not classified"]
 
 
-@dataclass(kw_only=True)
-class Benefit(_Requirement):
-    # Update defaults
-    name: str = "Benefit"
-    units: str = "GBP"
+# Direct cash flows
+@dataclass
+class _ParentPresentAnnualFutureValue(_Requirement):
+    """
+    Parent class for present, annual, and future value classes.
+
+    Attributes
+    ----------
+    values: list[float]
+        The cash flows distribution for Monte Carlo simulation where the list is the length of Monte Carlo iterations.
+    name : str
+        The name of the cash flow.
+    short_label : str
+        A short label of the cash flow - used for plotting etc.
+    currency: str
+        The currency of the cash flows.
+    rate_of_return: float
+        Given as a decimal. Note the rate of return, interest rate, and discount rate are used interchangeably in
+        this context. Used to convert between PV, AV, and FV.
+    number_of_periods: int
+        Used to convert between PV, AV, and FV. Typically, the system's life cycle.
+    tag: _tag_options
+        Identifier to categorise cost and benefit objects.
+    description: str
+        Optional description can be added here.
+    """
+    currency: str = None
+    rate_of_return: float = None
+    number_of_periods: int = None
+    tag: _tag_options = None
+
+    def __post_init__(self):
+        # Set short_label to name if not given.
+        if self.short_label is None:
+            self.short_label = self.name
+
+        # Flatten values if required
+        if len(self.values) == 1 and settings.user_inputs.general.MC_iterations != 1:
+            self.values = list(np.array(self.values).flatten())
+
+        if self.currency is None:
+            self.currency = settings.user_inputs.general.currency
+
+        if self.rate_of_return is None:
+            self.rate_of_return = settings.user_inputs.economic.rate_of_return_decimals
+
+        if self.number_of_periods is None:
+            self.number_of_periods = settings.user_inputs.general.system_life_span
+
+
+@dataclass
+class PresentValue(_ParentPresentAnnualFutureValue):
+    """
+    Also called present worth.
+    """
+
+
+class AnnualValue(_ParentPresentAnnualFutureValue):
+    """
+    Also called annual worth or annuity.
+    """
+
+
+class FutureValue(_ParentPresentAnnualFutureValue):
+    """
+    Also called future worth.
+    """
 
 
 # Other requirements
@@ -182,8 +243,9 @@ class Requirements:
     heat: tuple[Heat]
     fossil_GWP: tuple[FossilGWP]
     biogenic_GWP: tuple[BiogenicGWP]
-    cost: tuple[Cost]
-    benefit: tuple[Benefit]
+    cash_flow_pv: tuple[PresentValue]
+    cash_flow_av: tuple[AnnualValue]
+    cash_flow_fv: tuple[FutureValue]
     steam: tuple[Steam]
     oxygen: tuple[Oxygen]
 
@@ -202,9 +264,10 @@ class Requirements:
     fossil_GWP: tuple[FossilGWP] = ()
     biogenic_GWP: tuple[BiogenicGWP] = ()
 
-    # Economics - costs and benefits
-    cost: tuple[Cost] = ()
-    benefit: tuple[Benefit] = ()
+    # Direct cash flows
+    cash_flow_pv: tuple[PresentValue] = ()
+    cash_flow_av: tuple[AnnualValue] = ()
+    cash_flow_fv: tuple[FutureValue] = ()
 
     # Other requirements
     steam: tuple[Steam] = ()
@@ -216,7 +279,7 @@ class Requirements:
         "requirement" objects are children of the "_Requirement" class.
         Parameters
         ----------
-        requirement_object: Electricity | Heat | FossilGWP | BiogenicGWP | Cost | Benefit | Steam | Oxygen
+        requirement_object: Electricity | Heat | FossilGWP | BiogenicGWP | PresentValue | AnnualValue| FutureValue| Steam | Oxygen
             Requirement object (i.e. Type[_Requirement]).
         """
 
@@ -233,11 +296,14 @@ class Requirements:
         elif isinstance(requirement_object, BiogenicGWP):
             self.biogenic_GWP += (requirement_object, )
 
-        elif isinstance(requirement_object, Cost):
-            self.cost += (requirement_object, )
+        elif isinstance(requirement_object, PresentValue):
+            self.cash_flow_pv += (requirement_object,)
 
-        elif isinstance(requirement_object, Benefit):
-            self.benefit += (requirement_object, )
+        elif isinstance(requirement_object, AnnualValue):
+            self.cash_flow_av += (requirement_object,)
+
+        elif isinstance(requirement_object, FutureValue):
+            self.cash_flow_fv += (requirement_object,)
 
         elif isinstance(requirement_object, Steam):
             self.steam += (requirement_object, )

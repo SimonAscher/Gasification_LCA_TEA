@@ -129,6 +129,7 @@ def get_dryer_CAPEX_distribution(currency=None, CEPCI_year=None):
 
     CAPEX = PresentValue(values=distribution_draws,
                          name="CAPEX Feedstock Dryer",
-                         short_label="CAPEX Dry")
+                         short_label="CAPEX Dry",
+                         tag="CAPEX")
 
     return CAPEX
