@@ -533,13 +533,19 @@ class Results:
         process_mean_GWPs.append(self.GWP_mean)
         process_mean_GWPs_max_difference = max(process_mean_GWPs) - min(process_mean_GWPs)
 
+        # Delete entries containing all zeros
+        all_zero_indices = np.where(np.array(process_mean_GWPs) == 0)[0]
+        processes = list(self.processes)
+        processes = np.delete(arr=np.array(processes), obj=all_zero_indices)
+        x_array = np.delete(arr=np.array(x_array), obj=all_zero_indices)
+
         # Initialise figure
         # fig_size = (self.plot_style.fig_size[0], 0.8 * self.plot_style.fig_size[0])  # to allow for more labels space
         fig_size = tuple(self.plot_style.fig_size)
         fig, ax = plt.subplots(figsize=fig_size, dpi=self.plot_style.fig_dpi)
 
         # Plotting logic
-        for process_count, process in enumerate(self.processes):
+        for process_count, process in enumerate(processes):
             # Get subprocess names
             subprocess_names = []
             subprocess_short_labels = []
@@ -560,43 +566,42 @@ class Results:
                 y_array = np.zeros(len(x_array))  # Initialise y-array
                 y_array[process_count] = subprocess_GWP_mean  # Update y-array with GWP in appropriate position
 
-                if not np.all(y_array == 0):  # Only plot non-zero elements
-                    # Plot stacked bar graph for individual process
-                    if subprocess_count == 0:  # plot first subprocess
-                        ax.bar(x_array, y_array, bar_width, label=subprocess_label)
-                        if subprocess_GWP_mean > 0:  # positive number case
-                            running_total_pos = y_array
-                            running_total_neg = np.zeros(len(x_array))  # Initialise other case as zero
-                        else:  # negative number case
-                            running_total_neg = y_array
-                            running_total_pos = np.zeros(len(x_array))  # Initialise other case as zero
-                    else:  # plot other subprocesses
-                        if subprocess_GWP_mean > 0:  # positive number case
-                            ax.bar(x_array, y_array, bar_width, bottom=running_total_pos, label=subprocess_label)
-                            running_total_pos += y_array  # update running total
-                        else:  # negative number case
-                            ax.bar(x_array, y_array, bar_width, bottom=running_total_neg, label=subprocess_label)
-                            running_total_neg += y_array  # update running total
+                # Plot stacked bar graph for individual process
+                if subprocess_count == 0:  # plot first subprocess
+                    ax.bar(x_array, y_array, bar_width, label=subprocess_label)
+                    if subprocess_GWP_mean > 0:  # positive number case
+                        running_total_pos = y_array
+                        running_total_neg = np.zeros(len(x_array))  # Initialise other case as zero
+                    else:  # negative number case
+                        running_total_neg = y_array
+                        running_total_pos = np.zeros(len(x_array))  # Initialise other case as zero
+                else:  # plot other subprocesses
+                    if subprocess_GWP_mean > 0:  # positive number case
+                        ax.bar(x_array, y_array, bar_width, bottom=running_total_pos, label=subprocess_label)
+                        running_total_pos += y_array  # update running total
+                    else:  # negative number case
+                        ax.bar(x_array, y_array, bar_width, bottom=running_total_neg, label=subprocess_label)
+                        running_total_neg += y_array  # update running total
 
-                    # Plot labels on graph
-                    if legend_loc == "plot":
-                        # Set threshold for minimum stack size to avoid overlapping labels
-                        if abs(y_array[process_count]) > (0.05 * process_mean_GWPs_max_difference):
-                            if subprocess_GWP_mean > 0:
-                                y_position = (running_total_pos[process_count] - y_array[process_count]) \
-                                             + y_array[process_count] * 0.5
-                            else:
-                                y_position = (running_total_neg[process_count] - y_array[process_count]) \
-                                             + y_array[process_count] * 0.5
+                # Plot labels on graph
+                if legend_loc == "plot":
+                    # Set threshold for minimum stack size to avoid overlapping labels
+                    if abs(y_array[process_count]) > (0.05 * process_mean_GWPs_max_difference):
+                        if subprocess_GWP_mean > 0:
+                            y_position = (running_total_pos[process_count] - y_array[process_count]) \
+                                         + y_array[process_count] * 0.5
+                        else:
+                            y_position = (running_total_neg[process_count] - y_array[process_count]) \
+                                         + y_array[process_count] * 0.5
 
-                            plt.text(x=x_array[process_count],
-                                     y=y_position,
-                                     s=subprocess_label,
-                                     color="black",
-                                     fontsize=self.plot_style.legend_fontsize_small,
-                                     horizontalalignment="center",
-                                     verticalalignment="center"
-                                     )
+                        plt.text(x=x_array[process_count],
+                                 y=y_position,
+                                 s=subprocess_label,
+                                 color="black",
+                                 fontsize=self.plot_style.legend_fontsize_small,
+                                 horizontalalignment="center",
+                                 verticalalignment="center"
+                                 )
         # Add final bar showing total/overall GWP
         y_array = np.zeros(len(x_array))  # Initialise y-array
         y_array[-1] = self.GWP_mean  # Update y-array with GWP

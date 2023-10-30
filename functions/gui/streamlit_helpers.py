@@ -181,12 +181,23 @@ def show_simulation_results(results):
 
     # LCA plots
     with st.expander("Environmental Analysis (Life Cycle Assessment) Results"):
-        st.subheader("Global Global Warming Potential")
+        st.subheader("Overall Global Warming Potential")
         st.pyplot(results.figures["global_GWP"])
         st.subheader("Global Warming Potential by Process")
         st.pyplot(results.figures["global_GWP_byprocess"])
         st.subheader("Average Global Warming Potential by Process")
         st.pyplot(results.figures["average_GWP_byprocess"])
+
+    # Economic performance plots generation plots
+    with st.expander("Economic Analysis Results"):
+        st.subheader("Overall Net Present Value of the System")
+        st.pyplot(results.figures["global_NPV"])
+        st.subheader("Overall Benefit-Cost Ratio of the System")
+        st.pyplot(results.figures["global_BCR"])
+        st.subheader("Net Present Value by Process")
+        st.pyplot(results.figures["global_NPV_byprocess"])
+        st.subheader("Average Net Present Value by Process")
+        st.pyplot(results.figures["average_NPV_byprocess"])
 
     # Energy generation plots
     with st.expander("Energy Generation Performance of System"):
@@ -196,6 +207,7 @@ def show_simulation_results(results):
         st.pyplot(results.figures["energy_electricity"])
         st.subheader("Heat Generation and Consumption by Process")
         st.pyplot(results.figures["energy_heat"])
+
 
 def download_zipped_figures(results, figure_file_type=None):
     """
