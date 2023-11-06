@@ -113,11 +113,11 @@ class Gasification(Process):
         economic_requirements.add_requirement(CAPEX_gasification)
         economic_requirements.add_requirement(CAPEX_gas_cleaning)
         economic_requirements.add_requirement(AnnualValue(name="O&M Costs Gasifier",
-                                                          short_label="O&M Gas",
+                                                          short_label="O&M Gas.",
                                                           values=o_and_m_costs_gasification,
                                                           tag="O&M"))
         economic_requirements.add_requirement(AnnualValue(name="O&M Costs Gas Cleaning",
-                                                          short_label="O&M GasCln",
+                                                          short_label="O&M Gas Clean.",
                                                           values=o_and_m_costs_gas_cleaning,
                                                           tag="O&M"))
 

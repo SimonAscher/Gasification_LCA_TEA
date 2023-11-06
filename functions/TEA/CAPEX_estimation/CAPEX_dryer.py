@@ -95,16 +95,16 @@ def get_dryer_CAPEX_distribution(currency=None, CEPCI_year=None):
     if system_size_kg_H2O_per_hour < 1000:  # size < 1,000
         df = df[df["Ignore"] != True].copy()
         df = df[df["Plant size [kg H2O/hour]"] < 1000]
-        df = df.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
+        df = df.dropna(subset=[currency_and_CEPCI_scaled_label])
     elif system_size_kg_H2O_per_hour < 10000:  # size 1,000 to 10,000
         df = df[df["Ignore"] != True].copy()
         df = df[df["Plant size [kg H2O/hour]"].between(1000, 10000)]
         df = df[df["Reference_label"] == "g"]
-        df = df.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
+        df = df.dropna(subset=[currency_and_CEPCI_scaled_label])
     else:  # size >10,000
         df = df[df["Ignore"] != True].copy()
         df = df[df["Plant size [kg H2O/hour]"].between(1000, 30000)]
-        df = df.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
+        df = df.dropna(subset=[currency_and_CEPCI_scaled_label])
     # Fit model, get error metrics, and prediction.
     popt, _ = curve_fit(f=functions.general.curve_fitting.func_straight_line,
                         xdata=df["Plant size [kg H2O/hour]"],

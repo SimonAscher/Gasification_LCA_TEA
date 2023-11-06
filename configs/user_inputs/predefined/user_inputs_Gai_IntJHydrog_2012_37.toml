@@ -37,16 +37,6 @@ power_electric_user_imputed = false
 mass_basis_tonnes_per_hour = 1.00
 power_feedstock_MW_feedstock_LHV = 4.58
 power_electric_MW_el = 1.80
-#mass_basis_tonnes_per_hour = 2.00
-#power_feedstock_MW_feedstock_LHV = 9.17
-#power_electric_MW_el = 4.31
-
-
-
-
-
-
-# FAKE VALUES CURRENTLY
 
 [default.user_inputs.economic]
 CEPCI_year = 2020

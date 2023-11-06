@@ -2,6 +2,9 @@
 MC_iterations = 1000
 country = "UK"
 currency = "GBP"
+system_life_span = 20
+annual_operating_hours_user_imputed = true
+annual_operating_hours = 8000
 
 [default.user_inputs.feedstock]
 particle_size_post_pelleting = 6.35
@@ -16,6 +19,7 @@ sulphur = 0.52
 oxygen = 38.419999999999995
 moisture_ar = 9.34
 ash = 7.12
+LHV = 19
 
 [default.user_inputs.process_conditions]
 gasification_temperature = 799.99
@@ -27,13 +31,46 @@ gasifying_agent = "Steam"
 reactor_type = "Fixed bed"
 bed_material = "N/A"
 
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = false
+mass_basis_tonnes_per_hour = 5.00
+power_feedstock_MW_feedstock_LHV = 25
+power_electric_MW_el = 10
+
 [default.user_inputs.economic]
+CEPCI_year = 2020
+rate_of_return_decimals = 0.05
 electricity_price_choice = "default"
 heat_price_choice = "default"
-carbon_tax_selection = true
-carbon_tax_choice = "user selected"
+carbon_tax_included = true
+carbon_tax_choice = "default"
+biochar_price_choice = "default"
+gate_fee_or_feedstock_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "feedstock cost"
+CO2_transport_price_choice = "default"
+CO2_storage_price_choice = "default"
 
 [default.user_inputs.economic.electricity_price_parameters]
+
+[default.user_inputs.economic.carbon_tax_parameters]
+mean = 75.0
+std = 15.0
+distribution_type = "gaussian"
+# Fake values
+
+[default.user_inputs.economic.biochar_price_parameters]
+mean = 120.0
+std = 30.0
+distribution_type = "gaussian"
+# Fake values
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+mean = 120.0
+std = 30.0
+distribution_type = "gaussian"
+# Fake values
 
 [default.user_inputs.processes.milling]
 included = false

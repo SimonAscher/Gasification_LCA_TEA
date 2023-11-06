@@ -208,8 +208,8 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
         - References:
             - https://doi.org/10.1002/er.3038
             - https://doi.org/10.1002/bbb.137
-            - "Process Design and Economics for Conversion of Lignocellulosic Biomass to Ethanol: Thermochemical Pathway by 
-               Indirect Gasification and Mixed Alcohol Synthesis"
+            - "Process Design and Economics for Conversion of Lignocellulosic Biomass to Ethanol: Thermochemical 
+               Pathway by Indirect Gasification and Mixed Alcohol Synthesis"
     """
 
     # Manually remove one extreme outlier in the data
@@ -228,8 +228,8 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
     df_fixed = df[df["Type"] == "fixed bed"]
 
     # Fit models, get performance metric, and make prediction
-    # Small-scale fluidised bed reactor
-    if system_size_MWel <= threshold_small_scale_system and reactor_type == "Fluidised bed":
+    # Small-scale fluidised bed (or type "Other") reactor
+    if system_size_MWel <= threshold_small_scale_system and reactor_type in ["Other", "Fluidised bed"]:
         df_selected = df[df["Plant size [MWel]"] < threshold_small_scale_system]
 
         # Fit power function based on previous analysis
@@ -244,8 +244,9 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
 
         prediction = func_power_curve(system_size_MWel, *popt)
 
-    # Medium to large scale fluidised bed reactor
-    if threshold_small_scale_system < system_size_MWel < max_fluidised_bed_size and reactor_type == "Fluidised bed":
+    # Medium to large scale fluidised bed (or type "Other") reactor
+    if (threshold_small_scale_system < system_size_MWel < max_fluidised_bed_size
+            and reactor_type in ["Other", "Fluidised bed"]):
         df_selected = df_fluidised[df_fluidised["Plant size [MWel]"] > threshold_small_scale_system]
 
         # Fit power function based on previous analysis
@@ -308,7 +309,7 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
                                                                                 upper=upper_bound_gasification)))
     # Gas cleaning costs
 
-    # Gas cleaning cost fractions of total cost. See note at the start of script more information.
+    # Gas cleaning cost fractions of total cost. See notes at the start of script more information.
     gas_cleaning_fraction_of_total_CAPEX_lower = 0.17
     gas_cleaning_fraction_of_total_CAPEX_upper = 0.33
     # mode value = 0.24 (defined above)
@@ -327,12 +328,12 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
     # Store CAPEX distributions in PresentValue objects.
     CAPEX_gasification = PresentValue(values=list(np.multiply(dist_draws_gasification, -1)),
                                       name="CAPEX gasification",
-                                      short_label="CAPEX gas.",
+                                      short_label="CAPEX Gas.",
                                       tag="CAPEX")
 
     CAPEX_gas_cleaning = PresentValue(values=list(np.multiply(dist_draws_gas_cleaning, -1)),
                                       name="CAPEX gas cleaning",
-                                      short_label="CAPEX gas clean.",
+                                      short_label="CAPEX Gas Clean.",
                                       tag="CAPEX")
 
     return CAPEX_gasification, CAPEX_gas_cleaning

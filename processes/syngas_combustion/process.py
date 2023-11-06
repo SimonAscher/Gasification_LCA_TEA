@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 
 from dataclasses import dataclass
 from config import settings
@@ -6,7 +7,7 @@ from objects import Process, Requirements, BiogenicGWP, FossilGWP
 from functions.general.predictions_to_distributions import get_all_prediction_distributions
 from functions.general.utility import scale_gas_fractions
 from processes.syngas_combustion.utils import syngas_combustion_CO2_eq
-
+from dynaconf.vendor.box import BoxKeyError
 
 @dataclass()
 class SyngasCombustion(Process):
@@ -53,11 +54,14 @@ class SyngasCombustion(Process):
         total_CO2 = syngas_combustion_CO2_eq(scaled_gas_fractions, gas_yields)  # [kg CO2eq./FU]
 
         # Get background data on the feedstock
-        try:
-            biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock.category]
-        except:  # BoxKeyError
-            biogenic_fraction = 0
-            raise Warning("No default biogenic fraction available for this feedstock type - 0% biogenic assumed.")
+        try:  # try get user defined input first
+            biogenic_fraction = settings.user_inputs.feedstock.biogenic_carbon_fraction
+        except BoxKeyError:
+            try:  # default to presets
+                biogenic_fraction = settings.data.biogenic_fractions[settings.user_inputs.feedstock.category]
+            except BoxKeyError:
+                biogenic_fraction = 0
+                warnings.warn("No default biogenic fraction available for this feedstock type - 0% biogenic assumed.")
 
         # Calculate biogenic and fossil emissions
         biogenic_CO2 = list(np.array(total_CO2) * biogenic_fraction)

@@ -88,7 +88,7 @@ def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=
     # Fit models, get performance metric, and make prediction
     if system_size_MWel <= threshold_small_scale_system:  # small scale
         df_small = df[df["Plant size [MWel]"] <= threshold_small_scale_system]
-        df_small = df_small.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
+        df_small = df_small.dropna(subset=[currency_and_CEPCI_scaled_label])
 
         # Fit power function based on previous analysis
         popt, _ = curve_fit(func_power_curve,
@@ -112,7 +112,7 @@ def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=
         if system_size_MWel < max_system_size:
             df_medium = df[(df["Plant size [MWel]"] > threshold_small_scale_system) &
                            (df["Plant size [MWel]"] <= max_system_size)]
-            df_medium = df_medium.dropna(subset=['CAPEX_GBP_CEPCI_2020'])
+            df_medium = df_medium.dropna(subset=[currency_and_CEPCI_scaled_label])
 
             # Fit linear function based on previous analysis
             popt, _ = curve_fit(func_straight_line,

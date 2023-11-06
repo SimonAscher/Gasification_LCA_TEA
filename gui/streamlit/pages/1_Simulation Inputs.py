@@ -13,12 +13,10 @@ import toml
 import streamlit as st
 
 from human_id import generate_id
-
 from config import settings
 from functions.gui import display_correct_user_distribution_inputs
 from functions.TEA import get_most_recent_available_CEPCI_year
 from functions.general import convert_system_size, calculate_LHV_HHV_feedstock_from_direct_inputs
-from functions.general.utility import MJ_to_kWh
 
 # Background data
 country_options = settings.general.countries
@@ -72,8 +70,26 @@ else:  # set currency based on country selection
 # %% Feedstock information
 st.header("Feedstock information")
 st.subheader("General feedstock information")
-feedstock_category = st.selectbox(label="Feedstock category", options=feedstock_categories_options, index=2)
 feedstock_name = st.text_input(label="Feedstock name", placeholder="Please enter the name of your feedstock")
+feedstock_category = st.selectbox(label="Feedstock category", options=feedstock_categories_options, index=2)
+
+# Allow user to enter biogenic carbon fraction for certain waste types
+biogenic_carbon_fraction = None
+if feedstock_category in ["municipal solid waste", "sewage sludge", "other"]:
+    custom_biogenic_fraction_included = st.checkbox(label="Would you like to select a custom biogenic to fossil "
+                                                          "fraction of your feedstock?", value=False)
+    if custom_biogenic_fraction_included:
+        biogenic_carbon_fraction = st.slider(label="Biogenic fraction of the feedstock [%]",
+                                             min_value=0,
+                                             max_value=100,
+                                             value=50,
+                                             step=1,
+                                             help="A value of 0% would represent a fossil feedstock, whereas a value of"
+                                                  " 100% would represent a completely biogenic feedstock.")
+        biogenic_carbon_fraction /= 100  # turn into a decimal
+        st.markdown("""---""")
+
+
 particle_size_ar = st.number_input(label="Particle size [mm] (as received)", min_value=0.1, max_value=100.0, value=3.0,
                                    help="Please enter the feedstock's particle size in mm on an as received basis.")
 milling_included = st.checkbox(label="Is feedstock milling included as a pretreatment step?", value=False)
@@ -150,10 +166,14 @@ gasifying_agent = st.selectbox(label="Gasifying agent", options=["Air", "Oxygen"
 
 reactor_type = st.selectbox(label="Reactor type", options=["Fixed bed", "Fluidised bed", "Other"])
 
-bed_material = "N/A"
-if reactor_type != "Fixed bed":
+if reactor_type == "Fluidised bed":
     bed_material = st.selectbox(label="Reactor bed material", options=["Silica", "Alumina", "Olivine", "Other"])
     st.markdown("""---""")
+elif reactor_type == "Other":
+    bed_material = st.selectbox(label="Reactor bed material", options=["Silica", "Alumina", "Olivine", "Other", "N/A"])
+    st.markdown("""---""")
+else:
+    bed_material = "N/A"
 
 # %% System size
 st.header("System size information")
@@ -326,6 +346,10 @@ else:
 st.subheader("Carbon tax")
 carbon_tax_selector = st.checkbox("Is a carbon tax to be considered?")
 
+# Initialise defaults
+carbon_tax = None
+carbon_tax_parameters = {}
+
 if carbon_tax_selector:
     carbon_tax = st.selectbox(label=f"Select the carbon tax [{currency}/tonne CO2eq.]",
                               options=economic_inputs_options,
@@ -333,7 +357,6 @@ if carbon_tax_selector:
                               help="A carbon tax or potential carbon tax are subject to frequent changes. "
                                    "User selected values are recommended.")
 
-    carbon_tax_parameters = {}
     if carbon_tax == "user selected":
         carbon_tax_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
                                             key="carbon tax distribution type")
@@ -346,9 +369,15 @@ if carbon_tax_selector:
 else:
     st.divider()
 
-
+st.subheader("Carbon capture and storage (CCS)")
 carbon_capture_included_1 = st.checkbox(label="Is carbon capture and storage included?", value=False,
                                         key="carbon_capture_included_1")
+
+# Initialise defaults
+CO2_transport_price = None
+CO2_storage_price = None
+CO2_transport_parameters = {}
+CO2_storage_parameters = {}
 
 if carbon_capture_included_1:
     CO2_transport_price = st.selectbox(label=f"Select the CO2 transport price [{currency}/tonne CO2]",
@@ -357,7 +386,6 @@ if carbon_capture_included_1:
                                        help="CO2 transport costs vary greatly depending on the transport method and "
                                             "distance. User selected values are recommended.")
 
-    CO2_transport_parameters = {}
     if CO2_transport_price == "user selected":
         CO2_transport_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
                                                      key="CO2 transport price distribution type")
@@ -374,7 +402,6 @@ if carbon_capture_included_1:
                                      help="CO2 storage costs vary greatly depending on the locally available storage "
                                           "options. User selected values are recommended.")
 
-    CO2_storage_parameters = {}
     if CO2_storage_price == "user selected":
         CO2_storage_price_user_selected = st.radio(label="Distribution type", options=distribution_options, index=0,
                                                    key="CO2 storage price distribution type")
@@ -535,6 +562,7 @@ def user_data_to_toml():
 
                 "feedstock": {"category": feedstock_category,  # general
                               "name": feedstock_name,
+                              "biogenic_carbon_fraction": biogenic_carbon_fraction,
                               "particle_size_ar": particle_size_ar,
                               "carbon": feedstock_C,  # ultimate composition
                               "hydrogen": feedstock_H,

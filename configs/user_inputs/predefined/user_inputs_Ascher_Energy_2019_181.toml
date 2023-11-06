@@ -1,0 +1,109 @@
+[default.user_inputs.general]
+MC_iterations = 1000
+country = "UK"
+currency = "GBP"
+system_life_span = 20
+annual_operating_hours_user_imputed = false
+
+[default.user_inputs.feedstock]
+category = "municipal solid waste"
+name = "Municipal Solid Waste"
+biogenic_carbon_fraction = 0.78
+particle_size_ar = 3.0
+carbon = 49.75
+hydrogen = 7.08
+nitrogen = 1.95
+sulphur = 0.5
+oxygen = 40.72
+LHV = 9.87
+moisture_ar = 41.82
+moisture_post_drying = 10.0
+ash = 6.47
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 750.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Pilot"
+catalyst = "No"
+gasifying_agent = "Air"
+reactor_type = "Other"
+bed_material = "Other"
+
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = true
+mass_basis_tonnes_per_hour = 27.11
+power_feedstock_MW_feedstock_LHV = 74.32658333333333
+power_electric_MW_el = 24.84
+
+[default.user_inputs.economic]
+CEPCI_year = 2017
+rate_of_return_decimals = 0.06
+electricity_price_choice = "user selected"
+heat_price_choice = "user selected"
+biochar_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "gate fee"
+gate_fee_or_feedstock_price_choice = "user selected"
+carbon_tax_included = true
+carbon_tax_choice = "user selected"
+CO2_transport_price_choice = "user selected"
+CO2_storage_price_choice = "user selected"
+
+[default.user_inputs.economic.electricity_price_parameters]
+lower = 0.13
+mode = 0.16
+upper = 0.17
+distribution_type = "triangular"
+
+[default.user_inputs.economic.heat_price_parameters]
+lower = 0.11
+mode = 0.14
+upper = 0.15
+distribution_type = "triangular"
+
+[default.user_inputs.economic.biochar_price_parameters]
+lower = 75
+mode = 385
+upper = 538
+distribution_type = "triangular"
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+value = 0.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.carbon_tax_parameters]
+value = 0.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.CO2_transport_price_parameters]
+value = 0.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+value = 0.0
+distribution_type = "fixed"
+
+[default.user_inputs.processes.milling]
+included = true
+screen_size_mm = 3.2
+
+[default.user_inputs.processes.drying]
+included = true
+moisture_post_drying = 10.0
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = false
+
+[default.user_inputs.processes.CHP]
+type = "Jenbacher Type 6 gas engine (1600 kW) (default)"

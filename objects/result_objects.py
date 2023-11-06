@@ -811,13 +811,19 @@ class Results:
         process_mean_NPVs.append(self.PV_mean)
         process_mean_NPVs_max_difference = max(process_mean_NPVs) - min(process_mean_NPVs)
 
+        # Delete entries containing all zeros
+        all_zero_indices = np.where(np.array(process_mean_NPVs) == 0)[0]
+        processes = list(self.processes)
+        processes = np.delete(arr=np.array(processes), obj=all_zero_indices)
+        x_array = np.delete(arr=np.array(x_array), obj=all_zero_indices)
+
         # Initialise figure
         # fig_size = (self.plot_style.fig_size[0], 0.8 * self.plot_style.fig_size[0])  # to allow for more labels space
         fig_size = tuple(self.plot_style.fig_size)
         fig, ax = plt.subplots(figsize=fig_size, dpi=self.plot_style.fig_dpi)
 
         # Plotting logic
-        for process_count, process in enumerate(self.processes):
+        for process_count, process in enumerate(processes):
             # Get subprocess names
             subprocess_names = []
             subprocess_short_labels = []
