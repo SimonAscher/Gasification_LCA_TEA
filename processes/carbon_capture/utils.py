@@ -78,7 +78,11 @@ def carbon_capture_amine_post_comb(units="kWh"):
     # Calculate outputs
     recovery_out = np.random.normal(recovery_mean, recovery_std)  # decimal
     electricity_out = total_consumption * electricity_fraction  # [MJ/kg CO2]
+    if electricity_out < 0:
+        electricity_out = 0  # Do not allow values smaller than 0
     heat_out = total_consumption * heat_fraction  # [MJ/kg CO2]
+    if heat_out < 0:
+        heat_out = 0  # Do not allow values smaller than 0
 
     # Convert units to kWh
     if units == "kWh":
@@ -117,6 +121,7 @@ def carbon_capture_VPSA_post_comb(units="kWh"):
     # Calculate outputs
     recovery_out = np.random.normal(recovery_mean, recovery_std)  # decimal
     electricity_out = np.random.normal(electricity_consumption_mean, electricity_consumption_std)  # [MJ/kg CO2]
+    electricity_out[electricity_out < 0] = 0  # don't allow negative values
     heat_out = heat_consumption  # [MJ/kg CO2]
 
     # Convert units to kWh

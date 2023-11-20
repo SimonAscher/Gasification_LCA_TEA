@@ -10,7 +10,7 @@ from objects import Results
 from functions.general.utility import get_project_root
 from config import settings
 
-def display_correct_user_distribution_inputs(choice, key):
+def display_correct_user_distribution_inputs(choice, key, step_size=None):
     """
     Displays the correct input fields based on the user's selected distribution type.
 
@@ -20,31 +20,36 @@ def display_correct_user_distribution_inputs(choice, key):
         Chosen distribution type.
     key: str
         Key identifying what the distribution choices are shown for. This avoids DuplicateWidgetID error.
-
+    step_size: None | str
+        If "any" the user inputs can take on any number of significant figures.
     Returns
     -------
     dict
         Given user inputs.
     """
+    if step_size == "any":
+        step_size = "%f"
+
     dist_values = None
     if choice == "fixed":
-        value = st.number_input(label="Constant value", key=key + "fixed constant")
+        value = st.number_input(label="Constant value", key=key + "fixed constant", format=step_size)
         dist_values = {"value": value, "distribution_type": choice}
 
     elif choice == "range":
-        low = st.number_input(label="Distribution lower bound", key=key + "range low")
-        high = st.number_input(label="Distribution upper bound", key=key + "range high")
+        low = st.number_input(label="Distribution lower bound", key=key + "range low", format=step_size)
+        high = st.number_input(label="Distribution upper bound", key=key + "range high", format=step_size)
         dist_values = {"low": low, "high": high, "distribution_type": choice}
 
     elif choice == "triangular":
-        lower = st.number_input(label=" Distribution lower bound", key=key + "triangular lower")
-        mode = st.number_input(label="Distribution mode", key=key + "triangular mode")
-        upper = st.number_input(label="Distribution upper bound", key=key + "triangular upper")
+        lower = st.number_input(label=" Distribution lower bound", key=key + "triangular lower", format=step_size)
+        mode = st.number_input(label="Distribution mode", key=key + "triangular mode", format=step_size)
+        upper = st.number_input(label="Distribution upper bound", key=key + "triangular upper", format=step_size)
         dist_values = {"lower": lower, "mode": mode, "upper": upper, "distribution_type": choice}
 
     elif choice == "gaussian":
-        mean = st.number_input(label="Distribution mean", key=key + "gaussian mean")
-        std = st.number_input(label="Distribution standard deviation (σ)", key=key + "gaussian standard deviation")
+        mean = st.number_input(label="Distribution mean", key=key + "gaussian mean", format=step_size)
+        std = st.number_input(label="Distribution standard deviation (σ)", key=key + "gaussian standard deviation",
+                              format=step_size)
         dist_values = {"mean": mean, "std": std, "distribution_type": choice}
 
     return dist_values

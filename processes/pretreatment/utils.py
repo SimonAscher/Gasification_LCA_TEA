@@ -110,7 +110,6 @@ def energy_drying(mass_feedstock=None,
     # Electricity requirement:
     # Calculate auxiliary energy requirements (electricity) for screw feeders, pumps, fans, etc.
     electricity_drying = []
-    # TODO: Add auxiliary energy requirements and make sure to add to requirements below and LCA function
 
     if electricity_reference == 'GaBi (mean)':
         electricity_drying = electricity_requirements[electricity_reference] * mass_feedstock
@@ -133,18 +132,26 @@ def energy_drying(mass_feedstock=None,
         energy_source_drying = 'electricity'
 
     energies_out = []
-    if output_unit == "kWh":
-        energies_out = {"heat": kJ_to_kWh(heat_drying_post_dryer_efficiency),
-                        "electricity": electricity_drying,
-                        "heat source": energy_source_drying,
+
+    if dryer_type == "Solar drying":
+        energies_out = {"heat": 0,
+                        "electricity": 0,
+                        "heat source": "Solar",
                         "units": output_unit
                         }
-    elif output_unit == "kJ":
-        energies_out = {"heat": heat_drying_post_dryer_efficiency,
-                        "electricity": kJ_to_kWh(electricity_drying, reverse=True),
-                        "heat source": energy_source_drying,
-                        "units": output_unit
-                        }
+    else:
+        if output_unit == "kWh":
+            energies_out = {"heat": kJ_to_kWh(heat_drying_post_dryer_efficiency),
+                            "electricity": electricity_drying,
+                            "heat source": energy_source_drying,
+                            "units": output_unit
+                            }
+        elif output_unit == "kJ":
+            energies_out = {"heat": heat_drying_post_dryer_efficiency,
+                            "electricity": kJ_to_kWh(electricity_drying, reverse=True),
+                            "heat source": energy_source_drying,
+                            "units": output_unit
+                            }
 
     # Print calculations if desired
     if show_values:

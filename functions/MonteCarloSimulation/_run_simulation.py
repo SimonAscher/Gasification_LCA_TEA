@@ -33,7 +33,7 @@ def run_simulation():
         processes = processes + (process_pretreatment,)
 
     # Gasification
-    process_gasification = Gasification(short_label="Gasifier")
+    process_gasification = Gasification(short_label="Gasif.")
     processes = processes + (process_gasification,)
 
     # Syngas combustion and CHP

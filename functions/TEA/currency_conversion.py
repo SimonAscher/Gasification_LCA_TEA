@@ -246,8 +246,11 @@ def convert_currency_annual_average(value, year, base_currency, converted_curren
     float
         Converted value in desired currency.
     """
-    average_exchange_rate = get_average_annual_exchange_rate(year, base_currency, converted_currency, approximate_rate,
-                                                             method)
-    converted_value = average_exchange_rate * value
+    if base_currency != converted_currency:
+        average_exchange_rate = get_average_annual_exchange_rate(year, base_currency, converted_currency,
+                                                                 approximate_rate, method)
+        converted_value = average_exchange_rate * value
+    else:
+        converted_value = value
 
     return converted_value

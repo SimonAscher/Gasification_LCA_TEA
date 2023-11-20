@@ -198,13 +198,13 @@ class CostBenefit:
 
                 # Check that values are right sign
                 if requirement.generated:  # i.e. leading to sale of electricity
-                    if all(val <= 0 for val in requirement.values):  # Check that values are not already positive.
+                    if all(val <= 0 for val in self.values_AV):  # Check that values are not already positive.
                         self.values_AV = list(np.array(self.values_AV) * -1)
                         self.values_PV = list(np.array(self.values_PV) * -1)
                     self.cost = False
                     self.benefit = True
                 else:
-                    if all(val >= 0 for val in requirement.values):  # Check that values are not already negative.
+                    if all(val >= 0 for val in self.values_AV):  # Check that values are not already negative.
                         self.values_AV = list(np.array(self.values_AV) * -1)
                         self.values_PV = list(np.array(self.values_PV) * -1)
                     self.cost = True
@@ -281,14 +281,14 @@ class Process:
 
     # GWP results
     GWP_results: tuple[GlobalWarmingPotential] = None
-    GWP_total: list[float] = None
+    GWP_distribution: list[float] = None
     GWP_mean: float = None
 
     # Economic results
     CBA_results: tuple[CostBenefit] = None
-    PV_total: list[float] = None
+    PV_distribution: list[float] = None
     PV_mean: float = None
-    AV_total: list[float] = None
+    AV_distribution: list[float] = None
     AV_mean: float = None
 
     def __post_init__(self):
@@ -421,13 +421,13 @@ class Process:
         GWP_lists = []
         for GWP_obj in self.GWP_results:
             GWP_lists.append(GWP_obj.values)
-        self.GWP_total = list(np.array([sum(x) for x in zip(*GWP_lists)]).flatten())
-        self.GWP_mean = float(np.mean(self.GWP_total))
+        self.GWP_distribution = list(np.array([sum(x) for x in zip(*GWP_lists)]).flatten())
+        self.GWP_mean = float(np.mean(self.GWP_distribution))
 
         # Set GWP to zero if no requirements led to a GWP
-        if len(self.GWP_total) == 0 and np.isnan(self.GWP_mean):
+        if len(self.GWP_distribution) == 0 and np.isnan(self.GWP_mean):
             self.GWP_mean = 0
-            self.GWP_total = list(np.zeros(settings.user_inputs.general.MC_iterations))
+            self.GWP_distribution = list(np.zeros(settings.user_inputs.general.MC_iterations))
 
     def calculate_TEA(self, consider_subprocesses=True):
         """
@@ -502,18 +502,18 @@ class Process:
         for cost_benefit_object in self.CBA_results:
             pv_values_list.append(cost_benefit_object.values_PV)
             av_values_list.append(cost_benefit_object.values_AV)
-        self.PV_total = list(np.array([sum(x) for x in zip(*pv_values_list)]).flatten())
-        self.PV_mean = float(np.mean(self.PV_total))
-        self.AV_total = list(np.array([sum(x) for x in zip(*av_values_list)]).flatten())
-        self.AV_mean = float(np.mean(self.AV_total))
+        self.PV_distribution = list(np.array([sum(x) for x in zip(*pv_values_list)]).flatten())
+        self.PV_mean = float(np.mean(self.PV_distribution))
+        self.AV_distribution = list(np.array([sum(x) for x in zip(*av_values_list)]).flatten())
+        self.AV_mean = float(np.mean(self.AV_distribution))
 
         # Set values to zero if no requirements led to a av or pv
-        if len(self.PV_total) == 0 and np.isnan(self.PV_mean):
+        if len(self.PV_distribution) == 0 and np.isnan(self.PV_mean):
             self.PV_mean = 0
-            self.PV_total = list(np.zeros(settings.user_inputs.general.MC_iterations))
-        if len(self.AV_total) == 0 and np.isnan(self.AV_mean):
+            self.PV_distribution = list(np.zeros(settings.user_inputs.general.MC_iterations))
+        if len(self.AV_distribution) == 0 and np.isnan(self.AV_mean):
             self.AV_mean = 0
-            self.AV_total = list(np.zeros(settings.user_inputs.general.MC_iterations))
+            self.AV_distribution = list(np.zeros(settings.user_inputs.general.MC_iterations))
 
     def update_plot_style(self, style=None, style_box=None):
         """
@@ -571,7 +571,7 @@ class Process:
         marker_y = None
         marker_threshold = None
         if show_total:
-            GWP_total = np.array(self.GWP_total)
+            GWP_total = np.array(self.GWP_distribution)
             marker_x = np.array(plt.hist(GWP_total, bins=bins, alpha=0, histtype='bar')[1][0:-1])
             marker_y = np.array(plt.hist(GWP_total, bins=bins, alpha=0, histtype='bar')[0])
             # set threshold below which markers are not displayed

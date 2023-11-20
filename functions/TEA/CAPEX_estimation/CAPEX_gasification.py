@@ -245,7 +245,7 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
         prediction = func_power_curve(system_size_MWel, *popt)
 
     # Medium to large scale fluidised bed (or type "Other") reactor
-    if (threshold_small_scale_system < system_size_MWel < max_fluidised_bed_size
+    elif (threshold_small_scale_system < system_size_MWel < max_fluidised_bed_size
             and reactor_type in ["Other", "Fluidised bed"]):
         df_selected = df_fluidised[df_fluidised["Plant size [MWel]"] > threshold_small_scale_system]
 
@@ -260,6 +260,23 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
                             return_as_decimal=True)
 
         prediction = func_power_curve(system_size_MWel, *popt)
+    else:
+        # Note: Currently allowed - could also raise Error and not allow this - (same model as the one above for
+        # medium-sized systems)
+        df_selected = df_fluidised[df_fluidised["Plant size [MWel]"] > threshold_small_scale_system]
+
+        # Fit power function based on previous analysis
+        popt, _ = curve_fit(f=func_power_curve,
+                            xdata=df_selected["Plant size [MWel]"],
+                            ydata=df_selected[label_CAPEX_scaled_without_cleaning],
+                            maxfev=10000)
+
+        mape_decimal = MAPE(df_selected[label_CAPEX_scaled_without_cleaning],
+                            func_power_curve(df_selected["Plant size [MWel]"], *popt),
+                            return_as_decimal=True)
+
+        prediction = func_power_curve(system_size_MWel, *popt)
+        warnings.warn("Gasifier size very large - supported size exceeded which may lead to errors.")
 
     # Fixed bed reactor smaller than 15MWel
     if system_size_MWel <= max_fixed_bed_size and reactor_type == "Fixed bed":
@@ -297,7 +314,7 @@ def get_gasification_and_gas_cleaning_CAPEX_distributions(system_size=None,
 
     # Raise warnings if necessary
     if system_size_MWel > max_fluidised_bed_size:
-        warnings.warn("System size limited to 70 MWel. Given value exceeds this.")
+        warnings.warn("System size very large - supported size of 70 MWel exceeded which may lead to errors.")
 
     # Gasification costs
     # Get lower and upper bounds of distribution based on the distributions MAPE

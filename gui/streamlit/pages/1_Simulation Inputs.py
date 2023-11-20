@@ -16,7 +16,8 @@ from human_id import generate_id
 from config import settings
 from functions.gui import display_correct_user_distribution_inputs
 from functions.TEA import get_most_recent_available_CEPCI_year
-from functions.general import convert_system_size, calculate_LHV_HHV_feedstock_from_direct_inputs
+from functions.general import (convert_system_size, calculate_LHV_HHV_feedstock_from_direct_inputs,
+                               calculate_LHV_from_HHV)
 
 # Background data
 country_options = settings.general.countries
@@ -64,7 +65,7 @@ else:  # set currency based on country selection
         currency = "GBP"
     elif country == "USA":
         currency = "USD"
-    elif country == "Germany":
+    elif country == "Germany" or country == "EU":
         currency = "EUR"
 
 # %% Feedstock information
@@ -101,7 +102,7 @@ if milling_included:
     st.markdown("""---""")
 
 st.subheader("Feedstock ultimate composition",
-             help="Typical feedstock data may be obtained from the [Phyllis2 database](https://phyllis.nl).")
+             help="Typical feedstock data may be obtained from the [Phyllis2](https://phyllis.nl) database.")
 st.markdown("")
 feedstock_C = st.number_input(label="Carbon content [%daf]", min_value=0.0, max_value=100.0)
 feedstock_H = st.number_input(label="Hydrogen content [%daf]", min_value=0.0, max_value=100.0)
@@ -133,11 +134,27 @@ if drying_included:
 feedstock_ash = st.number_input(label="Ash content [%db]", min_value=0.0, max_value=100.0)
 
 st.subheader("Feedstock energy")
-feedstock_LHV_given_by_user = st.checkbox("Is the feedstock's lower heating value (LHV) (also known as net calorific "
-                                          "value) known? If not it will be estimated based on the feedstock's ultimate "
+feedstock_LHV_given_by_user = st.checkbox("Is the feedstock's lower heating value (LHV) or higher heating value (HHV) "
+                                          "(also known as net calorific value or gross calorific value, respectively) "
+                                          "known? If not it will be estimated based on the feedstock's ultimate "
                                           "and proximate composition.")
 if feedstock_LHV_given_by_user:
-    feedstock_LHV = st.number_input(label="Feedstock LHV [MJ/kg wb]", min_value=0.0, max_value=50.0)
+    LHV_HHV_switch = st.selectbox(label="Decide whether you would like to enter the value as a LHV or HHV",
+                                  options=["LHV", "HHV"])
+    if LHV_HHV_switch == "LHV":
+        feedstock_LHV = st.number_input(label="Feedstock LHV [MJ/kg wb]", min_value=0.0, max_value=50.0)
+    else:
+        feedstock_HHV = st.number_input(label="Feedstock HHV [MJ/kg wb]", min_value=0.0, max_value=50.0)
+        if drying_included:
+            feedstock_LHV = calculate_LHV_from_HHV(HHV=feedstock_HHV, H=feedstock_H,
+                                                   moisture=feedstock_moisture_post_drying)
+        else:
+            feedstock_LHV = calculate_LHV_from_HHV(HHV=feedstock_HHV, H=feedstock_H,
+                                                   moisture=feedstock_moisture_ar)
+        if feedstock_HHV != 0:
+            if feedstock_C != 0 or feedstock_H != 0 or feedstock_N != 0 or feedstock_S != 0:
+                st.write(f"Estimated feedstock LHV is {feedstock_LHV:.2f} MJ/kg wb.")
+
 else:
     if drying_included:
         feedstock_LHV = calculate_LHV_HHV_feedstock_from_direct_inputs(C=feedstock_C, H=feedstock_H, O=feedstock_O,
@@ -182,7 +199,7 @@ st.write("Please define the system size based on at least one of the three metri
          "defined. If not all size metrics are defined, the others will be estimated.")
 system_size_mass = st.checkbox("Define system size in terms of feedstock mass [tonnes feedstock/hour].")
 system_size_power_feedstock = st.checkbox("Define system size in terms of feedstock power/energy supply "
-                                          "[MW feedstock-LHV] or [MWh feedstock-LHV/hour].")
+                                          "[MW feedstock LHV] or [MWh feedstock LHV/hour].")
 system_size_power_electric = st.checkbox("Define system size in terms of net electric power [MWel].")
 
 # Ensure at least one metric is given
@@ -195,7 +212,7 @@ else:
         system_size_mass_value = st.number_input(label="System size [tonnes feedstock/hour]", value=10.0, step=0.01)
 
     if system_size_power_feedstock:
-        system_size_power_feedstock_value = st.number_input(label="System size [MW feedstock-LHV] or [MWh feedstock-LHV/hour]", value=10.0, step=0.01)
+        system_size_power_feedstock_value = st.number_input(label="System size [MW feedstock LHV] or [MWh feedstock LHV/hour]", value=10.0, step=0.01)
 
     if system_size_power_electric:
         system_size_power_electric_value = st.number_input(label="System size [MWel]", value=10.0, step=0.01)
@@ -241,7 +258,7 @@ else:
     if system_size_mass is True or system_size_power_feedstock is True or system_size_power_electric is True:
         st.write("Your selected (or estimated) system size is:")
         st.write(f"{system_size_mass_value:.1f} [tonnes/hour]")
-        st.write(f"{system_size_power_feedstock_value:.2f} [MW feedstock-LHV] or [MWh feedstock-LHV/hour]")
+        st.write(f"{system_size_power_feedstock_value:.2f} [MW feedstock LHV] or [MWh feedstock LHV/hour]")
         st.write(f"{system_size_power_electric_value:.2f} [MWel]")
 
 st.divider()
@@ -261,7 +278,11 @@ CEPCI_year = st.number_input("Select the year to which prices and costs should b
 st.divider()
 
 rate_of_return_percentage = st.number_input(label="Rate of return (or discount rate/interest rate) which is to be used "
-                                                  "for economic analysis [%]", value=5, min_value=0, max_value=20,
+                                                  "for economic analysis [%]",
+                                            value=5.0,
+                                            min_value=0.0,
+                                            max_value=50.0,
+                                            step=0.1,
                                             help="The rate of return is used to discount cash flows occurring at "
                                             "different times (e.g. convert an annuity to its present value "
                                             "equivalent.")
@@ -278,7 +299,8 @@ if electricity_price == "user selected":
                                                key="electricity price distribution type")
     electricity_price_parameters = display_correct_user_distribution_inputs(choice=electricity_price_user_selected,
                                                                             key="electricity price distribution " +
-                                                                                electricity_price_user_selected)
+                                                                                electricity_price_user_selected,
+                                                                            step_size="any")
     st.divider()
 else:
     st.divider()
@@ -292,7 +314,8 @@ if heat_price == "user selected":
                                         key="heat price distribution type")
     heat_price_parameters = display_correct_user_distribution_inputs(choice=heat_price_user_selected,
                                                                      key="heat price distribution " +
-                                                                         heat_price_user_selected)
+                                                                         heat_price_user_selected,
+                                                                     step_size="any")
     st.divider()
 else:
     st.divider()
@@ -524,11 +547,12 @@ if CHP_display_additional_inputs:
     CHP_parasitic_energy_demand = None
     CHP_size_kW = None
     if CHP_unit == "User defined":
-        CHP_electrical_efficiency = st.number_input(label="Electrical efficiency as a decimal",
-                                                    min_value=0, max_value=1)
-        CHP_thermal_efficiency = st.number_input(label="Thermal efficiency as a decimal", min_value=0, max_value=1)
-        CHP_parasitic_energy_demand = st.number_input(label="Parasitic energy demand as a decimal",
-                                                      min_value=0, max_value=1)
+        CHP_electrical_efficiency = st.number_input(label="Electrical efficiency as a decimal", value=float(0),
+                                                    min_value=float(0), max_value=float(1))
+        CHP_thermal_efficiency = st.number_input(label="Thermal efficiency as a decimal",  value=float(0),
+                                                 min_value=float(0), max_value=float(1))
+        CHP_parasitic_energy_demand = st.number_input(label="Parasitic energy demand as a decimal", value=float(0),
+                                                      min_value=float(0), max_value=float(1))
         CHP_size_kW = st.number_input(label="CHP plant size [kW]")
 
     CHP_dict = {"type": CHP_unit,

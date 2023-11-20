@@ -1,0 +1,90 @@
+[default.user_inputs.general]
+MC_iterations = 1000
+country = "EU"
+currency = "EUR"
+system_life_span = 15
+annual_operating_hours_user_imputed = true
+annual_operating_hours = 8000
+
+[default.user_inputs.feedstock]
+category = "woody biomass"
+name = "Pinus sawdust"
+particle_size_ar = 1.0
+carbon = 49.0
+hydrogen = 6.7
+nitrogen = 0.35
+sulphur = 0.03
+oxygen = 42.6
+LHV = 16.3
+moisture_ar = 3.4
+ash = 1.3
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 850.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Pilot"
+catalyst = "No"
+gasifying_agent = "Steam"
+reactor_type = "Fluidised bed"
+bed_material = "Silica"
+
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = false
+mass_basis_tonnes_per_hour = 1.0
+power_feedstock_MW_feedstock_LHV = 4.527777777777778
+power_electric_MW_el = 1.800777315839576
+
+[default.user_inputs.economic]
+CEPCI_year = 2019
+rate_of_return_decimals = 0.07
+electricity_price_choice = "user selected"
+heat_price_choice = "user selected"
+biochar_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "feedstock cost"
+gate_fee_or_feedstock_price_choice = "user selected"
+carbon_tax_included = false
+
+[default.user_inputs.economic.electricity_price_parameters]
+value = 0.23
+distribution_type = "fixed"
+
+[default.user_inputs.economic.heat_price_parameters]
+value = 0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.biochar_price_parameters]
+value = 70.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+value = 5.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.carbon_tax_parameters]
+
+[default.user_inputs.economic.CO2_transport_price_parameters]
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = false
+
+[default.user_inputs.processes.drying]
+included = false
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = false
+
+[default.user_inputs.processes.CHP]

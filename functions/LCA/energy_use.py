@@ -1,5 +1,8 @@
+import warnings
+
 from config import settings
 from functions.general.utility import kJ_to_kWh, MJ_to_kWh
+from dynaconf.vendor.box import BoxKeyError
 
 
 def thermal_energy_GWP(amount, source=None, units="kWh", country=None, displaced=False):
@@ -32,7 +35,14 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=None, displaced
 
     # Get country specific carbon intensity of thermal energy
     if source == "natural gas":
-        carbon_intensity = settings.data.CO2_equivalents.thermal_energy.natural_gas[country]
+        try:
+            carbon_intensity = settings.data.CO2_equivalents.thermal_energy.natural_gas[country]
+        except BoxKeyError:
+            carbon_intensity = settings.data.CO2_equivalents.thermal_energy.natural_gas["UK"]
+            warnings.warn("Country specific carbon intensity unknown. UK value used. Consider adding the value to default_settings.toml")
+    elif source == "Solar":
+        carbon_intensity = 0
+
     else:
         raise TypeError("Heat source not supported.")
 
@@ -101,7 +111,12 @@ def electricity_GWP(amount, source=None, units="kWh", country=None, displaced=Fa
 
     # Get country specific carbon intensity of electricity
     if source == "grid":
-        carbon_intensity = settings.data.CO2_equivalents.electricity[country]
+        try:
+            carbon_intensity = settings.data.CO2_equivalents.electricity[country]
+        except BoxKeyError:
+            carbon_intensity = settings.data.CO2_equivalents.electricity["UK"]
+            warnings.warn("Country specific carbon intensity unknown. UK value used. Consider adding the value to default_settings.toml")
+
     else:
         raise TypeError("Electricity source not supported.")
 

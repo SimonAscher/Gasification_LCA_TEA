@@ -18,7 +18,7 @@ biogenic_carbon_equivalency = 0.0
 
 [default.general]
 # List of countries supported within the model
-countries = ["UK", "EU", "Germany", "USA", "World"]
+countries = ["UK", "EU", "Germany", "USA"]
 
 # Broad feedstock categories supported in analysis and ML prediction model
 feedstock_categories = ["plastics", "municipal solid waste", "herbaceous biomass", "woody biomass", "sewage sludge", "other"]
@@ -137,10 +137,12 @@ N2O_equ_factor = 273
 # Carbon intensity of grid electricity
 UK = 0.21233  # [kg CO2eq./kWh] Ref: https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2021
 USA = 0.38  # [kg CO2eq./kWh] Ref: https://www.eia.gov/environment/emissions/carbon/
+Germany = 0.385  # [kg CO2eq./kWh] Ref: https://www.statista.com/statistics/1290224/carbon-intensity-power-sector-germany/#:~:text=The%20carbon%20intensity%20of%20Germany's,%2FKWh)%20of%20electricity%20generated.
 
 [default.data.CO2_equivalents.thermal_energy.natural_gas]
 # Carbon intensity of thermal energy generation from natural gas
 UK = 0.222  # [kg CO2eq./kWh] Ref: GaBi model "Natural gas use"
+USA = 0.191 # https://www.eia.gov/totalenergy/data/monthly/archive/00352011.pdf
 
 [default.data.CO2_equivalents.resource_requirements]
 # Carbon intensity of various resource requirements
@@ -167,12 +169,13 @@ room_temperature = 18  # in deg C
 "Contact dryer" = 0.65
 "Direct fired dryer" = 0.40  # energy generally supplied by natural gas (could use syngas)
 "Microwave drying" = 0.50
+"Solar drying" = 1  # unused value
 
 [default.data.feedstock_drying.electricity_requirements]
 # Electricity requirements for auxiliary processes (Note difference in units)
 "GaBi (mean)" = 0.0037  # [kWh/kg of biomass input]
 "Huber Belt dryer" = 0.0375  # [kWh/kg of water evaporation]
-
+"Solar drying" = 0  # unused value
 
 [default.data.milling]
 screen_sizes = [3.20, 4.76, 6.50]  # mm
@@ -275,7 +278,6 @@ USD = 0.045
 # Also allow for call with countries
 UK = 0.04
 EU = 0.03
-Germany = 0.03
 USA = 0.045
 
 [default.data.economic.conversion_rates]  # Currency conversion rates
@@ -284,8 +286,6 @@ USA = 0.045
 USD_TO_GBP = 0.8003
 EUR_TO_GBP = 0.8489
 source = "https://www.gov.uk/government/publications/exchange-rates-for-customs-and-vat-yearly"
-# TODO: Double check if this is unused now - use currency conversion functions instead.
-
 
 [default.data.economic.electricity_wholesale_prices.UK]  # Electricity wholesale prices
 lower = 0.080
@@ -364,9 +364,9 @@ source = ["https://ember-climate.org/data/data-tools/carbon-price-viewer/", "htt
 2018 = 603.1
 2019 = 619.2
 2020 = 597.5
-2021 = "unavailable"
-2022 = "unavailable"
-2023 = "unavailable"
+2021 = 708.8
+2022 = 816.0
+2023 = 803.3  # most recent value for June 2023 -
 2024 = "unavailable"
 2025 = "unavailable"
 2026 = "unavailable"
@@ -375,7 +375,6 @@ source = ["https://ember-climate.org/data/data-tools/carbon-price-viewer/", "htt
 2029 = "unavailable"
 2030 = "unavailable"
 sources = ["10.1016/J.ENCONMAN.2021.114631 (Fig. S1)", "10.1016/j.energy.2019.05.191", "10.1016/j.biortech.2020.123076"]
-# TODO add values for 2021 and 2022
 
 
 [default.streamlit]
@@ -386,7 +385,8 @@ carbon_capture_options = ["Vacuum pressure swing adsorption (VPSA) post combusti
                           "Amine-based post combustion capture"]
 CHP_options = ["Jenbacher Type 6 gas engine (1600 kW) (default)", "Solid oxide fuel cell (SOFC) (1.7 kW)",
                "Stirling engine (1.2 kW)", "Micro gas turbine (30kW)", "User defined"]
-dryer_type_options = ["Direct fired dryer", "Indirect-heated convection dryer", "Contact dryer", "Microwave drying"]
+dryer_type_options = ["Direct fired dryer", "Indirect-heated convection dryer", "Contact dryer", "Microwave drying",
+                      "Solar drying"]
 sensitivity_analysis_energy_options = ["default", "75 % of current emissions", "50 % of current emissions",
     "25 % of current emissions", "user defined"]
 sensitivity_analysis_run_options = ['Use .toml file','Use new selection of parameters']

@@ -132,8 +132,26 @@ def get_CHP_CAPEX_distribution(system_size_MWel=None, currency=None, CEPCI_year=
 
             prediction = func_straight_line(system_size_MWel, *popt)
 
-        else:  # too large - not supported
-            raise ValueError("CHP size exceeds the supported size.")
+        else:
+            # Note: Currently allowed - could also raise Error and not allow this - (same model as the one above for
+            # medium-sized systems)
+
+            df_medium = df[(df["Plant size [MWel]"] > threshold_small_scale_system) &
+                           (df["Plant size [MWel]"] <= max_system_size)]
+            df_medium = df_medium.dropna(subset=[currency_and_CEPCI_scaled_label])
+
+            # Fit linear function based on previous analysis
+            popt, _ = curve_fit(func_straight_line,
+                                df_medium["Plant size [MWel]"],
+                                df_medium[currency_and_CEPCI_scaled_label],
+                                maxfev=10000)
+
+            mape_decimal = MAPE(df_medium[currency_and_CEPCI_scaled_label],
+                                func_straight_line(df_medium["Plant size [MWel]"], *popt),
+                                return_as_decimal=True)
+
+            prediction = func_straight_line(system_size_MWel, *popt)
+            warnings.warn("CHP size very large - supported size exceeded which may lead to errors.")
 
     # Raise warnings if necessary
     if system_size_MWel < 0.05:

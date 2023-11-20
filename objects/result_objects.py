@@ -1,8 +1,6 @@
 import datetime
 import math
 import os
-import pathlib
-import shutil
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -43,7 +41,7 @@ class Results:
     plot_style: str | DynaBox
         Style to be used for plotting - str loads predefined style from settings (e.g. "digital" or "poster").
         Alternatively DynaBox object can be given directly.
-    GWP_total: list[float]
+    GWP_distribution: list[float]
         GWP Monte Carlo results - populated later.
     GWP_mean: float
         Average GWP - populated later.
@@ -78,17 +76,16 @@ class Results:
     # Define defaults which are to be populated later
 
     # Environmental
-    GWP_total: list[float] = None
+    GWP_distribution: list[float] = None
     GWP_mean: float = None
 
     # Economics
-    CBA_results: tuple[CostBenefit] = None
     PV_distribution: list[float] | float = None
     PV_mean: float = None
     AV_distribution: list[float] | float = None
     AV_mean: float = None
-    benefit_cost_ratio_distribution: list[float] | float = None
-    benefit_cost_ratio_mean: float = None
+    BCR_distribution: list[float] | float = None
+    BCR_mean: float = None
 
     # Energy
     electricity_results: dict = None
@@ -130,9 +127,9 @@ class Results:
 
         # Effects of a carbon price, due to e.g. a carbon tax or emissions trading scheme
         if settings.user_inputs.economic.carbon_tax_included:
-            if self.GWP_total is None:
+            if self.GWP_distribution is None:
                 self.calculate_total_GWP()
-            economic_requirements.add_requirement(carbon_price_cost_benefit(self.GWP_total))
+            economic_requirements.add_requirement(carbon_price_cost_benefit(self.GWP_distribution))
 
         # Add requirements to new process object, calculate LCA and TEA effects, and add process to results object.
         general_process.add_requirements(economic_requirements)
@@ -148,8 +145,8 @@ class Results:
         pv_totals = []
         av_totals = []
         for process in self.processes:
-            pv_totals.append(np.array(process.PV_total).flatten())
-            av_totals.append(np.array(process.AV_total).flatten())
+            pv_totals.append(np.array(process.PV_distribution).flatten())
+            av_totals.append(np.array(process.AV_distribution).flatten())
         pv_totals = np.array(pv_totals)
         av_totals = np.array(av_totals)
 
@@ -177,8 +174,8 @@ class Results:
         total_benefits_distribution = np.sum(np.array(benefit_distributions), axis=0)
 
         # Add benefit cost ratio to results
-        self.benefit_cost_ratio_distribution = list(total_benefits_distribution / (-1 * total_costs_distribution))
-        self.benefit_cost_ratio_mean = np.mean(self.benefit_cost_ratio_distribution)
+        self.BCR_distribution = list(total_benefits_distribution / (-1 * total_costs_distribution))
+        self.BCR_mean = np.mean(self.BCR_distribution)
 
     def calculate_total_GWP(self):
         """
@@ -187,12 +184,12 @@ class Results:
         # Calculate totals for each Monte Carlo instance
         GWP_totals = []
         for process in self.processes:
-            GWP_totals.append(np.array(process.GWP_total).flatten())
+            GWP_totals.append(np.array(process.GWP_distribution).flatten())
         GWP_totals = np.array(GWP_totals)
-        self.GWP_total = list(np.sum(GWP_totals, axis=0))  # sum elementwise
+        self.GWP_distribution = list(np.sum(GWP_totals, axis=0))  # sum elementwise
 
         # Calculate overall sum
-        self.GWP_mean = float(np.mean(self.GWP_total))
+        self.GWP_mean = float(np.mean(self.GWP_distribution))
 
     def calculate_electricity_heat_output(self):
         """
@@ -477,7 +474,7 @@ class Results:
         """
         sns.set_theme()
         fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
-        ax.hist(self.GWP_total, bins=bins)
+        ax.hist(self.GWP_distribution, bins=bins)
 
         # Set title and labels
         ax.set_xlabel("GWP " + settings.labels.LCA_output_plotting_string, fontsize=self.plot_style.labels_fontsize)
@@ -647,7 +644,7 @@ class Results:
         for process_count, process in enumerate(self.processes):  # get distributions of each process' GWP
             process_names.append(process.name)
             process_short_names.append(process.short_label)
-            GWP_matrix.append(np.array(process.GWP_total).flatten())
+            GWP_matrix.append(np.array(process.GWP_distribution).flatten())
 
         # Prepare lists for plotting
         process_names.append("Total")
@@ -656,7 +653,7 @@ class Results:
             process_names = process_short_names
 
         # Add total to matrix
-        GWP_matrix.append(np.array(self.GWP_total))
+        GWP_matrix.append(np.array(self.GWP_distribution))
         GWP_matrix = np.transpose(np.array(GWP_matrix))  # convert to right format
         GWP_exc_total = GWP_matrix[:, 0:-1]  # get array without the total
         GWP_total = GWP_matrix[:, -1]  # get list of total GWP
@@ -754,10 +751,10 @@ class Results:
         """
         sns.set_theme()
         fig, ax = plt.subplots(figsize=tuple(self.plot_style.fig_size), dpi=self.plot_style.fig_dpi)
-        ax.hist(self.benefit_cost_ratio_distribution, bins=bins)
+        ax.hist(self.BCR_distribution, bins=bins)
 
         # Set title and labels
-        ax.set_xlabel(f"Benefit-cost ratio",
+        ax.set_xlabel(f"Benefit-Cost Ratio",
                       fontsize=self.plot_style.labels_fontsize)
         ax.set_ylabel("Monte Carlo Iterations", fontsize=self.plot_style.labels_fontsize)
         ax.tick_params(labelsize=self.plot_style.ticks_fontsize)
@@ -926,7 +923,7 @@ class Results:
         for process_count, process in enumerate(self.processes):  # get present value distribution of each process
             process_names.append(process.name)
             process_short_names.append(process.short_label)
-            NPV_matrix.append(np.array(process.PV_total).flatten())
+            NPV_matrix.append(np.array(process.PV_distribution).flatten())
 
         # Prepare lists for plotting
         process_names.append("Total")

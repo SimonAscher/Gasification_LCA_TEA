@@ -1,0 +1,93 @@
+[default.user_inputs.general]
+MC_iterations = 1000
+country = "USA"
+currency = "USD"
+system_life_span = 30
+annual_operating_hours_user_imputed = true
+annual_operating_hours = 8759
+
+[default.user_inputs.feedstock]
+category = "woody biomass"
+name = "Canadian Pine Wood"
+particle_size_ar = 3.0
+carbon = 49.0
+hydrogen = 6.4
+nitrogen = 0.14
+sulphur = 0.01
+oxygen = 44.45
+LHV = 19.6
+moisture_ar = 5.8
+ash = 1.5
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 870.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Pilot"
+catalyst = "No"
+gasifying_agent = "Steam"
+reactor_type = "Fluidised bed"
+bed_material = "Olivine"
+
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = false
+mass_basis_tonnes_per_hour = 308.0
+power_feedstock_MW_feedstock_LHV = 1676.8888888888887
+power_electric_MW_el = 868.5459391885167
+
+[default.user_inputs.economic]
+CEPCI_year = 2018
+rate_of_return_decimals = 0.12
+electricity_price_choice = "user selected"
+heat_price_choice = "user selected"
+biochar_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "feedstock cost"
+gate_fee_or_feedstock_price_choice = "user selected"
+carbon_tax_included = false
+CO2_transport_price_choice = "default"
+CO2_storage_price_choice = "default"
+
+[default.user_inputs.economic.electricity_price_parameters]
+value = 0.018
+distribution_type = "fixed"
+
+[default.user_inputs.economic.heat_price_parameters]
+value = 0.010
+distribution_type = "fixed"
+
+[default.user_inputs.economic.biochar_price_parameters]
+value = 0.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+value = 100.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.carbon_tax_parameters]
+
+[default.user_inputs.economic.CO2_transport_price_parameters]
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = false
+
+[default.user_inputs.processes.drying]
+included = false
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = false
+
+[default.user_inputs.processes.carbon_capture]
+included = true
+method = "VPSA post combustion"
+
+[default.user_inputs.processes.CHP]

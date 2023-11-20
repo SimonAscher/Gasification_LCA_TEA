@@ -13,7 +13,7 @@ from functions.TEA.cost_benefit_components import get_operation_and_maintenance_
 @dataclass()
 class Gasification(Process):
     name: str = "Gasification"
-    short_label: str = "G"
+    short_label: str = "Gasif."
 
     def instantiate_default_requirements(self):
         self.calculate_requirements()

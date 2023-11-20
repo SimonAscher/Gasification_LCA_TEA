@@ -101,8 +101,9 @@ class CarbonCapture(Process):
             CCS_requirements.add_requirement(FossilGWP(values=captured_CO2_fossil, name="Captured fossil CO2",
                                                        short_label="$CO_{2}$ fossil"))
             CCS_requirements.add_requirement(Electricity(values=electricity_req,
-                                                         name="Electricity use for carbon capture"))
-            CCS_requirements.add_requirement(Heat(values=heat_req, name="Heat use for carbon capture"))
+                                                         name="Electricity use for carbon capture",
+                                                         generated=False))
+            CCS_requirements.add_requirement(Heat(values=heat_req, name="Heat use for carbon capture", generated=False))
 
         # Do analysis for pre combustion process which acts on the syngas
         elif cc_method == "VPSA pre combustion":

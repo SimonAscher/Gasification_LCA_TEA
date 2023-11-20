@@ -15,5 +15,4 @@ sys.path.append(root_path)
 
 st.title('General Biomass and Waste Gasification LCA and TEA')
 
-# Test streamlit
-st.write(root_path)
+st.write("TODO: ADD INTRODUCTION HERE - This is a model for - the model is strutured as such - the gui is structured in this way - etc.")

@@ -1,0 +1,94 @@
+[default.user_inputs.general]
+MC_iterations = 1000
+country = "EU"
+currency = "EUR"
+system_life_span = 20
+annual_operating_hours_user_imputed = false
+
+[default.user_inputs.feedstock]
+category = "municipal solid waste"
+name = "MSW (solid recovered fuel (SRF) in Finland)"
+biogenic_carbon_fraction = 0.64
+particle_size_ar = 100.0
+carbon = 59.56
+hydrogen = 9.53
+nitrogen = 2.0
+sulphur = 0.31
+oxygen = 28.599999999999998
+LHV = 9.8
+moisture_ar = 34.0
+moisture_post_drying = 10.0
+ash = 36.36
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 875.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Pilot"
+catalyst = "No"
+gasifying_agent = "Air"
+reactor_type = "Fluidised bed"
+bed_material = "Silica"
+
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = false
+mass_basis_tonnes_per_hour = 31.25
+power_feedstock_MW_feedstock_LHV = 85.06944444444444
+power_electric_MW_el = 87.20482013879881
+
+[default.user_inputs.economic]
+CEPCI_year = 2018
+rate_of_return_decimals = 0.05
+electricity_price_choice = "user selected"
+heat_price_choice = "user selected"
+biochar_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "gate fee"
+gate_fee_or_feedstock_price_choice = "user selected"
+carbon_tax_included = false
+
+[default.user_inputs.economic.electricity_price_parameters]
+value = 0.065
+distribution_type = "fixed"
+
+[default.user_inputs.economic.heat_price_parameters]
+value = 0.025
+distribution_type = "fixed"
+
+[default.user_inputs.economic.biochar_price_parameters]
+value = 50.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+value = 0.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.carbon_tax_parameters]
+
+[default.user_inputs.economic.CO2_transport_price_parameters]
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = true
+screen_size_mm = 6.5
+
+[default.user_inputs.processes.drying]
+included = true
+moisture_post_drying = 10.0
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = false
+
+[default.user_inputs.processes.CHP]
+type = "Jenbacher Type 6 gas engine (1600 kW) (default)"

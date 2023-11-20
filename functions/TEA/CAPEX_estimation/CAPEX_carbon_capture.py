@@ -76,7 +76,7 @@ def get_carbon_capture_CAPEX_distribution(CO2_capture_rate, currency=None, CEPCI
 
     CAPEX = AnnualValue(values=list(annuity_cash_flow_array_capture),
                         name="Carbon Capture CAPEX",
-                        short_label="CC",
+                        short_label="CAPEX CC",
                         tag="CAPEX")
 
     return CAPEX
