@@ -1,0 +1,101 @@
+[default.user_inputs.general]
+MC_iterations = 100
+country = "UK"
+currency = "GBP"
+system_life_span = 20
+annual_operating_hours_user_imputed = false
+
+[default.user_inputs.feedstock]
+category = "woody biomass"
+name = "Draff"
+particle_size_ar = 5.00
+carbon = 49.12
+hydrogen = 6.81
+nitrogen = 2.27
+sulphur = 0.20
+oxygen = 41.60
+LHV = 18.18
+moisture_ar = 75.0
+moisture_post_drying = 15.0
+ash = 3.10
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 750.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Pilot"
+catalyst = "No"
+gasifying_agent = "Air"
+reactor_type = "Fluidised bed"
+bed_material = "Silica"
+
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = false
+mass_basis_tonnes_per_hour = 8.0
+power_feedstock_MW_feedstock_LHV = 40.40
+power_electric_MW_el = 21.56
+#mass_basis_tonnes_per_hour = 5.0
+#power_feedstock_MW_feedstock_LHV = 25.25
+#power_electric_MW_el = 13.09
+
+[default.user_inputs.economic]
+CEPCI_year = 2023
+rate_of_return_decimals = 0.0525
+electricity_price_choice = "user selected"
+heat_price_choice = "user selected"
+biochar_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "feedstock cost"
+gate_fee_or_feedstock_price_choice = "user selected"
+carbon_tax_included = false
+
+[default.user_inputs.economic.electricity_price_parameters]
+lower = 0.05
+mode = 0.11
+upper = 0.2
+distribution_type = "triangular"
+
+[default.user_inputs.economic.heat_price_parameters]
+lower = 0.017
+mode = 0.044
+upper = 0.068
+distribution_type = "triangular"
+
+[default.user_inputs.economic.biochar_price_parameters]
+low = 50.0
+high = 100.0
+distribution_type = "range"
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+lower = 10.50
+mode = 27.00
+upper = 49.00
+distribution_type = "triangular"
+
+[default.user_inputs.economic.carbon_tax_parameters]
+
+[default.user_inputs.economic.CO2_transport_price_parameters]
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = false
+
+[default.user_inputs.processes.drying]
+included = true
+moisture_post_drying = 15.0
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = false
+
+[default.user_inputs.processes.CHP]

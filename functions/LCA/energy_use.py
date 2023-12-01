@@ -56,11 +56,6 @@ def thermal_energy_GWP(amount, source=None, units="kWh", country=None, displaced
     else:
         raise TypeError("Other units currently not supported.")
 
-    # Check if updated carbon intensity value is provided in sensitivity analysis
-    if "heat" in settings.sensitivity_analysis.energy_impacts and \
-            settings.sensitivity_analysis.energy_impacts.heat != "None":
-        carbon_intensity = settings.sensitivity_analysis.energy_impacts.heat
-
     # Calculate GWP value
     GWP = carbon_intensity * amount
 
@@ -119,11 +114,6 @@ def electricity_GWP(amount, source=None, units="kWh", country=None, displaced=Fa
 
     else:
         raise TypeError("Electricity source not supported.")
-
-    # Check if updated carbon intensity value is provided in sensitivity analysis
-    if "electricity" in settings.sensitivity_analysis.energy_impacts and \
-            settings.sensitivity_analysis.energy_impacts.electricity != "None":
-        carbon_intensity = settings.sensitivity_analysis.energy_impacts.electricity
 
     # Calculate GWP value
     GWP = carbon_intensity * amount

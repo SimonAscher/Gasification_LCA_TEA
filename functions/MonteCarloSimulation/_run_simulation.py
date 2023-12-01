@@ -9,7 +9,19 @@ from processes.pretreatment import (FeedstockDrying, FeedstockPelleting, Feedsto
 from objects.result_objects import Results
 
 
-def run_simulation():
+def run_simulation(show_figures=True):
+    """
+    Runs techno-economic and environmental simulation based on user inputs file defined in config.py.
+
+    Parameters
+    ----------
+    show_figures: bool
+        Determines whether figures should be shown.
+
+    Returns
+    -------
+
+    """
     # Create processes
     processes = ()  # to store all created processes
 
@@ -65,6 +77,7 @@ def run_simulation():
     results.calculate_electricity_heat_output()
 
     # # Plot results
-    results.plot_all_results()
+    if show_figures:
+        results.plot_all_results()
 
     return results

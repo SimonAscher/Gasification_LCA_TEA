@@ -1,11 +1,7 @@
-import io
-import os
 import sys
-import zipfile
 
 from pathlib import Path
 
-from matplotlib import pyplot as plt
 
 # Add root directory
 root_path = str(Path(__file__).parent.parent.parent.parent)
@@ -14,7 +10,6 @@ sys.path.append(root_path)
 
 import streamlit as st
 
-from config import settings
 from functions.MonteCarloSimulation import run_simulation
 from functions.gui.streamlit_helpers import update_settings_with_user_inputs, show_simulation_results, \
     download_zipped_figures

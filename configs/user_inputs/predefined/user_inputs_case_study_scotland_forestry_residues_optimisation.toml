@@ -1,0 +1,102 @@
+[default.user_inputs.feedstock]
+particle_size_post_milling = 15.92484770558109
+category = "woody biomass"
+name = "Forestry residues(Phyllis #3155)"
+particle_size_ar = 25.0
+carbon = 51.99
+hydrogen = 6.18
+nitrogen = 0.41
+sulphur = 0.02
+oxygen = 41.4
+LHV = 17.97
+moisture_ar = 20.0
+moisture_post_drying = 12.0
+ash = 1.33
+
+[default.user_inputs.general]
+MC_iterations = 100
+country = "UK"
+currency = "GBP"
+system_life_span = 20
+annual_operating_hours_user_imputed = false
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 750.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Pilot"
+catalyst = "No"
+gasifying_agent = "Air"
+reactor_type = "Fluidised bed"
+bed_material = "Silica"
+
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = false
+mass_basis_tonnes_per_hour = 10.0
+power_feedstock_MW_feedstock_LHV = 49.92
+power_electric_MW_el = 27.21
+#mass_basis_tonnes_per_hour = 5.0
+#power_feedstock_MW_feedstock_LHV = 24.96
+#power_electric_MW_el = 13.09
+
+[default.user_inputs.economic]
+CEPCI_year = 2023
+rate_of_return_decimals = 0.0525
+electricity_price_choice = "user selected"
+heat_price_choice = "user selected"
+biochar_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "feedstock cost"
+gate_fee_or_feedstock_price_choice = "user selected"
+carbon_tax_included = false
+
+[default.user_inputs.economic.electricity_price_parameters]
+lower = 0.05
+mode = 0.11
+upper = 0.2
+distribution_type = "triangular"
+
+[default.user_inputs.economic.heat_price_parameters]
+lower = 0.017
+mode = 0.044
+upper = 0.068
+distribution_type = "triangular"
+
+[default.user_inputs.economic.biochar_price_parameters]
+low = 50.0
+high = 100.0
+distribution_type = "range"
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+low = 25.0
+high = 45.0
+distribution_type = "range"
+
+[default.user_inputs.economic.carbon_tax_parameters]
+
+[default.user_inputs.economic.CO2_transport_price_parameters]
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = true
+screen_size_mm = 3.2
+
+[default.user_inputs.processes.drying]
+included = true
+moisture_post_drying = 12.0
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = false
+
+[default.user_inputs.processes.CHP]

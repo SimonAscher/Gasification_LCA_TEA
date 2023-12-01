@@ -1,7 +1,0 @@
-[default.user_inputs.feedstock]
-particle_size_post_milling = 15.548498721624416
-particle_size_post_pelleting = 6.35
-
-[default.sensitivity_analysis.energy_impacts]
-electricity = "None"
-heat = "None"

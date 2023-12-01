@@ -1,0 +1,95 @@
+[default.user_inputs.general]
+MC_iterations = 100
+country = "UK"
+currency = "GBP"
+system_life_span = 20
+annual_operating_hours_user_imputed = false
+
+[default.user_inputs.feedstock]
+category = "herbaceous biomass"
+name = "Barley Straw (Phyllis #3169)"
+particle_size_ar = 10.0
+carbon = 49.09
+hydrogen = 6.06
+nitrogen = 0.64
+sulphur = 0.08
+oxygen = 44.129999999999995
+LHV = 15.14
+moisture_ar = 11.53
+ash = 5.88
+
+[default.user_inputs.process_conditions]
+gasification_temperature = 750.0
+ER = 0.3
+operation_mode = "Continuous"
+operation_scale = "Pilot"
+catalyst = "No"
+gasifying_agent = "Air"
+reactor_type = "Fluidised bed"
+bed_material = "Silica"
+
+[default.user_inputs.system_size]
+mass_basis_user_imputed = true
+power_feedstock_user_imputed = false
+power_electric_user_imputed = false
+mass_basis_tonnes_per_hour = 5.0
+power_feedstock_MW_feedstock_LHV = 21.02777777777778
+power_electric_MW_el = 13.093873887470547
+
+[default.user_inputs.economic]
+CEPCI_year = 2023
+rate_of_return_decimals = 0.0525
+electricity_price_choice = "user selected"
+heat_price_choice = "user selected"
+biochar_price_choice = "user selected"
+gate_fee_or_feedstock_price_selection = "feedstock cost"
+gate_fee_or_feedstock_price_choice = "user selected"
+carbon_tax_included = false
+
+[default.user_inputs.economic.electricity_price_parameters]
+lower = 0.05
+mode = 0.11
+upper = 0.2
+distribution_type = "triangular"
+
+[default.user_inputs.economic.heat_price_parameters]
+lower = 0.017
+mode = 0.044
+upper = 0.068
+distribution_type = "triangular"
+
+[default.user_inputs.economic.biochar_price_parameters]
+low = 50.0
+high = 100.0
+distribution_type = "range"
+
+[default.user_inputs.economic.gate_fee_or_feedstock_price_parameters]
+value = 50.0
+distribution_type = "fixed"
+
+[default.user_inputs.economic.carbon_tax_parameters]
+
+[default.user_inputs.economic.CO2_transport_price_parameters]
+
+[default.user_inputs.economic.CO2_storage_price_parameters]
+
+[default.user_inputs.processes.milling]
+included = true
+screen_size_mm = 3.2
+
+[default.user_inputs.processes.drying]
+included = false
+
+[default.user_inputs.processes.pelleting]
+included = false
+
+[default.user_inputs.processes.bale_shredding]
+included = false
+
+[default.user_inputs.processes.biochar]
+included = true
+
+[default.user_inputs.processes.carbon_capture]
+included = false
+
+[default.user_inputs.processes.CHP]

@@ -16,3 +16,4 @@ cachetools~=4.2.2
 shap~=0.39.0
 scipy~=1.7.3
 yfinance~=0.2.30
+dill~=0.3.7

@@ -85,7 +85,7 @@ def save_uploaded_user_inputs_to_toml(uploaded_user_input_file):
     return complete_path
 
 
-def update_settings_with_user_inputs(uploaded_user_input_file, reset_sensitivity_analysis=True):
+def update_settings_with_user_inputs(uploaded_user_input_file):
     """
     Takes the uploaded user input data and updates Dynaconf settings with it.
 
@@ -93,8 +93,6 @@ def update_settings_with_user_inputs(uploaded_user_input_file, reset_sensitivity
     ----------
     uploaded_user_input_file: UploadedFile
         User input .toml file uploaded by user.
-    reset_sensitivity_analysis: bool
-        Determines whether sensitivity analysis values should be reset.
 
     Returns
     -------
@@ -115,12 +113,7 @@ def update_settings_with_user_inputs(uploaded_user_input_file, reset_sensitivity
     root_path = get_project_root()
 
     # Get settings
-    if reset_sensitivity_analysis:
-        files_to_update = [user_inputs_path,  # user inputs (overwrites defaults)
-                           root_path + r"\configs\sensitivity_analysis_defaults.toml"  # reverts to default sensitivity analysis choices
-                           ]
-    else:
-        files_to_update = [user_inputs_path]
+    files_to_update = [user_inputs_path]
 
     settings_updated = Dynaconf(
         settings_files=files_to_update,

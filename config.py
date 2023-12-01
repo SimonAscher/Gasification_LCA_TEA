@@ -15,13 +15,16 @@ settings = Dynaconf(
         # root_path + r"\configs\user_inputs\predefined\user_inputs_Wang_2012_IntJHydrog_37.toml",  # user inputs (overwrites defaults)
         # root_path + r"\configs\user_inputs\predefined\user_inputs_Song_2012_BiomassBioenergy_36.toml",  # user inputs (overwrites defaults)
         # root_path + r"\configs\user_inputs\predefined\user_inputs_Ascher_2019_Energy_181.toml",  # user inputs (overwrites defaults)
+        # root_path + r"\configs\user_inputs\predefined\user_inputs_Ascher_2019_Energy_181_optimisation.toml",  # user inputs (overwrites defaults)
         # root_path + r"\configs\user_inputs\predefined\user_inputs_Salkuyeh_2018_IntJHyrdog_43.toml",  # user inputs (overwrites defaults)
         # root_path + r"\configs\user_inputs\predefined\user_inputs_Parascanu_2019_Energy_189.toml", # user inputs (overwrites defaults)
         # root_path + r"\configs\user_inputs\predefined\user_inputs_Dong_2018_SciTotalEnviron_626.toml", # user inputs (overwrites defaults)
         # root_path + r"\configs\user_inputs\predefined\user_inputs_Zang_2018_IntJGreenhGasControl_78_CCS.toml",  # user inputs (overwrites defaults)
-        root_path + r"\configs\user_inputs\predefined\user_inputs_Puy_2010_BiomassBioenergy_34.toml",  # user inputs (overwrites defaults)
-        root_path + r"\configs\sensitivity_analysis_defaults.toml",  # default sensitivity analysis choices
-        root_path + r"\configs\secrets.toml"  # a file for sensitive data (gitignored)
+        # root_path + r"\configs\user_inputs\predefined\user_inputs_Puy_2010_BiomassBioenergy_34.toml",  # user inputs (overwrites defaults)
+        # root_path + r"\configs\user_inputs\predefined\user_inputs_case_study_scotland_draff_optimisation.toml",  # user inputs (overwrites defaults)
+        root_path + r"\configs\user_inputs\predefined\user_inputs_case_study_scotland_forestry_residues_optimisation.toml",  # user inputs (overwrites defaults)
+        # root_path + r"\configs\user_inputs\predefined\user_inputs_case_study_scotland_barley_straw_optimisation.toml",  # user inputs (overwrites defaults)
+        # root_path + r"\configs\secrets.toml"  # a file for sensitive data (gitignored)
     ],
     environments=True,  # Enable layered environments
     merge_enabled=True  # Allows for default inputs to be overwritten
