@@ -51,40 +51,28 @@ def run_optimisation(optimisation_parameters=None):
 
     # Default optimisation parameters
     if optimisation_parameters is None:
-        # optimisation_parameters = {"gasification_temperature": [600, 700, 800],
-        #               "ER": [0.25, 0.3],
-        #               "reactor_type": ["Fluidised bed", "Fixed bed"],
-        #               "gasifying_agent": ["Air", "Steam"],
-        #               "rate_of_return_decimals": [0.04, 0.05, 0.06],
-        #               }
-
-        # optimisation_parameters = {"gasification_temperature": [600, 700, 800],
-        #               "ER": [0.25, 0.3],
-        #               "gasifying_agent": ["Air", "Steam"],
-        #               "operation_scale": ["Pilot", "Lab"],
-        #               "reactor_type": ["Fluidised bed", "Fixed bed"],
-        #               "rate_of_return_decimals": [0.04, 0.05, 0.06],
-        #               "system_life_span": [15, 20, 25]
-        #               }
-
-        # optimisation_parameters = {"gasification_temperature": [600, 700, 800],
+        # optimisation_parameters = {"gasification_temperature": [650, 750, 850],
         #                            "ER": [0.25, 0.3],
         #                            "gasifying_agent": ["Air", "Steam"],
+        #                            "operation_scale": ["Pilot", "Lab"],
+        #                            "reactor_type": ["Fluidised bed", "Fixed bed"],
+        #                            "rate_of_return_decimals": [0.04, 0.05, 0.06],
         #                            "carbon_capture": [True, False],
-        #                            "carbon_tax": [0, 50, 75]
+        #                            "carbon_tax": [0, 50, 75],
+        #                            "system_life_span": [15, 20, 25]
+        #                            "electricity_price": []
         #                            }
-
-        optimisation_parameters = {"gasification_temperature": [650, 750, 850],
-                                   "ER": [0.25, 0.3],
+        optimisation_parameters = {"gasification_temperature": [700, 800, 900, 1000, 1100, 1200],
                                    "gasifying_agent": ["Air", "Steam"],
-                                   "operation_scale": ["Pilot", "Lab"],
                                    "reactor_type": ["Fluidised bed", "Fixed bed"],
-                                   "rate_of_return_decimals": [0.04, 0.05, 0.06],
                                    "carbon_capture": [True, False],
-                                   "carbon_tax": [0, 50, 75]
+                                   "carbon_tax": [0, 50, 75],
                                    }
 
+
+
     optimisation_combinations = list(ParameterGrid(optimisation_parameters))
+    print(f"Run optimisation using the following feedstock: {settings.user_inputs.feedstock.name}")
     print(f"Number of combinations considered in optimisation: {len(optimisation_combinations)}")
 
     # Reduce number of Monte Carlo iterations to speed up model
@@ -124,6 +112,20 @@ def run_optimisation(optimisation_parameters=None):
                 settings.user_inputs.economic["carbon_tax_choice"] = "default"
                 settings.user_inputs.economic.carbon_tax_parameters["value"] = parameter_combination["carbon_tax"]
                 settings.user_inputs.economic.carbon_tax_parameters["distribution_type"] = "fixed"
+            if "electricity_price" in parameter_combination:
+                settings.user_inputs.economic["electricity_price_choice"] = "user selected"
+                if parameter_combination["electricity_price"] is list:  # nested list denotes triangular distribution
+                    settings.user_inputs.economic.electricity_price_parameters["lower"] = parameter_combination["electricity_price"][0]
+                    settings.user_inputs.economic.electricity_price_parameters["mode"] = parameter_combination["electricity_price"][1]
+                    settings.user_inputs.economic.electricity_price_parameters["upper"] = parameter_combination["electricity_price"][2]
+                    settings.user_inputs.economic.electricity_price_parameters["distribution_type"] = "triangular"
+                else:  # int or float denotes singular fixed value
+                    settings.user_inputs.economic.electricity_price_parameters["value"] = parameter_combination["electricity_price"]
+                    settings.user_inputs.economic.electricity_price_parameters["distribution_type"] = "fixed"
+                    # Check that values are of the expected type
+                    if isinstance(parameter_combination["electricity_price"], int) or isinstance(parameter_combination["electricity_price"], float):
+                        raise ValueError("Decimal or integer expected.")
+
             settings.user_inputs.general.MC_iterations = reduced_MC_iterations
 
             result = run_simulation(show_figures=False)
@@ -140,7 +142,7 @@ def run_optimisation(optimisation_parameters=None):
 
     # Get other info
     ID = generate_id()
-    user_inputs_settings_file_name = pathlib.PurePath(settings.settings_file[-2]).name
+    user_inputs_settings_file_name = pathlib.PurePath(settings.settings_file[-1]).name
 
     # Get path components
     file_name = "optimisation_results_" + ID
@@ -148,18 +150,59 @@ def run_optimisation(optimisation_parameters=None):
 
     # Add new directory to data folder
     try:
-        os.mkdir(os.path.join("data", new_directory_name))
+        os.mkdir(os.path.join("examples/data", new_directory_name))
     except OSError as error:
         warnings.warn(str(error))
 
         # Get path
-    relative_results_objects_path = os.path.join("data", new_directory_name, file_name)
+    relative_results_objects_path = os.path.join("examples/data", new_directory_name, file_name)
 
     # Store results and parameter combinations
     with open(relative_results_objects_path, "wb") as f:
         pickle.dump(results, f)
 
     return results, relative_results_objects_path, optimisation_combinations
+
+
+def load_and_analyse_results(relative_file_path):
+
+    # Load results
+    with open(relative_file_path, 'rb') as results_objects:
+        results = (pickle.load(results_objects))
+
+    # Get pareto optimal mask
+    # Extract mean GWP, BCR, and parameter combination values for all data
+    GWP_means = [results[i].GWP_mean for i in range(len(results))]
+    BCR_means = [results[i].BCR_mean for i in range(len(results))]
+    parameter_combinations = [results[i].parameter_combination for i in range(len(results))]
+
+    # Turn values into np arrays to find pareto optimal values
+    GWP_means = np.array(GWP_means)
+    GWP_inverted = GWP_means * -1  # invert GWP values for optimisation - now want to maximise GWP and BCR
+    BCR_means = np.array(BCR_means)
+    parameter_combinations = np.array(parameter_combinations)
+
+    # Get pareto optimal masks
+    costs_array = np.array([BCR_means, GWP_inverted]).transpose()  # of dimension n_datapoints, n_costs
+    pareto_efficient_mask = get_pareto_mask(costs_array)
+    # pareto_inefficient_mask = np.invert(pareto_efficient_mask)
+
+    # Get optimal values
+    GWP_optimal = GWP_means[pareto_efficient_mask]
+    BCR_optimal = BCR_means[pareto_efficient_mask]
+    parameter_combinations_optimal = parameter_combinations[pareto_efficient_mask]
+
+    # # Sort values
+    GWP_optimal_sorted_indices = GWP_optimal.argsort()
+    GWP_optimal = GWP_optimal[GWP_optimal_sorted_indices]
+    BCR_optimal = BCR_optimal[GWP_optimal_sorted_indices]
+    parameter_combinations_optimal = parameter_combinations_optimal[GWP_optimal_sorted_indices]
+
+    print("Pareto optimal values and their corresponding parameter combinations:")
+    for i in range(len(GWP_optimal)):
+        print(f"{i+1} Optimum: \t GWP: {GWP_optimal[i]} \t  BCR: {BCR_optimal[i]} \t  Parameters: {parameter_combinations_optimal[i]}")
+
+    return results, GWP_optimal, BCR_optimal, parameter_combinations_optimal
 
 
 def plot_optimisation_by_sets(relative_results_objects_paths, set_labels=None):
@@ -225,26 +268,26 @@ def plot_optimisation_by_sets(relative_results_objects_paths, set_labels=None):
 
         # Plot
         if count == 0:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(dpi=300)
         ax.scatter(BCR_means[pareto_inefficient_mask], GWP_means[pareto_inefficient_mask],
-                   label=f"Non-optimal solutions set {set_labels[count]}",
-                   color=scatter_colours[count], alpha=0.9)
+                   label=f"Non-optimal solutions - {set_labels[count]}",
+                   color=scatter_colours[count], alpha=0.5)
         ax.scatter(BCR_means[pareto_efficient_mask], GWP_means[pareto_efficient_mask],
-                   label=f"Pareto optimal solutions set {set_labels[count]}",
-                   color=pareto_front_colours[count])
+                   label=f"Optimal solutions - {set_labels[count]}",
+                   color=pareto_front_colours[count], zorder=9)
 
         # Get sorted arrays to plot pareto front
         BCR_pareto = BCR_means[pareto_efficient_mask]
         GWP_pareto = GWP_means[pareto_efficient_mask]
         BCR_pareto_sorted = sorted(BCR_pareto)
         GWP_pareto_sorted = [x for _, x in sorted(zip(BCR_pareto, GWP_pareto))]
-        ax.plot(BCR_pareto_sorted, GWP_pareto_sorted, color=pareto_front_colours[count])
+        ax.plot(BCR_pareto_sorted, GWP_pareto_sorted, color=pareto_front_colours[count], zorder=10)
 
     # Add labels and display figure
     ax.set_xlabel("BCR")
     ax.set_ylabel("GWP " + settings.labels.LCA_output_plotting_string)
     ax.invert_yaxis()
-    plt.legend()
+    plt.legend().set_zorder(11)
     plt.tight_layout()
     plt.show()
 
@@ -292,9 +335,9 @@ def plot_optimisation_by_parameter(relative_results_objects_path, highlighted_pa
         BCR = list(compress(BCR_means, parameter_mask))
 
         if count == 0:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(dpi=300)
         ax.scatter(BCR, GWP, label=f"{highlighted_parameter} = {parameter_options_str[count]}",
-                   color=parameter_colours[count])
+                   color=parameter_colours[count], alpha=0.5)
 
     # Overlay pareto front
 

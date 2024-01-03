@@ -102,6 +102,8 @@ def get_pellet_mill_and_cooler_CAPEX_distribution(currency=None, CEPCI_year=None
 
     # Fit models, get error metrics, and predictions.
     # Mill
+    df_pellet_mill = df_pellet_mill[df_pellet_mill["doi"] != "10.2174/1876387101003010001"].copy()  # Discard outliers
+
     popt_mill, _ = curve_fit(f=functions.general.curve_fitting.func_straight_line,
                              xdata=df_pellet_mill["Plant size [tonnes/hour]"],
                              ydata=df_pellet_mill[currency_and_CEPCI_scaled_label],
@@ -130,7 +132,7 @@ def get_pellet_mill_and_cooler_CAPEX_distribution(currency=None, CEPCI_year=None
                               number_of_periods=10)   # "Economics of producing fuel pellets from biomass", Mani et al., 2006
 
     # Cooler
-    df_pellet_cooler = df_pellet_cooler[df_pellet_cooler["Reference Label"] != "b"]  # Discard outlier
+    df_pellet_cooler = df_pellet_cooler[df_pellet_cooler["Reference Label"] != "b"]  # Discard outliers
 
     popt_cooler, _ = curve_fit(f=functions.general.curve_fitting.func_straight_line,
                                xdata=df_pellet_cooler["Plant size [tonnes/hour]"],

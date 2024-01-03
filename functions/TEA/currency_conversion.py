@@ -153,7 +153,7 @@ def get_average_annual_exchange_rate(year, base_currency, converted_currency, ap
     start_date, end_date = get_year_start_end_date(year)
 
     # Define methods as helper functions
-    def run_with_forex_python():
+    def run_with_forex_python(approximate_rate: bool):
         # Get parameters to iterate through year
         date_delta = datetime.timedelta(days=1)  # set increment by which date should be increased - i.e. 1 day
         date = start_date  # initiate date which is used for counting
@@ -161,11 +161,13 @@ def get_average_annual_exchange_rate(year, base_currency, converted_currency, ap
         currency_rates = CurrencyRates()
         exceptions_counter = 0
         none_values_counter = 0
+        approximation_steps = int(365 / 12)  # number of days between values if value is approximated
+
         # Iterate over range of dates and get exchange rates
         while date <= end_date:
             date += date_delta
             if approximate_rate:
-                date += datetime.timedelta(days=13)
+                date += datetime.timedelta(days=approximation_steps)
 
             try:
                 historic_rates_array.append(currency_rates.get_rate(base_cur=base_currency,
@@ -180,12 +182,12 @@ def get_average_annual_exchange_rate(year, base_currency, converted_currency, ap
                 except RatesNotAvailableError:  # skip value if rate could not be fetched again
                     none_values_counter += 1
 
-        # Raise error if too many exceptions occurred
+        # Raise error if too many exceptions occurred - more than 1/3 of all values missing
         if approximate_rate:
-            if none_values_counter > 3:
+            if none_values_counter > int(365 / (3 * approximation_steps)):
                 raise RatesNotAvailableError("Exchange rate could not be fetched on too many instances.")
         else:
-            if none_values_counter > 3 * 13:
+            if none_values_counter > int(365 / 3):
                 raise RatesNotAvailableError("Exchange rate could not be fetched on too many instances.")
 
         return historic_rates_array
@@ -194,25 +196,30 @@ def get_average_annual_exchange_rate(year, base_currency, converted_currency, ap
         from functions.general.utility import HidePrints
         with HidePrints():
             # Get yahoo finance code and fetch data from api
-            yahoo_finance_code = base_currency + converted_currency + "=X"
-            historic_rates_array = list(yf.download(yahoo_finance_code, start=start_date, end=end_date).Close)
+            if base_currency == "USD":
+                yahoo_finance_code = converted_currency + "=X"
+            else:
+                yahoo_finance_code = base_currency + converted_currency + "=X"
 
+            historic_rates_array = list(yf.download(yahoo_finance_code, start=start_date, end=end_date).Close)
+        if len(historic_rates_array) == 0:
+            raise RatesNotAvailableError("Rates are not available for the given year.")
         return historic_rates_array
 
     # Run with appropriate method
     if method == "forex_python":
         try:
-            historic_rates_array = run_with_forex_python()
-        except:  # slower but sometimes yfinance breaks
+            historic_rates_array = run_with_forex_python(approximate_rate=approximate_rate)
+        except RatesNotAvailableError:
             warnings.warn("Error with forex_python - revert to yfinance library")
             historic_rates_array = run_with_yfinance()
 
     elif method == "yfinance":
         try:
             historic_rates_array = run_with_yfinance()
-        except:  # slower but sometimes yfinance breaks
-            warnings.warn("Error with yfinance - revert to slower method using forex_python library")
-            historic_rates_array = run_with_forex_python()
+        except RatesNotAvailableError:  # slower but sometimes yfinance breaks
+            warnings.warn("Rates not available on yfinance - revert to slower method using forex_python library")
+            historic_rates_array = run_with_forex_python(approximate_rate=True)
     else:
         raise ValueError("Method not supported.")
 
