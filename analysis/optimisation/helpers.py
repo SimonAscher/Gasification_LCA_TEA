@@ -59,7 +59,7 @@ def run_optimisation(optimisation_parameters=None):
         #                            "rate_of_return_decimals": [0.04, 0.05, 0.06],
         #                            "carbon_capture": [True, False],
         #                            "carbon_tax": [0, 50, 75],
-        #                            "system_life_span": [15, 20, 25]
+        #                            "system_life_span": [15, 20, 25],
         #                            "electricity_price": []
         #                            }
         optimisation_parameters = {"gasification_temperature": [700, 800, 900, 1000, 1100, 1200],
