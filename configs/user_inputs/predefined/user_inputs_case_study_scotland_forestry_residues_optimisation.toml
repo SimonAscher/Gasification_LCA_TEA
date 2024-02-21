@@ -1,7 +1,7 @@
 [default.user_inputs.feedstock]
 particle_size_post_milling = 15.92484770558109
 category = "woody biomass"
-name = "Forestry residues(Phyllis #3155)"
+name = "Forestry residues (Phyllis #3155)"
 particle_size_ar = 25.0
 carbon = 51.99
 hydrogen = 6.18

@@ -14,6 +14,7 @@ from numpy.typing import ArrayLike
 
 from config import settings
 from functions.MonteCarloSimulation import run_simulation
+from functions.general.utility import get_project_root
 
 
 def get_pareto_mask(costs_array):
@@ -35,7 +36,7 @@ def get_pareto_mask(costs_array):
     return pareto_efficient_mask
 
 
-def run_optimisation(optimisation_parameters=None):
+def run_optimisation(optimisation_parameters=None, relative_path_from_root="analysis\\optimisation\\results"):
     """
     Run optimisation based on user_input file currently defined in config.py.
     It is highly recommended to set number of Monte Carlo iterations to 100 in user_input file to speed up optimisation.
@@ -44,6 +45,8 @@ def run_optimisation(optimisation_parameters=None):
     ----------
     optimisation_parameters: dict | None
         Dictionary of parameters which are to be varied during optimisation.
+    relative_path_from_root: str
+        Path from root directory where results should be saved.
     """
     # General parameters
     reduced_MC_iterations = 100  # so that model runs faster
@@ -114,7 +117,7 @@ def run_optimisation(optimisation_parameters=None):
                 settings.user_inputs.economic.carbon_tax_parameters["distribution_type"] = "fixed"
             if "electricity_price" in parameter_combination:
                 settings.user_inputs.economic["electricity_price_choice"] = "user selected"
-                if parameter_combination["electricity_price"] is list:  # nested list denotes triangular distribution
+                if isinstance(parameter_combination["electricity_price"], list):  # nested list denotes triangular distribution
                     settings.user_inputs.economic.electricity_price_parameters["lower"] = parameter_combination["electricity_price"][0]
                     settings.user_inputs.economic.electricity_price_parameters["mode"] = parameter_combination["electricity_price"][1]
                     settings.user_inputs.economic.electricity_price_parameters["upper"] = parameter_combination["electricity_price"][2]
@@ -123,7 +126,7 @@ def run_optimisation(optimisation_parameters=None):
                     settings.user_inputs.economic.electricity_price_parameters["value"] = parameter_combination["electricity_price"]
                     settings.user_inputs.economic.electricity_price_parameters["distribution_type"] = "fixed"
                     # Check that values are of the expected type
-                    if isinstance(parameter_combination["electricity_price"], int) or isinstance(parameter_combination["electricity_price"], float):
+                    if not isinstance(parameter_combination["electricity_price"], int) and not isinstance(parameter_combination["electricity_price"], float):
                         raise ValueError("Decimal or integer expected.")
 
             settings.user_inputs.general.MC_iterations = reduced_MC_iterations
@@ -144,24 +147,29 @@ def run_optimisation(optimisation_parameters=None):
     ID = generate_id()
     user_inputs_settings_file_name = pathlib.PurePath(settings.settings_file[-1]).name
 
+    project_root_path = get_project_root()
+
     # Get path components
     file_name = "optimisation_results_" + ID
     new_directory_name = user_inputs_settings_file_name[: user_inputs_settings_file_name.find('.')]
 
+    # Complete paths to directory and file where results are stored
+    full_directory_path = os.path.join(project_root_path, relative_path_from_root, new_directory_name)
+    results_object_path = os.path.join(project_root_path, relative_path_from_root, new_directory_name, file_name)
+
     # Add new directory to data folder
     try:
-        os.mkdir(os.path.join("examples/data", new_directory_name))
+        os.mkdir(full_directory_path)
     except OSError as error:
         warnings.warn(str(error))
-
-        # Get path
-    relative_results_objects_path = os.path.join("examples/data", new_directory_name, file_name)
+        warnings.warn("Analysis has already been done for this file and directory already exists. "
+                      "File added to directory.")
 
     # Store results and parameter combinations
-    with open(relative_results_objects_path, "wb") as f:
+    with open(results_object_path, "wb") as f:
         pickle.dump(results, f)
 
-    return results, relative_results_objects_path, optimisation_combinations
+    return results, results_object_path, optimisation_combinations
 
 
 def load_and_analyse_results(relative_file_path):
@@ -205,24 +213,26 @@ def load_and_analyse_results(relative_file_path):
     return results, GWP_optimal, BCR_optimal, parameter_combinations_optimal
 
 
-def plot_optimisation_by_sets(relative_results_objects_paths, set_labels=None):
+def plot_optimisation_by_sets(results_objects_paths, set_labels=None, save_name=False):
     """
     Plots optimisation results for each set defined in relative_results_objects_paths.
     Typically, sets may consider different feedstocks.
 
     Parameters
     ----------
-    relative_results_objects_paths: str | list
+    results_objects_paths: str | list
         File paths to the results objects which are to be plotted.
     set_labels: list[str] | None
         Set of labels describing the datasets defined by the file paths to the results objects.
+    save_name: bool | str
+        Name and directory of the saved figure. If False, the figure will not be saved.
     """
     # Get paths to results in right format
     results_object_paths = []
-    if isinstance(relative_results_objects_paths, str):
-        results_object_paths.append(relative_results_objects_paths)
-    elif isinstance(relative_results_objects_paths, list):
-        results_object_paths = relative_results_objects_paths
+    if isinstance(results_objects_paths, str):
+        results_object_paths.append(results_objects_paths)
+    elif isinstance(results_objects_paths, list):
+        results_object_paths = results_objects_paths
     else:
         raise ValueError("Wrong data type supplied.")
 
@@ -232,7 +242,7 @@ def plot_optimisation_by_sets(relative_results_objects_paths, set_labels=None):
     scatter_colours = [colours[i] for i in range(len(colours)) if i % 2 == 0]
     pareto_front_colours = [colours[i] for i in range(len(colours)) if i % 2 != 0]
     if set_labels is None:
-        set_labels = [(n+1) for n in range(len(relative_results_objects_paths))]
+        set_labels = [(n+1) for n in range(len(results_objects_paths))]
 
     # Load all sets of results
     result_sets = []
@@ -289,22 +299,26 @@ def plot_optimisation_by_sets(relative_results_objects_paths, set_labels=None):
     ax.invert_yaxis()
     plt.legend().set_zorder(11)
     plt.tight_layout()
+    if save_name is not False:
+        plt.savefig(save_name, dpi=500, bbox_inches="tight")
     plt.show()
 
     return fig, ax
 
 
-def plot_optimisation_by_parameter(relative_results_objects_path, highlighted_parameter):
+def plot_optimisation_by_parameter(results_object_path, highlighted_parameter, save_name=False):
     """
     Plots optimisation results for a single set of results, but allows for differentiation by one parameter varied
     within the optimisation (e.g. ER, gasifying_agent, or carbon_capture ).
 
     Parameters
     ----------
-    relative_results_objects_path: str
+    results_object_path: str
         File path to the results object which is to be plotted.
     highlighted_parameter: str
         Defines which optimisation parameter should be highlighted in plot. Can only highlight one parameter at a time.
+    save_name: bool | str
+        Name and directory of the saved figure. If False, the figure will not be saved.
     """
     # Define general parameters
     colour_map = get_cmap("Paired")
@@ -312,7 +326,7 @@ def plot_optimisation_by_parameter(relative_results_objects_path, highlighted_pa
     parameter_colours = [colours[i] for i in range(len(colours)) if i % 2 == 0]
 
     # Load results
-    with open(relative_results_objects_path, 'rb') as results_objects:
+    with open(results_object_path, 'rb') as results_objects:
         results = (pickle.load(results_objects))
 
     # Get parameter combinations and masks
@@ -366,6 +380,8 @@ def plot_optimisation_by_parameter(relative_results_objects_path, highlighted_pa
     ax.invert_yaxis()
     plt.legend()
     plt.tight_layout()
+    if save_name is not False:
+        plt.savefig(save_name, dpi=500, bbox_inches="tight")
     plt.show()
 
     return fig, ax

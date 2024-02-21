@@ -9,7 +9,7 @@ optimisation_parameters = {"gasification_temperature": [650, 750, 850],
                           "carbon_capture": [True, False],
                           "carbon_tax": [0, 50, 75],
                           "system_life_span": [15, 20, 25],
-                          "electricity_price": [0, 0.2, [2,4,5]]  # TODO: edit and selected realistic values
+                          "electricity_price": [0, 0.2, 0.3]  # TODO: edit and selected realistic values
                           }
 
 results, relative_results_objects_path, optimisation_combinations = run_optimisation(optimisation_parameters)
